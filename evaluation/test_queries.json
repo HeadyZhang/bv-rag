@@ -1,0 +1,24 @@
+{
+  "test_cases": [
+    {"id": "exact_01", "category": "exact_reference", "query": "What are the requirements of SOLAS Regulation II-1/3-6?", "expected_document": "SOLAS", "difficulty": "easy"},
+    {"id": "exact_02", "category": "exact_reference", "query": "MARPOL Annex VI Regulation 14 sulphur limits?", "expected_document": "MARPOL", "difficulty": "easy"},
+    {"id": "number_01", "category": "numerical", "query": "SOLAS对散货船货舱通道开口的最小尺寸是多少？", "expected_document": "SOLAS", "difficulty": "medium"},
+    {"id": "number_02", "category": "numerical", "query": "What is the maximum sulphur content allowed under MARPOL?", "expected_document": "MARPOL", "difficulty": "medium"},
+    {"id": "semantic_01", "category": "semantic", "query": "What fire safety equipment is required for passenger ships?", "expected_document": "SOLAS", "difficulty": "medium"},
+    {"id": "semantic_02", "category": "semantic", "query": "油轮需要什么防污染设备？", "expected_document": "MARPOL", "difficulty": "medium"},
+    {"id": "applicability_01", "category": "applicability", "query": "Does SOLAS II-1/3-6 apply to FPSO vessels?", "expected_answer_contains": "not normally", "difficulty": "medium"},
+    {"id": "applicability_02", "category": "applicability", "query": "ISM Code applies to which ship types?", "expected_document": "ISM", "difficulty": "medium"},
+    {"id": "cross_doc_01", "category": "cross_document", "query": "Which circulars provide unified interpretations for SOLAS Chapter II-1?", "difficulty": "hard"},
+    {"id": "cross_doc_02", "category": "cross_document", "query": "MARPOL Annex VI所有相关的统一解释和通函?", "difficulty": "hard"},
+    {"id": "relation_01", "category": "relationship", "query": "What resolutions have amended SOLAS Chapter V?", "difficulty": "hard"},
+    {"id": "comparison_01", "category": "comparison", "query": "ISM Code和ISPS Code对船舶运营商的要求有什么区别？", "difficulty": "hard"},
+    {"id": "context_01", "category": "context_followup", "query_sequence": ["What is SOLAS Regulation II-1/3-6?", "Does this apply to FPSO?"], "difficulty": "medium"},
+    {"id": "context_02", "category": "context_followup", "query_sequence": ["MARPOL Annex VI Regulation 14的硫氧化物限制是多少？", "那ECA区域的要求呢？"], "difficulty": "medium"},
+    {"id": "voice_01", "category": "voice_natural", "query": "散货船的额外安全要求是啥", "difficulty": "easy"},
+    {"id": "voice_02", "category": "voice_natural", "query": "ECDIS的配备要求帮我查查", "difficulty": "easy"},
+    {"id": "timeline_01", "category": "temporal", "query": "What SOLAS regulations take effect for ships built after 1 January 2026?", "difficulty": "hard"},
+    {"id": "equipment_01", "category": "equipment", "query": "VDR voyage data recorder requirements under SOLAS?", "difficulty": "medium"},
+    {"id": "general_01", "category": "general", "query": "What is the purpose of the ISM Code?", "expected_document": "ISM", "difficulty": "easy"},
+    {"id": "general_02", "category": "general", "query": "How many annexes does MARPOL have and what do they cover?", "expected_document": "MARPOL", "difficulty": "easy"}
+  ]
+}

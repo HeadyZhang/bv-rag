@@ -1,0 +1,13 @@
+.env
+api.txt
+data/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.scrapy/
+*.log
+.venv/
+venv/
+.DS_Store

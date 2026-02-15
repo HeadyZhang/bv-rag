@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BV-RAG Maritime Regulation AI</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0a1628;
+  --card: #1e3a5f;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --user-bubble: #1d4ed8;
+  --ai-bubble: #1e293b;
+  --border: #334155;
+  --danger: #ef4444;
+  --success: #22c55e;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 768px;
+  margin: 0 auto;
+}
+/* Header */
+.header {
+  background: linear-gradient(135deg, #0f2744, #1e3a5f);
+  padding: 16px 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.header h1 { font-size: 20px; font-weight: 700; }
+.header p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+/* Chat area */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 14px; word-wrap: break-word; }
+.msg.user { background: var(--user-bubble); align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg.ai { background: var(--ai-bubble); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+.msg .mode-tag { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+.msg .answer-content h1,.msg .answer-content h2,.msg .answer-content h3 { font-size: 15px; font-weight: 600; margin: 8px 0 4px; }
+.msg .answer-content blockquote { border-left: 3px solid var(--primary); padding-left: 10px; margin: 6px 0; color: var(--text-muted); font-style: italic; }
+.msg .answer-content ul,.msg .answer-content ol { padding-left: 20px; margin: 4px 0; }
+.msg .answer-content strong { color: #60a5fa; }
+.msg .answer-content a,.citation-link { color: #60a5fa; text-decoration: none; }
+.msg .answer-content a:hover,.citation-link:hover { text-decoration: underline; }
+.msg-meta { display: flex; gap: 12px; align-items: center; margin-top: 8px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; }
+.confidence { display: flex; align-items: center; gap: 4px; }
+.conf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+.conf-dot.active { background: var(--success); }
+.audio-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 3px 8px; border-radius: 12px; cursor: pointer; font-size: 11px; }
+.audio-btn:hover { border-color: var(--primary); color: var(--primary); }
+.loading-msg { color: var(--text-muted); font-style: italic; display: flex; align-items: center; gap: 8px; }
+.spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Input area */
+.input-area {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: #0f1d32;
+  flex-shrink: 0;
+}
+.text-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.text-row input {
+  flex: 1; background: var(--ai-bubble); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 14px; border-radius: 24px; font-size: 14px; outline: none;
+}
+.text-row input::placeholder { color: var(--text-muted); }
+.text-row input:focus { border-color: var(--primary); }
+.send-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: var(--primary); color: #fff; cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+.send-btn:hover { background: var(--primary-hover); }
+.voice-btn {
+  width: 100%; padding: 14px; border-radius: 24px; border: 2px solid var(--border);
+  background: transparent; color: var(--text); font-size: 15px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; user-select: none; -webkit-user-select: none;
+}
+.voice-btn:active,.voice-btn.recording {
+  background: var(--danger); border-color: var(--danger); transform: scale(0.97);
+}
+.voice-btn.recording { animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
+.welcome { text-align: center; color: var(--text-muted); padding: 40px 20px; }
+.welcome h2 { font-size: 18px; margin-bottom: 8px; color: var(--text); }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>BV-RAG</h1>
+  <p>Maritime Regulation AI Assistant</p>
+</div>
+
+<div class="chat-area" id="chatArea">
+  <div class="welcome">
+    <h2>Welcome, Surveyor</h2>
+    <p>Ask about IMO regulations by text or voice.</p>
+    <p style="margin-top:8px;font-size:12px">Try: "What are the requirements of SOLAS II-1/3-6?"</p>
+  </div>
+</div>
+
+<div class="input-area">
+  <div class="text-row">
+    <input type="text" id="textInput" placeholder="Ask about maritime regulations..." autocomplete="off">
+    <button class="send-btn" id="sendBtn" title="Send">&#9654;</button>
+  </div>
+  <button class="voice-btn" id="voiceBtn">Hold to Speak</button>
+</div>
+
+<script>
+const SESSION_ID = crypto.randomUUID();
+const chatArea = document.getElementById('chatArea');
+const textInput = document.getElementById('textInput');
+const sendBtn = document.getElementById('sendBtn');
+const voiceBtn = document.getElementById('voiceBtn');
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+
+function scrollBottom() { chatArea.scrollTop = chatArea.scrollHeight; }
+
+function addUserMsg(text, mode) {
+  const d = document.createElement('div');
+  d.className = 'msg user';
+  d.innerHTML = '<div class="mode-tag">' + (mode === 'voice' ? 'Voice' : 'Text') + '</div>' + escapeHtml(text);
+  chatArea.appendChild(d);
+  scrollBottom();
+}
+
+function addLoadingMsg() {
+  const d = document.createElement('div');
+  d.className = 'msg ai loading-msg';
+  d.id = 'loadingMsg';
+  d.innerHTML = '<div class="spinner"></div> Searching regulations...';
+  chatArea.appendChild(d);
+  scrollBottom();
+  return d;
+}
+
+function removeLoading() {
+  const el = document.getElementById('loadingMsg');
+  if (el) el.remove();
+}
+
+function addAIMsg(data) {
+  removeLoading();
+  const d = document.createElement('div');
+  d.className = 'msg ai';
+  let html = '<div class="answer-content">' + renderMarkdown(data.answer_text, data.sources || []) + '</div>';
+  html += '<div class="msg-meta">';
+  html += renderConfidence(data.confidence);
+  if (data.timing && data.timing.total_ms) html += '<span>' + (data.timing.total_ms / 1000).toFixed(1) + 's</span>';
+  if (data.model_used) html += '<span>' + data.model_used.split('-').slice(0,2).join('-') + '</span>';
+  if (data.answer_audio_base64) html += '<button class="audio-btn" onclick="playAudio(this,\'' + data.answer_audio_base64.substring(0, 50) + '\')">Play Audio</button>';
+  html += '</div>';
+  d.innerHTML = html;
+  if (data.answer_audio_base64) d.dataset.audio = data.answer_audio_base64;
+  chatArea.appendChild(d);
+  scrollBottom();
+  if (data.answer_audio_base64) autoPlay(data.answer_audio_base64);
+}
+
+function renderConfidence(level) {
+  const n = level === 'high' ? 3 : level === 'medium' ? 2 : 1;
+  let dots = '';
+  for (let i = 0; i < 3; i++) dots += '<span class="conf-dot' + (i < n ? ' active' : '') + '"></span>';
+  return '<span class="confidence">' + dots + ' ' + (level || 'unknown') + '</span>';
+}
+
+function renderMarkdown(text, sources) {
+  if (!text) return '';
+  let h = escapeHtml(text);
+  h = h.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  h = h.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  h = h.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+  h = h.replace(/^- (.+)$/gm, '<li>$1</li>');
+  h = h.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+  h = h.replace(/\[([A-Z][^\]]*)\]/g, function(m, p1) {
+    const src = sources.find(s => s.url && s.breadcrumb && s.breadcrumb.includes(p1.split(' ')[0]));
+    const url = src ? src.url : '#';
+    return '<a class="citation-link" href="' + url + '" target="_blank" rel="noopener">[' + p1 + ']</a>';
+  });
+  h = h.replace(/\n/g, '<br>');
+  return h;
+}
+
+function escapeHtml(t) {
+  const d = document.createElement('div'); d.textContent = t; return d.innerHTML;
+}
+
+function autoPlay(b64) {
+  try {
+    const bin = atob(b64); const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const blob = new Blob([arr], {type:'audio/mp3'});
+    const audio = new Audio(URL.createObjectURL(blob));
+    audio.play().catch(() => {});
+  } catch(e) {}
+}
+
+function playAudio(btn, prefix) {
+  const msg = btn.closest('.msg');
+  if (!msg || !msg.dataset.audio) return;
+  autoPlay(msg.dataset.audio);
+}
+
+async function sendText(text) {
+  if (!text.trim()) return;
+  const welcome = chatArea.querySelector('.welcome');
+  if (welcome) welcome.remove();
+  addUserMsg(text, 'text');
+  textInput.value = '';
+  addLoadingMsg();
+
+  const form = new FormData();
+  form.append('text', text);
+  form.append('session_id', SESSION_ID);
+  form.append('generate_audio', 'true');
+
+  try {
+    const res = await fetch('/api/v1/voice/text-query', {method:'POST', body:form});
+    const data = await res.json();
+    addAIMsg(data);
+  } catch(e) {
+    removeLoading();
+    addAIMsg({answer_text:'Error: ' + e.message, confidence:'low', timing:{}, sources:[]});
+  }
+}
+
+async function sendAudio(blob) {
+  const welcome = chatArea.querySelector('.welcome');
+  if (welcome) welcome.remove();
+  addUserMsg('(Voice message)', 'voice');
+  addLoadingMsg();
+
+  const form = new FormData();
+  form.append('audio', blob, 'audio.webm');
+  form.append('session_id', SESSION_ID);
+
+  try {
+    const res = await fetch('/api/v1/voice/query', {method:'POST', body:form});
+    const data = await res.json();
+    const userMsgs = chatArea.querySelectorAll('.msg.user');
+    const lastUser = userMsgs[userMsgs.length - 1];
+    if (lastUser && data.transcription) {
+      lastUser.innerHTML = '<div class="mode-tag">Voice</div>' + escapeHtml(data.transcription);
+    }
+    addAIMsg(data);
+  } catch(e) {
+    removeLoading();
+    addAIMsg({answer_text:'Error: ' + e.message, confidence:'low', timing:{}, sources:[]});
+  }
+}
+
+sendBtn.onclick = () => sendText(textInput.value);
+textInput.onkeydown = (e) => { if (e.key === 'Enter') sendText(textInput.value); };
+
+async function initRecorder() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder = new MediaRecorder(stream, {mimeType:'audio/webm;codecs=opus'});
+    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, {type:'audio/webm'});
+      audioChunks = [];
+      if (blob.size > 1000) sendAudio(blob);
+    };
+  } catch(e) {
+    voiceBtn.textContent = 'Microphone unavailable';
+    voiceBtn.disabled = true;
+  }
+}
+
+function startRec() {
+  if (!mediaRecorder || mediaRecorder.state === 'recording') return;
+  audioChunks = [];
+  mediaRecorder.start();
+  isRecording = true;
+  voiceBtn.classList.add('recording');
+  voiceBtn.textContent = 'Recording...';
+}
+
+function stopRec() {
+  if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+  mediaRecorder.stop();
+  isRecording = false;
+  voiceBtn.classList.remove('recording');
+  voiceBtn.textContent = 'Hold to Speak';
+}
+
+voiceBtn.onmousedown = voiceBtn.ontouchstart = (e) => { e.preventDefault(); startRec(); };
+voiceBtn.onmouseup = voiceBtn.onmouseleave = voiceBtn.ontouchend = (e) => { e.preventDefault(); stopRec(); };
+
+initRecorder();
+</script>
+</body>
+</html>
