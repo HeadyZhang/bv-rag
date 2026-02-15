@@ -36,6 +36,31 @@ async def stats(request: Request):
     }
 
 
+@router.get("/session/{session_id}")
+async def debug_session(session_id: str, request: Request):
+    """Debug endpoint to inspect session contents."""
+    memory = request.app.state.pipeline.memory
+    session = memory.get_session(session_id)
+    if not session:
+        return {"error": "session not found", "session_id": session_id}
+    return {
+        "session_id": session.session_id,
+        "user_id": session.user_id,
+        "turns_count": len(session.turns),
+        "active_regulations": session.active_regulations,
+        "active_topics": session.active_topics,
+        "active_ship_type": session.active_ship_type,
+        "turns": [
+            {
+                "role": t.role,
+                "content": t.content[:100],
+                "metadata": t.metadata,
+            }
+            for t in session.turns[-4:]
+        ],
+    }
+
+
 @router.post("/reindex")
 async def reindex(request: Request):
     return {

@@ -120,7 +120,13 @@ class VoiceQAPipeline:
         if session_id:
             session = self.memory.get_session(session_id)
         if not session:
-            session = self.memory.create_session(user_id)
+            session = self.memory.create_session(
+                user_id=user_id, session_id=session_id,
+            )
+        logger.info(
+            f"[Pipeline] session={session.session_id}, "
+            f"turns={len(session.turns)}, regs={session.active_regulations}"
+        )
 
         messages, enhanced_query = self.memory.build_llm_context(session, text)
         timing["memory_ms"] = int((time.time() - t0) * 1000)

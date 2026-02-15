@@ -205,7 +205,7 @@ body {
 </div>
 
 <script>
-const SESSION_ID = crypto.randomUUID();
+let SESSION_ID = crypto.randomUUID();
 const chatArea = document.getElementById('chatArea');
 const textInput = document.getElementById('textInput');
 const sendBtn = document.getElementById('sendBtn');
@@ -517,6 +517,7 @@ async function sendText(text) {
   try {
     const res = await fetch('/api/v1/voice/text-query', {method:'POST', body:form});
     const data = await res.json();
+    if (data.session_id) SESSION_ID = data.session_id;
     addAIMsg(data, 'text');
   } catch(e) {
     removeLoading();
@@ -538,6 +539,7 @@ async function sendAudio(blob) {
   try {
     const res = await fetch('/api/v1/voice/query', {method:'POST', body:form});
     const data = await res.json();
+    if (data.session_id) SESSION_ID = data.session_id;
     const userMsgs = chatArea.querySelectorAll('.msg.user');
     const lastUser = userMsgs[userMsgs.length - 1];
     if (lastUser && data.transcription) {

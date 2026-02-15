@@ -75,12 +75,17 @@ class ConversationMemory:
         self.session_ttl = session_ttl_hours * 3600
         self.fast_model = "claude-haiku-4-5-20251001"
 
-    def create_session(self, user_id: str = "anonymous") -> SessionContext:
+    def create_session(
+        self, user_id: str = "anonymous", session_id: str | None = None,
+    ) -> SessionContext:
         session = SessionContext(
-            session_id=str(uuid.uuid4()),
+            session_id=session_id or str(uuid.uuid4()),
             user_id=user_id,
         )
         self._save_session(session)
+        logger.info(
+            f"[Memory] Created session: {session.session_id} for user={user_id}"
+        )
         return session
 
     def get_session(self, session_id: str) -> SessionContext | None:
@@ -157,6 +162,10 @@ class ConversationMemory:
             active_regulations=new_regs[-20:],
             active_topics=new_topics,
             active_ship_type=new_ship_type,
+        )
+        logger.info(
+            f"[Memory] add_turn: role={role}, session={session.session_id}, "
+            f"turns_after={len(new_turns)}, active_regs={new_regs[-5:]}"
         )
         self._save_session(new_session)
         return new_session
