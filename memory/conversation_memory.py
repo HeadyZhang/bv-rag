@@ -1,6 +1,7 @@
-"""Redis-based conversation memory with coreference resolution."""
+"""Redis-based conversation memory with industrial-grade coreference resolution."""
 import json
 import logging
+import re
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -8,15 +9,36 @@ from dataclasses import asdict, dataclass, field
 import anthropic
 import redis
 
-from generation.prompts import COREFERENCE_PROMPT, SUMMARIZE_PROMPT
+from generation.prompts import SUMMARIZE_PROMPT
 
 logger = logging.getLogger(__name__)
 
-PRONOUN_INDICATORS = [
-    "这个", "那个", "该", "它", "上面", "之前",
-    "this", "that", "it", "the above", "same", "these", "those",
-    "其", "此",
+REFERENCE_PATTERNS_ZH = [
+    "这个", "那个", "该", "它的", "上面", "刚才", "之前",
+    "同一个", "相同的", "这条", "那条", "此",
 ]
+REFERENCE_PATTERNS_EN = [
+    "this", "that", "it", "its", "the above", "same",
+    "this regulation", "that requirement", "the said",
+    "aforementioned", "these",
+]
+
+CITED_PATTERN = re.compile(
+    r"\[(SOLAS|MARPOL|MSC|MEPC|ISM|ISPS|LSA|FSS|Resolution)[^\]]*\]"
+)
+
+SHIP_TYPES = {
+    "bulk carrier": "散货船",
+    "oil tanker": "油轮",
+    "passenger ship": "客船",
+    "container ship": "集装箱船",
+    "fpso": "FPSO",
+    "chemical tanker": "化学品船",
+    "gas carrier": "气体运输船",
+    "roro": "滚装船",
+    "cargo ship": "货船",
+    "fishing vessel": "渔船",
+}
 
 
 @dataclass
@@ -94,27 +116,47 @@ class ConversationMemory:
             metadata=metadata or {},
         )
         new_turns = [*session.turns, turn]
+        new_regs = list(session.active_regulations)
+        new_topics = list(session.active_topics)
+        new_ship_type = session.active_ship_type
 
-        if metadata and role == "assistant":
+        if role == "assistant" and metadata:
+            # Track retrieved regulations from the retrieval pipeline
+            regs = metadata.get("retrieved_regulations", [])
+            for reg in regs:
+                if reg and reg not in new_regs:
+                    new_regs.append(reg)
+            new_regs = new_regs[-20:]
+
+            # Extract cited regulations from answer text
+            cited = CITED_PATTERN.findall(content)
+            for c in cited:
+                if c not in new_regs:
+                    new_regs.append(c)
+
+            # Also track citation objects
             citations = metadata.get("citations", [])
             for c in citations:
                 citation_text = c.get("citation", "")
-                if citation_text and citation_text not in session.active_regulations:
-                    new_regs = [*session.active_regulations, citation_text]
-                else:
-                    new_regs = list(session.active_regulations)
-            if not citations:
-                new_regs = list(session.active_regulations)
-        else:
-            new_regs = list(session.active_regulations)
+                if citation_text and citation_text not in new_regs:
+                    new_regs.append(citation_text)
+
+        if role == "user":
+            content_lower = content.lower()
+            for eng, chn in SHIP_TYPES.items():
+                if eng in content_lower or chn in content:
+                    new_ship_type = eng
+                    if eng not in new_topics:
+                        new_topics.append(eng)
+                    break
 
         new_session = SessionContext(
             session_id=session.session_id,
             user_id=session.user_id,
             turns=new_turns,
-            active_regulations=new_regs[-10:],
-            active_topics=list(session.active_topics),
-            active_ship_type=session.active_ship_type,
+            active_regulations=new_regs[-20:],
+            active_topics=new_topics,
+            active_ship_type=new_ship_type,
         )
         self._save_session(new_session)
         return new_session
@@ -142,39 +184,86 @@ class ConversationMemory:
         for turn in recent_turns:
             messages.append({"role": turn.role, "content": turn.content})
 
-        enhanced_query = self._resolve_coreferences(session, current_query)
+        enhanced_query = self._resolve_references(current_query, session)
 
         return messages, enhanced_query
 
-    def _resolve_coreferences(self, session: SessionContext, query: str) -> str:
+    def _resolve_references(self, query: str, session: SessionContext) -> str:
+        """
+        Industrial-grade coreference resolution with 3-layer strategy:
+        1. Rule layer: fast regex detection, zero latency
+        2. Context prefix injection: no query rewriting, attach context prefix
+        3. LLM layer: Haiku fallback for complex cases only
+        """
+        # === Layer 1: detect whether resolution is needed ===
         query_lower = query.lower()
-        has_pronoun = any(p in query_lower for p in PRONOUN_INDICATORS)
-
-        if not has_pronoun or not session.active_regulations:
-            return query
-
-        last_exchanges = []
-        for turn in session.turns[-6:]:
-            last_exchanges.append(f"{turn.role}: {turn.content[:200]}")
-
-        prompt = COREFERENCE_PROMPT.format(
-            regulations=session.active_regulations[-5:],
-            exchanges="\n".join(last_exchanges),
-            query=query,
+        has_reference = any(
+            p in query_lower
+            for p in REFERENCE_PATTERNS_ZH + REFERENCE_PATTERNS_EN
         )
 
-        try:
-            response = self.anthropic_client.messages.create(
-                model=self.fast_model,
-                max_tokens=200,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            rewritten = response.content[0].text.strip()
-            if rewritten and len(rewritten) > 5:
-                logger.info(f"Coreference resolved: '{query}' → '{rewritten}'")
-                return rewritten
-        except Exception as e:
-            logger.warning(f"Coreference resolution failed: {e}")
+        if not has_reference:
+            return query
+
+        if not session.active_regulations:
+            return query
+
+        # === Layer 2: context prefix injection (zero API calls) ===
+
+        # Find the last assistant turn's retrieved regulations
+        last_regulations = []
+        for turn in reversed(session.turns):
+            if turn.role == "assistant":
+                last_regulations = turn.metadata.get("retrieved_regulations", [])
+                break
+
+        if last_regulations:
+            reg_context = ", ".join(last_regulations[:3])
+            return f"[Context: the previous question was about {reg_context}] {query}"
+
+        # Fallback to session-level active_regulations
+        if session.active_regulations:
+            reg_context = ", ".join(session.active_regulations[-3:])
+            return f"[Context: this conversation has discussed {reg_context}] {query}"
+
+        # === Layer 3: LLM resolution (only if layers 1-2 cannot handle) ===
+        if session.turns:
+            recent_summary = []
+            for turn in session.turns[-6:]:
+                content_preview = turn.content[:150]
+                if turn.role == "assistant" and turn.metadata:
+                    regs = turn.metadata.get("retrieved_regulations", [])
+                    if regs:
+                        content_preview += f" [Cited: {', '.join(regs[:3])}]"
+                recent_summary.append(f"{turn.role}: {content_preview}")
+
+            context_str = "\n".join(recent_summary)
+
+            try:
+                response = self.anthropic_client.messages.create(
+                    model=self.fast_model,
+                    max_tokens=150,
+                    messages=[{
+                        "role": "user",
+                        "content": (
+                            "You are resolving pronoun references in a maritime regulation Q&A.\n\n"
+                            f"Recent conversation:\n{context_str}\n\n"
+                            f"Active regulations discussed: {', '.join(session.active_regulations[-5:])}\n\n"
+                            f'New user query: "{query}"\n\n'
+                            "Task: Rewrite the query to be fully self-contained by replacing pronouns/references "
+                            '("this regulation", "这个规定", "it", "that") with the specific regulation they refer to.\n'
+                            "Keep the SAME language as the original query.\n"
+                            "If the query is already clear, return it unchanged.\n\n"
+                            "IMPORTANT: The reference most likely points to regulations from the LAST assistant response.\n"
+                            "Only output the rewritten query, nothing else."
+                        ),
+                    }],
+                )
+                result = response.content[0].text.strip().strip("\"'")
+                if len(result) < len(query) * 3 and len(result) > 5:
+                    return result
+            except Exception as e:
+                logger.warning(f"LLM coreference resolution failed: {e}")
 
         return query
 

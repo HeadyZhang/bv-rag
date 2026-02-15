@@ -59,7 +59,7 @@ class VoiceQAPipeline:
         self,
         text: str,
         session_id: str | None = None,
-        generate_audio: bool = True,
+        generate_audio: bool = False,
         user_id: str = "anonymous",
     ) -> dict:
         timing = {}
@@ -97,7 +97,7 @@ class VoiceQAPipeline:
         timing["memory_ms"] = int((time.time() - t0) * 1000)
 
         t0 = time.time()
-        retrieved_chunks = self.retriever.retrieve(enhanced_query, top_k=10)
+        retrieved_chunks = self.retriever.retrieve(enhanced_query, top_k=5)
         timing["retrieval_ms"] = int((time.time() - t0) * 1000)
 
         t0 = time.time()
@@ -111,7 +111,7 @@ class VoiceQAPipeline:
         timing["generation_ms"] = int((time.time() - t0) * 1000)
 
         answer_audio_base64 = None
-        if generate_audio:
+        if generate_audio and input_mode == "voice":
             t0 = time.time()
             tts_text = TTSService.prepare_tts_text(gen_result["answer"])
             if tts_text:
@@ -121,13 +121,26 @@ class VoiceQAPipeline:
                 except Exception as e:
                     logger.error(f"TTS error: {e}")
             timing["tts_ms"] = int((time.time() - t0) * 1000)
+        else:
+            timing["tts_ms"] = 0
 
-        session = self.memory.add_turn(session, "user", text, input_mode)
+        # Track retrieved regulation numbers for coreference resolution
+        retrieved_regulations = [
+            c.get("metadata", {}).get("regulation_number", "")
+            for c in retrieved_chunks[:5]
+            if c.get("metadata", {}).get("regulation_number")
+        ]
+
+        session = self.memory.add_turn(
+            session, "user", text, input_mode,
+            metadata={"enhanced_query": enhanced_query},
+        )
         session = self.memory.add_turn(
             session, "assistant", gen_result["answer"], "text",
             metadata={
                 "citations": gen_result["citations"],
                 "confidence": gen_result["confidence"],
+                "retrieved_regulations": retrieved_regulations,
             },
         )
 
@@ -141,4 +154,5 @@ class VoiceQAPipeline:
             "model_used": gen_result["model_used"],
             "sources": gen_result["sources"],
             "timing": timing,
+            "input_mode": input_mode,
         }

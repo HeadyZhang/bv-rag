@@ -1,4 +1,4 @@
-"""Claude LLM answer generation."""
+"""Claude LLM answer generation with smart model routing."""
 import logging
 import re
 from collections import defaultdict
@@ -12,6 +12,21 @@ logger = logging.getLogger(__name__)
 CITATION_PATTERN = re.compile(
     r"\[(SOLAS|MARPOL|MSC|MEPC|ISM|ISPS|Resolution|LSA|FSS|FTP|STCW|COLREG)[^\]]*\]"
 )
+
+REG_PATTERN = re.compile(
+    r"(SOLAS|MARPOL|STCW|COLREG|ISM|ISPS|LSA|FSS|IBC|IGC)\s*[\w\-\/\.]+",
+    re.IGNORECASE,
+)
+
+COMPLEX_KEYWORDS = [
+    "compare", "比较", "区别", "difference", "vs",
+    "所有相关", "修改", "amend", "解释", "interpret",
+    "适用", "apply", "applicable", "豁免", "exempt",
+]
+
+RELATION_KEYWORDS = [
+    "所有", "哪些", "all", "which", "compare", "区别", "关系", "relationship",
+]
 
 
 class AnswerGenerator:
@@ -28,8 +43,21 @@ class AnswerGenerator:
         user_context: str | None = None,
     ) -> dict:
         model = self._select_model(query, retrieved_chunks)
-        context_text = self._build_context(retrieved_chunks)
+        is_fast = model == self.fast_model
+        max_tokens = 1024 if is_fast else 2048
+        max_context_tokens = 3000 if is_fast else 5000
+
+        context_text = self._build_context(retrieved_chunks, max_context_tokens)
+
         system = SYSTEM_PROMPT
+        if is_fast:
+            system += (
+                "\n\n重要：请简洁回答，直接给出关键数值和法规引用，"
+                "控制在300字以内。不需要列出完整的适用性分析和替代方案。"
+            )
+        else:
+            system += "\n\n请提供完整但不冗余的回答，控制在600字以内。"
+
         if user_context:
             system = f"{system}\n\n## 用户偏好\n{user_context}"
 
@@ -43,7 +71,7 @@ class AnswerGenerator:
         try:
             response = self.client.messages.create(
                 model=model,
-                max_tokens=4096,
+                max_tokens=max_tokens,
                 system=system,
                 messages=messages,
             )
@@ -65,53 +93,63 @@ class AnswerGenerator:
         }
 
     def _select_model(self, query: str, chunks: list[dict]) -> str:
-        has_exact_ref = bool(re.search(
-            r"(SOLAS|MARPOL|STCW|ISM|ISPS)\s*(regulation|chapter|annex|rule)",
-            query,
-            re.IGNORECASE,
-        ))
+        """Smart model routing: Haiku for simple, Sonnet for complex."""
+        use_fast = False
+
+        # Haiku conditions (any one triggers fast)
+        if REG_PATTERN.search(query):
+            use_fast = True
+
         top_score = max(
             (c.get("score") or c.get("fused_score", 0) for c in chunks),
             default=0,
         )
-        if has_exact_ref and top_score > 0.8:
-            return self.fast_model
-        return self.primary_model
+        if chunks and top_score > 0.75:
+            use_fast = True
 
-    def _build_context(self, chunks: list[dict]) -> str:
-        by_document = defaultdict(list)
+        word_count = len(query.split())
+        if word_count < 15 and not any(kw in query.lower() for kw in RELATION_KEYWORDS):
+            use_fast = True
+
+        # Sonnet overrides (complex queries force Sonnet)
+        query_lower = query.lower()
+        if any(kw in query_lower for kw in COMPLEX_KEYWORDS):
+            use_fast = False
+
+        return self.fast_model if use_fast else self.primary_model
+
+    def _build_context(self, chunks: list[dict], max_context_tokens: int = 5000) -> str:
+        """Build context with per-chunk and total token limits."""
+        context_parts = []
+        total_tokens = 0
+
         for chunk in chunks:
-            doc = chunk.get("metadata", {}).get("document", "Other")
-            by_document[doc].append(chunk)
+            text = chunk.get("text", "")
+            if len(text) > 1600:
+                text = text[:1600] + "..."
+            chunk_tokens = len(text) // 4
+            if total_tokens + chunk_tokens > max_context_tokens:
+                break
 
-        sections = []
-        for doc, doc_chunks in by_document.items():
-            section_parts = [f"### {doc}\n"]
-            for chunk in doc_chunks:
-                meta = chunk.get("metadata", {})
-                breadcrumb = meta.get("breadcrumb", "")
-                url = meta.get("url", "")
-                text = chunk.get("text", "")
-                section_parts.append(
-                    f"**[{breadcrumb}]** (Source: {url})\n{text}\n"
+            meta = chunk.get("metadata", {})
+            breadcrumb = meta.get("breadcrumb", "")
+            url = meta.get("url", "")
+            context_parts.append(f"**[{breadcrumb}]** (Source: {url})\n{text}")
+            total_tokens += chunk_tokens
+
+            graph_ctx = chunk.get("graph_context", {})
+            if graph_ctx.get("has_interpretations"):
+                count = graph_ctx.get("interpretation_count", 0)
+                context_parts.append(
+                    f"*Note: {count} unified interpretation(s) available for this regulation.*"
                 )
 
-                graph_ctx = chunk.get("graph_context", {})
-                if graph_ctx.get("has_interpretations"):
-                    count = graph_ctx.get("interpretation_count", 0)
-                    section_parts.append(
-                        f"*Note: {count} unified interpretation(s) available for this regulation.*\n"
-                    )
-            sections.append("\n".join(section_parts))
-
-        return "\n---\n".join(sections)
+        return "\n\n---\n\n".join(context_parts)
 
     def _extract_citations(self, answer: str) -> list[dict]:
-        matches = CITATION_PATTERN.findall(answer)
-        full_matches = CITATION_PATTERN.finditer(answer)
         citations = []
         seen = set()
-        for match in full_matches:
+        for match in CITATION_PATTERN.finditer(answer):
             citation = match.group(0)
             if citation not in seen:
                 seen.add(citation)

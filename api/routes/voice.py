@@ -35,7 +35,8 @@ async def text_query(
     request: Request,
     text: str = Form(...),
     session_id: str = Form(default=None),
-    generate_audio: bool = Form(default=True),
+    generate_audio: bool = Form(default=False),
+    input_mode: str = Form(default="text"),
 ):
     pipeline = request.app.state.pipeline
     result = await pipeline.process_text_query(
@@ -44,6 +45,28 @@ async def text_query(
         generate_audio=generate_audio,
     )
     return result
+
+
+@router.post("/tts")
+async def generate_tts(
+    request: Request,
+    text: str = Form(..., description="Text to convert to speech"),
+):
+    """On-demand TTS endpoint - called when user clicks Play Audio."""
+    from voice.tts_service import TTSService
+
+    tts = request.app.state.tts
+    tts_text = TTSService.prepare_tts_text(text)
+    if not tts_text:
+        return {"answer_audio_base64": None, "audio_format": "mp3"}
+
+    try:
+        audio_bytes = tts.synthesize(tts_text)
+        audio_b64 = base64.b64encode(audio_bytes).decode("utf-8")
+        return {"answer_audio_base64": audio_b64, "audio_format": "mp3"}
+    except Exception as e:
+        logger.error(f"TTS generation error: {e}")
+        return {"answer_audio_base64": None, "error": str(e)}
 
 
 @router.websocket("/ws/{session_id}")

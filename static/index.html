@@ -58,15 +58,96 @@ body {
 .msg .answer-content strong { color: #60a5fa; }
 .msg .answer-content a,.citation-link { color: #60a5fa; text-decoration: none; }
 .msg .answer-content a:hover,.citation-link:hover { text-decoration: underline; }
-.msg-meta { display: flex; gap: 12px; align-items: center; margin-top: 8px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; }
+.loading-msg { color: var(--text-muted); font-style: italic; display: flex; align-items: center; gap: 8px; }
+
+/* Audio controls */
+.audio-controls { margin-top: 12px; padding: 8px 0; }
+.audio-btn {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.audio-btn:hover {
+  background: rgba(59, 130, 246, 0.35);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+.audio-btn .btn-icon { font-size: 14px; }
+.voice-player-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+.time-display {
+  font-size: 11px;
+  color: #94a3b8;
+  font-family: monospace;
+  min-width: 85px;
+  text-align: center;
+}
+.audio-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+.audio-loading .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Message meta */
+.msg-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #64748b;
+  align-items: center;
+  flex-wrap: wrap;
+}
 .confidence { display: flex; align-items: center; gap: 4px; }
 .conf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
 .conf-dot.active { background: var(--success); }
-.audio-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 3px 8px; border-radius: 12px; cursor: pointer; font-size: 11px; }
-.audio-btn:hover { border-color: var(--primary); color: var(--primary); }
-.loading-msg { color: var(--text-muted); font-style: italic; display: flex; align-items: center; gap: 8px; }
-.spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.confidence-high { color: #22c55e; }
+.confidence-medium { color: #f59e0b; }
+.confidence-low { color: #ef4444; }
+.model-tag { color: #8b5cf6; }
+
+.hidden { display: none !important; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
+
 /* Input area */
 .input-area {
   padding: 12px 16px;
@@ -132,8 +213,122 @@ const voiceBtn = document.getElementById('voiceBtn');
 let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
+let msgCounter = 0;
 
+// ============ Global Audio Controller ============
+const audioController = {
+  currentAudio: null,
+  currentMessageId: null,
+
+  play(messageId, audioSrc) {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this._resetUI(this.currentMessageId);
+    }
+    this.currentAudio = new Audio(audioSrc);
+    this.currentMessageId = messageId;
+    this.currentAudio.onplay = () => this._updateUI(messageId, 'playing');
+    this.currentAudio.onpause = () => {
+      if (this.currentAudio && this.currentAudio.currentTime < this.currentAudio.duration) {
+        this._updateUI(messageId, 'paused');
+      }
+    };
+    this.currentAudio.onended = () => this._updateUI(messageId, 'ended');
+    this.currentAudio.ontimeupdate = () => this._updateProgress(messageId);
+    this.currentAudio.play().catch(() => {});
+  },
+
+  pause() {
+    if (this.currentAudio) this.currentAudio.pause();
+  },
+
+  resume() {
+    if (this.currentAudio) this.currentAudio.play().catch(() => {});
+  },
+
+  replay() {
+    if (this.currentAudio) {
+      this.currentAudio.currentTime = 0;
+      this.currentAudio.play().catch(() => {});
+    }
+  },
+
+  stop() {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this._resetUI(this.currentMessageId);
+      this.currentAudio = null;
+      this.currentMessageId = null;
+    }
+  },
+
+  _updateUI(messageId, state) {
+    const controls = document.getElementById('audio-controls-' + messageId);
+    if (!controls) return;
+    controls.dataset.state = state;
+    const playBtn = controls.querySelector('.play-btn');
+    const pauseBtn = controls.querySelector('.pause-btn');
+    const replayBtn = controls.querySelector('.replay-btn');
+
+    if (state === 'playing') {
+      if (playBtn) playBtn.classList.add('hidden');
+      if (pauseBtn) pauseBtn.classList.remove('hidden');
+      if (replayBtn) replayBtn.classList.add('hidden');
+    } else if (state === 'paused') {
+      if (playBtn) playBtn.classList.remove('hidden');
+      if (pauseBtn) pauseBtn.classList.add('hidden');
+    } else if (state === 'ended') {
+      if (playBtn) playBtn.classList.add('hidden');
+      if (pauseBtn) pauseBtn.classList.add('hidden');
+      if (replayBtn) replayBtn.classList.remove('hidden');
+    }
+  },
+
+  _resetUI(messageId) {
+    const controls = document.getElementById('audio-controls-' + messageId);
+    if (!controls) return;
+    controls.dataset.state = 'idle';
+    const playBtn = controls.querySelector('.play-btn');
+    const pauseBtn = controls.querySelector('.pause-btn');
+    const replayBtn = controls.querySelector('.replay-btn');
+    if (playBtn) playBtn.classList.remove('hidden');
+    if (pauseBtn) pauseBtn.classList.add('hidden');
+    if (replayBtn) replayBtn.classList.add('hidden');
+    const progressFill = controls.querySelector('.progress-fill');
+    if (progressFill) progressFill.style.width = '0%';
+    const timeDisplay = controls.querySelector('.time-display');
+    if (timeDisplay) timeDisplay.textContent = '0:00 / 0:00';
+  },
+
+  _updateProgress(messageId) {
+    if (!this.currentAudio) return;
+    const controls = document.getElementById('audio-controls-' + messageId);
+    if (!controls) return;
+    const progressFill = controls.querySelector('.progress-fill');
+    const timeDisplay = controls.querySelector('.time-display');
+    if (this.currentAudio.duration) {
+      const pct = (this.currentAudio.currentTime / this.currentAudio.duration) * 100;
+      if (progressFill) progressFill.style.width = pct + '%';
+      if (timeDisplay) {
+        const cur = Math.floor(this.currentAudio.currentTime);
+        const dur = Math.floor(this.currentAudio.duration);
+        timeDisplay.textContent =
+          Math.floor(cur/60) + ':' + (cur%60).toString().padStart(2,'0') +
+          ' / ' +
+          Math.floor(dur/60) + ':' + (dur%60).toString().padStart(2,'0');
+      }
+    }
+  }
+};
+
+// ============ Helpers ============
 function scrollBottom() { chatArea.scrollTop = chatArea.scrollHeight; }
+
+function escapeHtml(t) {
+  const d = document.createElement('div'); d.textContent = t; return d.innerHTML;
+}
 
 function addUserMsg(text, mode) {
   const d = document.createElement('div');
@@ -147,7 +342,7 @@ function addLoadingMsg() {
   const d = document.createElement('div');
   d.className = 'msg ai loading-msg';
   d.id = 'loadingMsg';
-  d.innerHTML = '<div class="spinner"></div> Searching regulations...';
+  d.innerHTML = '<div class="spinner" style="width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;"></div> Searching regulations...';
   chatArea.appendChild(d);
   scrollBottom();
   return d;
@@ -156,24 +351,6 @@ function addLoadingMsg() {
 function removeLoading() {
   const el = document.getElementById('loadingMsg');
   if (el) el.remove();
-}
-
-function addAIMsg(data) {
-  removeLoading();
-  const d = document.createElement('div');
-  d.className = 'msg ai';
-  let html = '<div class="answer-content">' + renderMarkdown(data.answer_text, data.sources || []) + '</div>';
-  html += '<div class="msg-meta">';
-  html += renderConfidence(data.confidence);
-  if (data.timing && data.timing.total_ms) html += '<span>' + (data.timing.total_ms / 1000).toFixed(1) + 's</span>';
-  if (data.model_used) html += '<span>' + data.model_used.split('-').slice(0,2).join('-') + '</span>';
-  if (data.answer_audio_base64) html += '<button class="audio-btn" onclick="playAudio(this,\'' + data.answer_audio_base64.substring(0, 50) + '\')">Play Audio</button>';
-  html += '</div>';
-  d.innerHTML = html;
-  if (data.answer_audio_base64) d.dataset.audio = data.answer_audio_base64;
-  chatArea.appendChild(d);
-  scrollBottom();
-  if (data.answer_audio_base64) autoPlay(data.answer_audio_base64);
 }
 
 function renderConfidence(level) {
@@ -202,26 +379,118 @@ function renderMarkdown(text, sources) {
   return h;
 }
 
-function escapeHtml(t) {
-  const d = document.createElement('div'); d.textContent = t; return d.innerHTML;
+function playerBarHTML(messageId) {
+  return '<div class="voice-player-bar">' +
+    '<button class="pause-btn audio-btn" onclick="audioController.pause()"><span class="btn-icon">&#9208;</span></button>' +
+    '<button class="play-btn audio-btn hidden" onclick="audioController.resume()"><span class="btn-icon">&#9654;</span></button>' +
+    '<div class="progress-bar"><div class="progress-fill"></div></div>' +
+    '<span class="time-display">0:00 / 0:00</span>' +
+    '<button class="replay-btn audio-btn hidden" onclick="audioController.replay()"><span class="btn-icon">&#128260;</span></button>' +
+    '</div>';
 }
 
-function autoPlay(b64) {
+// ============ On-demand TTS ============
+async function requestAndPlayAudio(messageId, answerText) {
+  const controls = document.getElementById('audio-controls-' + messageId);
+  if (!controls) return;
+
+  // If audio already cached, just play
+  if (controls.dataset.audioSrc) {
+    audioController.play(messageId, controls.dataset.audioSrc);
+    return;
+  }
+
+  const playBtn = controls.querySelector('.play-btn');
+  const loadingEl = controls.querySelector('.audio-loading');
+  if (playBtn) playBtn.classList.add('hidden');
+  if (loadingEl) loadingEl.classList.remove('hidden');
+
   try {
-    const bin = atob(b64); const arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-    const blob = new Blob([arr], {type:'audio/mp3'});
-    const audio = new Audio(URL.createObjectURL(blob));
-    audio.play().catch(() => {});
-  } catch(e) {}
+    const formData = new FormData();
+    formData.append('text', answerText);
+    const response = await fetch('/api/v1/voice/tts', { method: 'POST', body: formData });
+    const data = await response.json();
+
+    if (data.answer_audio_base64) {
+      const audioSrc = 'data:audio/mp3;base64,' + data.answer_audio_base64;
+      controls.dataset.audioSrc = audioSrc;
+
+      // Replace with player bar
+      if (loadingEl) loadingEl.classList.add('hidden');
+      controls.innerHTML = playerBarHTML(messageId);
+      audioController.play(messageId, audioSrc);
+    } else {
+      if (loadingEl) loadingEl.classList.add('hidden');
+      if (playBtn) {
+        playBtn.classList.remove('hidden');
+        playBtn.innerHTML = '<span class="btn-icon">&#10060;</span> Audio failed';
+      }
+    }
+  } catch(e) {
+    if (loadingEl) loadingEl.classList.add('hidden');
+    if (playBtn) {
+      playBtn.classList.remove('hidden');
+      playBtn.innerHTML = '<span class="btn-icon">&#10060;</span> Audio failed';
+    }
+  }
 }
 
-function playAudio(btn, prefix) {
-  const msg = btn.closest('.msg');
-  if (!msg || !msg.dataset.audio) return;
-  autoPlay(msg.dataset.audio);
+// ============ Add AI Message ============
+function addAIMsg(data, inputMode) {
+  removeLoading();
+  msgCounter++;
+  const mid = 'msg' + msgCounter;
+  const d = document.createElement('div');
+  d.className = 'msg ai';
+  d.id = 'msg-' + mid;
+
+  const answerText = data.answer_text || '';
+  const confidence = data.confidence || 'medium';
+  const timing = data.timing || {};
+  const modelUsed = data.model_used || '';
+  const sources = data.sources || [];
+  const mode = inputMode || data.input_mode || 'text';
+
+  let html = '<div class="answer-content">' + renderMarkdown(answerText, sources) + '</div>';
+
+  // Audio controls
+  html += '<div id="audio-controls-' + mid + '" class="audio-controls" data-state="idle">';
+  if (mode === 'text') {
+    // Text input: show Play Audio button
+    html += '<button class="play-btn audio-btn" onclick="requestAndPlayAudio(\'' + mid + '\', document.getElementById(\'msg-' + mid + '\').dataset.answerText)">' +
+      '<span class="btn-icon">&#128266;</span> Play Audio</button>';
+    html += '<div class="audio-loading hidden"><div class="spinner"></div> Loading audio...</div>';
+  } else {
+    // Voice input: show player bar (auto-play)
+    html += playerBarHTML(mid);
+  }
+  html += '</div>';
+
+  // Meta info
+  html += '<div class="msg-meta">';
+  html += renderConfidence(confidence);
+  if (timing.total_ms) html += '<span>' + (timing.total_ms / 1000).toFixed(1) + 's</span>';
+  if (modelUsed) {
+    const isHaiku = modelUsed.toLowerCase().includes('haiku');
+    html += '<span class="model-tag">' + (isHaiku ? '&#9889; haiku' : '&#129504; sonnet') + '</span>';
+  }
+  html += '</div>';
+
+  d.innerHTML = html;
+  d.dataset.answerText = answerText;
+  chatArea.appendChild(d);
+  scrollBottom();
+
+  // Voice input: auto-play audio
+  if (mode === 'voice' && data.answer_audio_base64) {
+    const audioSrc = 'data:audio/mp3;base64,' + data.answer_audio_base64;
+    const controls = document.getElementById('audio-controls-' + mid);
+    if (controls) controls.dataset.audioSrc = audioSrc;
+    setTimeout(function() { audioController.play(mid, audioSrc); }, 100);
+  }
 }
 
+// ============ Send Text Query ============
 async function sendText(text) {
   if (!text.trim()) return;
   const welcome = chatArea.querySelector('.welcome');
@@ -233,18 +502,20 @@ async function sendText(text) {
   const form = new FormData();
   form.append('text', text);
   form.append('session_id', SESSION_ID);
-  form.append('generate_audio', 'true');
+  form.append('generate_audio', 'false');
+  form.append('input_mode', 'text');
 
   try {
     const res = await fetch('/api/v1/voice/text-query', {method:'POST', body:form});
     const data = await res.json();
-    addAIMsg(data);
+    addAIMsg(data, 'text');
   } catch(e) {
     removeLoading();
-    addAIMsg({answer_text:'Error: ' + e.message, confidence:'low', timing:{}, sources:[]});
+    addAIMsg({answer_text:'Error: ' + e.message, confidence:'low', timing:{}, sources:[]}, 'text');
   }
 }
 
+// ============ Send Voice Query ============
 async function sendAudio(blob) {
   const welcome = chatArea.querySelector('.welcome');
   if (welcome) welcome.remove();
@@ -263,13 +534,14 @@ async function sendAudio(blob) {
     if (lastUser && data.transcription) {
       lastUser.innerHTML = '<div class="mode-tag">Voice</div>' + escapeHtml(data.transcription);
     }
-    addAIMsg(data);
+    addAIMsg(data, 'voice');
   } catch(e) {
     removeLoading();
-    addAIMsg({answer_text:'Error: ' + e.message, confidence:'low', timing:{}, sources:[]});
+    addAIMsg({answer_text:'Error: ' + e.message, confidence:'low', timing:{}, sources:[]}, 'voice');
   }
 }
 
+// ============ Event Bindings ============
 sendBtn.onclick = () => sendText(textInput.value);
 textInput.onkeydown = (e) => { if (e.key === 'Enter') sendText(textInput.value); };
 
