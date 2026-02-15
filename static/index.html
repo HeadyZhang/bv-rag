@@ -214,6 +214,8 @@ let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
 let msgCounter = 0;
+let audioUnlocked = false;
+let pendingVoiceAudio = null; // {messageId, audioSrc} waiting to play after unlock
 
 // ============ Global Audio Controller ============
 const audioController = {
@@ -236,7 +238,14 @@ const audioController = {
     };
     this.currentAudio.onended = () => this._updateUI(messageId, 'ended');
     this.currentAudio.ontimeupdate = () => this._updateProgress(messageId);
-    this.currentAudio.play().catch(() => {});
+    this.currentAudio.onerror = () => this._updateUI(messageId, 'paused');
+    var playPromise = this.currentAudio.play();
+    if (playPromise) {
+      playPromise.catch(() => {
+        // Autoplay blocked by browser - show play button so user can tap
+        this._updateUI(messageId, 'paused');
+      });
+    }
   },
 
   pause() {
@@ -576,6 +585,15 @@ function stopRec() {
   isRecording = false;
   voiceBtn.classList.remove('recording');
   voiceBtn.textContent = 'Hold to Speak';
+
+  // Unlock audio context on user gesture (touchend/mouseup)
+  // Mobile browsers require audio.play() within a user-initiated event
+  if (!audioUnlocked) {
+    var silentAudio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwmHAAAAAAD/+1DEAAAGAAGn9AAAIgAANP8AAAAT');
+    silentAudio.play().then(function() {
+      audioUnlocked = true;
+    }).catch(function() {});
+  }
 }
 
 voiceBtn.onmousedown = voiceBtn.ontouchstart = (e) => { e.preventDefault(); startRec(); };

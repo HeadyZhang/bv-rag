@@ -1,6 +1,7 @@
 """End-to-end voice Q&A pipeline."""
 import base64
 import logging
+import re
 import time
 
 from generation.generator import AnswerGenerator
@@ -77,6 +78,34 @@ class VoiceQAPipeline:
         result["timing"]["total_ms"] = int((time.time() - total_start) * 1000)
         return result
 
+    @staticmethod
+    def _extract_regulation_ref(meta: dict) -> str:
+        """Extract a meaningful regulation reference from chunk metadata.
+
+        The regulation_number field is often empty or too generic (just "SOLAS").
+        This extracts specific references like "SOLAS II-1/3-6" from the title.
+        """
+        title = meta.get("title", "")
+        # Try to extract specific regulation references from title
+        # e.g. "1 SOLAS Regulation II-1/3-6 – Access to..." → "SOLAS Regulation II-1/3-6"
+        pattern = r"(SOLAS|MARPOL|STCW|COLREG|ISM|ISPS|LSA|FSS|IBC|IGC|MSC|MEPC)\s*(?:Regulation\s*)?[\w\-\/\.]+"
+        match = re.search(pattern, title, re.IGNORECASE)
+        if match:
+            return match.group(0).strip()
+
+        # Fall back to document + regulation_number if specific enough
+        doc = meta.get("document", "")
+        reg_num = meta.get("regulation_number", "")
+        if reg_num and reg_num != doc and len(reg_num) > 3:
+            return reg_num
+
+        # Fall back to document + condensed title
+        if doc and title:
+            clean_title = title.strip()[:60].strip()
+            return f"{doc}: {clean_title}"
+
+        return ""
+
     async def _process_query(
         self,
         text: str,
@@ -124,12 +153,17 @@ class VoiceQAPipeline:
         else:
             timing["tts_ms"] = 0
 
-        # Track retrieved regulation numbers for coreference resolution
-        retrieved_regulations = [
-            c.get("metadata", {}).get("regulation_number", "")
-            for c in retrieved_chunks[:5]
-            if c.get("metadata", {}).get("regulation_number")
-        ]
+        # Track retrieved regulation references for coreference resolution
+        # regulation_number is often empty/generic, so also extract from title
+        retrieved_regulations = []
+        seen_refs = set()
+        for c in retrieved_chunks[:5]:
+            meta = c.get("metadata", {})
+            ref = self._extract_regulation_ref(meta)
+            if ref and ref not in seen_refs:
+                seen_refs.add(ref)
+                retrieved_regulations.append(ref)
+        logger.info(f"[Memory] Saving assistant turn with regs: {retrieved_regulations}")
 
         session = self.memory.add_turn(
             session, "user", text, input_mode,

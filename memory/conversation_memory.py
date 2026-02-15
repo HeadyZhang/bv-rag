@@ -196,16 +196,22 @@ class ConversationMemory:
         3. LLM layer: Haiku fallback for complex cases only
         """
         # === Layer 1: detect whether resolution is needed ===
+        logger.info(f"[Coreference] Query: {query}")
+        logger.info(f"[Coreference] Active regulations: {session.active_regulations}")
+        logger.info(f"[Coreference] Session turns count: {len(session.turns)}")
+
         query_lower = query.lower()
         has_reference = any(
             p in query_lower
             for p in REFERENCE_PATTERNS_ZH + REFERENCE_PATTERNS_EN
         )
+        logger.info(f"[Coreference] Has reference: {has_reference}")
 
         if not has_reference:
             return query
 
         if not session.active_regulations:
+            logger.info("[Coreference] No active regulations, skipping resolution")
             return query
 
         # === Layer 2: context prefix injection (zero API calls) ===
@@ -217,14 +223,20 @@ class ConversationMemory:
                 last_regulations = turn.metadata.get("retrieved_regulations", [])
                 break
 
+        logger.info(f"[Coreference] Last assistant regs: {last_regulations}")
+
         if last_regulations:
             reg_context = ", ".join(last_regulations[:3])
-            return f"[Context: the previous question was about {reg_context}] {query}"
+            enhanced = f"[Context: the previous question was about {reg_context}] {query}"
+            logger.info(f"[Coreference] Enhanced query (Layer 2a): {enhanced}")
+            return enhanced
 
         # Fallback to session-level active_regulations
         if session.active_regulations:
             reg_context = ", ".join(session.active_regulations[-3:])
-            return f"[Context: this conversation has discussed {reg_context}] {query}"
+            enhanced = f"[Context: this conversation has discussed {reg_context}] {query}"
+            logger.info(f"[Coreference] Enhanced query (Layer 2b): {enhanced}")
+            return enhanced
 
         # === Layer 3: LLM resolution (only if layers 1-2 cannot handle) ===
         if session.turns:
@@ -261,6 +273,7 @@ class ConversationMemory:
                 )
                 result = response.content[0].text.strip().strip("\"'")
                 if len(result) < len(query) * 3 and len(result) > 5:
+                    logger.info(f"[Coreference] Enhanced query (Layer 3 LLM): {result}")
                     return result
             except Exception as e:
                 logger.warning(f"LLM coreference resolution failed: {e}")
