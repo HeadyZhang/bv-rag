@@ -8,6 +8,7 @@ from generation.generator import AnswerGenerator
 from knowledge.practical_knowledge import PracticalKnowledgeBase
 from memory.conversation_memory import ConversationMemory
 from retrieval.hybrid_retriever import HybridRetriever
+from retrieval.query_classifier import QueryClassifier
 from voice.stt_service import STTService
 from voice.tts_service import TTSService
 
@@ -29,6 +30,7 @@ class VoiceQAPipeline:
         self.retriever = retriever
         self.generator = generator
         self.practical_kb = PracticalKnowledgeBase()
+        self.query_classifier = QueryClassifier()
 
     async def process_voice_query(
         self,
@@ -131,11 +133,12 @@ class VoiceQAPipeline:
         )
 
         messages, enhanced_query = self.memory.build_llm_context(session, text)
+        classification = self.query_classifier.classify(text)
         timing["memory_ms"] = int((time.time() - t0) * 1000)
 
         t0 = time.time()
-        # Retrieval uses terminology-enhanced query for better recall
-        retrieved_chunks = self.retriever.retrieve(enhanced_query, top_k=8)
+        effective_top_k = classification["top_k"]
+        retrieved_chunks = self.retriever.retrieve(enhanced_query, top_k=effective_top_k)
         timing["retrieval_ms"] = int((time.time() - t0) * 1000)
 
         t0 = time.time()
@@ -151,6 +154,7 @@ class VoiceQAPipeline:
             conversation_history=messages if messages else None,
             user_context=user_context if user_context else None,
             practical_context=practical_context if practical_context else None,
+            query_classification=classification,
         )
         timing["generation_ms"] = int((time.time() - t0) * 1000)
 
