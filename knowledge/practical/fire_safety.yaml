@@ -1,0 +1,35 @@
+- id: fire_detection_zones
+  title: "火灾探测和报警系统分区要求"
+  keywords: ["火灾探测", "报警系统", "探测器", "分区"]
+  terms: ["fire detection", "smoke detector", "fire alarm", "fire zone"]
+  regulations: ["SOLAS II-2/7", "FSS Code Chapter 9"]
+  ship_types: ["all"]
+  correct_interpretation: "火灾探测系统必须按防火区域分区设置。每个区域应能独立报警，并在驾驶台和消防控制站显示具体区域位置。"
+  common_mistake: "认为只要有探测器就行了，忽略了分区显示和独立回路的要求。"
+  decision_tree:
+    - "Step 1: 确认防火分区划分（主竖区 main vertical zones）"
+    - "Step 2: 每个分区需要独立探测回路"
+    - "Step 3: 驾驶台火警面板需要逐区显示"
+    - "Step 4: 机舱、货舱、起居处所分别有不同的探测器类型要求"
+
+- id: fire_extinguisher_portable
+  title: "手提式灭火器配置"
+  keywords: ["灭火器", "手提式", "数量", "位置"]
+  terms: ["portable fire extinguisher", "fire extinguisher"]
+  regulations: ["SOLAS II-2/10", "FSS Code Chapter 4"]
+  ship_types: ["all"]
+  correct_interpretation: "灭火器配置不是简单的按面积计算。关键是每个逃生通道、机舱入口、厨房、工作间等特定位置必须有，且灭火器类型要匹配火灾类型（A类/B类/C类）。"
+  typical_configurations:
+    - "机舱：CO2 或干粉灭火器，入口处和操作平台"
+    - "起居处所：泡沫或水基灭火器"
+    - "厨房：适用于油脂火灾的灭火器（F类）"
+    - "电气设备间：CO2 灭火器"
+
+- id: structural_fire_protection
+  title: "结构防火 A/B 级分隔"
+  keywords: ["防火", "A级", "B级", "分隔", "防火门", "甲级", "乙级"]
+  terms: ["A-class division", "B-class division", "fire door", "structural fire protection"]
+  regulations: ["SOLAS II-2/3", "SOLAS II-2/9"]
+  ship_types: ["all"]
+  correct_interpretation: "A级和B级分隔是按防火等级划分的。A级能耐火60分钟且隔热（A-60/A-30/A-15/A-0），B级能耐火30分钟（B-15/B-0）。关键是查SOLAS II-2/9的表格确定哪些处所之间需要什么等级。"
+  common_mistake: "认为所有舱壁都需要A-60，实际上等级取决于两侧处所的类型组合。例如走廊和普通房间之间可能只需要B-15。"

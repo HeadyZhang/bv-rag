@@ -1,0 +1,15 @@
+- id: ais_requirements
+  title: "AIS 配备要求"
+  keywords: ["AIS", "自动识别系统", "船舶自动识别"]
+  terms: ["AIS", "automatic identification system"]
+  regulations: ["SOLAS V/19.2.4"]
+  ship_types: ["all"]
+  correct_interpretation: "所有300GT以上的国际航行船舶和500GT以上的非国际航行船舶必须配备AIS。客船不论吨位都必须配备。AIS必须保持常开，除非船长认为会危及安全（如海盗区域）。"
+
+- id: ecdis_requirements
+  title: "ECDIS 电子海图配备"
+  keywords: ["ECDIS", "电子海图", "纸质海图"]
+  terms: ["ECDIS", "electronic chart", "paper chart"]
+  regulations: ["SOLAS V/19.2.10"]
+  ship_types: ["all"]
+  correct_interpretation: "根据SOLAS修正案，新造船和现有船已分阶段强制配备ECDIS。2024年后所有SOLAS船舶应配备ECDIS。如果配备了符合要求的ECDIS，可以不再携带纸质海图。但必须有backup方案（第二台ECDIS或纸质海图）。"

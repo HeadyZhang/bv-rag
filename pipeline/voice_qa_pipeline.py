@@ -5,6 +5,7 @@ import re
 import time
 
 from generation.generator import AnswerGenerator
+from knowledge.practical_knowledge import PracticalKnowledgeBase
 from memory.conversation_memory import ConversationMemory
 from retrieval.hybrid_retriever import HybridRetriever
 from voice.stt_service import STTService
@@ -27,6 +28,7 @@ class VoiceQAPipeline:
         self.memory = memory
         self.retriever = retriever
         self.generator = generator
+        self.practical_kb = PracticalKnowledgeBase()
 
     async def process_voice_query(
         self,
@@ -138,13 +140,17 @@ class VoiceQAPipeline:
 
         t0 = time.time()
         user_context = self.memory.get_user_context(session.user_id)
-        # LLM sees the natural-language query (with coreference context but
-        # without the appended English terminology), so the prompt reads cleanly
+
+        # Query practical knowledge base for surveyor experience context
+        practical_entries = self.practical_kb.query(user_query=text)
+        practical_context = self.practical_kb.format_for_llm(practical_entries)
+
         gen_result = self.generator.generate(
             query=enhanced_query,
             retrieved_chunks=retrieved_chunks,
             conversation_history=messages if messages else None,
             user_context=user_context if user_context else None,
+            practical_context=practical_context if practical_context else None,
         )
         timing["generation_ms"] = int((time.time() - t0) * 1000)
 

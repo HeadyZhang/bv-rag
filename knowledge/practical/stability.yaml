@@ -1,0 +1,21 @@
+- id: intact_stability_criteria
+  title: "完整稳性标准"
+  keywords: ["稳性", "GM", "GZ", "复原力臂", "初稳性高"]
+  terms: ["intact stability", "metacentric height", "righting lever", "GZ curve"]
+  regulations: ["SOLAS II-1/22", "IS Code 2008"]
+  ship_types: ["all"]
+  correct_interpretation: "完整稳性不只是看GM值。需要同时满足: GZ曲线下面积（到30°和40°）、最大GZ值及其对应角度、GM最小值等多个标准。很多验船师只关注GM而忽略了面积标准。"
+  decision_tree:
+    - "Step 1: GM ≥ 0.15m (一般货船)"
+    - "Step 2: GZ30° 面积 ≥ 0.055 m·rad"
+    - "Step 3: GZ40° 面积 ≥ 0.09 m·rad"
+    - "Step 4: 30°~40° 之间面积 ≥ 0.03 m·rad"
+    - "Step 5: 最大 GZ ≥ 0.20m 且出现在 ≥ 25°"
+
+- id: damage_stability_passenger
+  title: "客船破损稳性"
+  keywords: ["破损稳性", "进水", "分舱", "客船"]
+  terms: ["damage stability", "subdivision", "flooding", "survivability"]
+  regulations: ["SOLAS II-1/6", "SOLAS II-1/7", "SOLAS II-1/8"]
+  ship_types: ["passenger ship", "客船"]
+  correct_interpretation: "客船破损稳性用概率法计算分舱指数。不是简单的'一舱进水不沉'。需要计算attained subdivision index A ≥ required subdivision index R。R值取决于船长和人数。"

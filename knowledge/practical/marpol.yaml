@@ -1,0 +1,24 @@
+- id: oily_water_separator
+  title: "油水分离器排放标准"
+  keywords: ["油水分离器", "排放", "含油污水", "15ppm"]
+  terms: ["oily water separator", "OWS", "oil content meter", "15 ppm"]
+  regulations: ["MARPOL Annex I/Reg.14", "MARPOL Annex I/Reg.15"]
+  ship_types: ["all"]
+  correct_interpretation: "机舱舱底水排放需要经过油水分离器处理到15ppm以下，且必须有油含量监测器(OCM)联锁自动关闭排放阀。特殊区域内可能有更严格要求。400GT以上的船舶必须配备。"
+  common_mistake: "认为只要有油水分离器就行了。实际上OCM（油含量计）的校准和联锁功能同样重要，是PSC检查重点。"
+
+- id: sewage_discharge
+  title: "生活污水排放要求"
+  keywords: ["生活污水", "排放", "污水处理"]
+  terms: ["sewage", "sewage treatment plant", "marine sanitation device"]
+  regulations: ["MARPOL Annex IV"]
+  ship_types: ["all"]
+  correct_interpretation: "400GT以上或载客15人以上的国际航行船舶必须配备污水处理装置。距最近陆地12海里以内不得排放未经处理的污水。处理后的污水需满足TSS、大肠杆菌等标准才能排放。"
+
+- id: ballast_water
+  title: "压载水管理"
+  keywords: ["压载水", "置换", "处理系统", "D-1", "D-2"]
+  terms: ["ballast water", "BWM", "ballast water management", "D-1 standard", "D-2 standard"]
+  regulations: ["BWM Convention", "BWMS Code"]
+  ship_types: ["all"]
+  correct_interpretation: "2024年9月8日后，所有船舶必须满足D-2标准（使用压载水处理系统）。之前可以用D-1标准（200海里外深海置换）。很多现有船在特检时需要加装BWMS，这是目前改装的热点。"

@@ -41,8 +41,19 @@ class AnswerGenerator:
         retrieved_chunks: list[dict],
         conversation_history: list[dict] | None = None,
         user_context: str | None = None,
+        practical_context: str | None = None,
+        query_classification: dict | None = None,
     ) -> dict:
-        model = self._select_model(query, retrieved_chunks)
+        classification = query_classification or {}
+
+        # Model selection: classifier hint > fallback routing
+        if classification.get("model") == "primary":
+            model = self.primary_model
+        elif classification.get("model") == "fast":
+            model = self.fast_model
+        else:
+            model = self._select_model(query, retrieved_chunks)
+
         is_fast = model == self.fast_model
         max_tokens = 1024 if is_fast else 2048
         max_context_tokens = 3000 if is_fast else 5000
@@ -61,11 +72,28 @@ class AnswerGenerator:
         if user_context:
             system = f"{system}\n\n## 用户偏好\n{user_context}"
 
+        # Applicability: inject extracted ship info
+        ship_info = classification.get("ship_info", {})
+        if classification.get("intent") == "applicability" and ship_info:
+            extra = "\n\n## 用户船舶信息"
+            if ship_info.get("type"):
+                extra += f"\n- 船型: {ship_info['type']}"
+            if ship_info.get("length"):
+                extra += f"\n- 船长: {ship_info['length']}米"
+            if ship_info.get("tonnage"):
+                extra += f"\n- 总吨: {ship_info['tonnage']}GT"
+            extra += "\n请根据这些参数给出明确的适用性判断。"
+            system += extra
+
         messages = []
         if conversation_history:
             messages.extend(conversation_history[-6:])
 
-        user_message = f"## 检索到的法规内容\n\n{context_text}\n\n## 用户问题\n\n{query}"
+        user_parts = [f"## 检索到的法规内容\n\n{context_text}"]
+        if practical_context:
+            user_parts.append(practical_context)
+        user_parts.append(f"## 用户问题\n\n{query}")
+        user_message = "\n\n".join(user_parts)
         messages.append({"role": "user", "content": user_message})
 
         try:

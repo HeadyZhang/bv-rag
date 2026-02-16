@@ -1,0 +1,15 @@
+- id: psc_focus_areas
+  title: "PSC检查重点领域"
+  keywords: ["PSC", "港口国检查", "滞留", "缺陷"]
+  terms: ["port state control", "PSC", "detention", "deficiency"]
+  regulations: ["SOLAS", "MARPOL", "MLC"]
+  ship_types: ["all"]
+  correct_interpretation: "PSC检查最常关注的领域：1)消防设备的维保记录和实际状态 2)救生设备的释放试验 3)油水分离器的15ppm报警功能 4)ISM体系文件的执行情况 5)船员证书和工作时间记录 6)ECDIS/AIS功能。这些是高频滞留原因。"
+
+- id: thickness_measurement
+  title: "船体测厚要求"
+  keywords: ["测厚", "腐蚀", "最小厚度", "换板"]
+  terms: ["thickness measurement", "corrosion", "minimum thickness", "steel renewal"]
+  regulations: ["SOLAS II-1", "ESP Code", "Classification Rules"]
+  ship_types: ["bulk carrier", "tanker", "散货船", "油轮"]
+  correct_interpretation: "测厚不是全船均匀测。重点区域包括：货舱区域的甲板板、舷侧板、底板和纵桁。允许腐蚀余量通常是建造厚度的20-25%，低于这个值需要换板。实际操作中，验船师会根据船龄和维保历史决定测厚范围。"
