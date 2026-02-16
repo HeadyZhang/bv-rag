@@ -140,11 +140,86 @@ class HybridRetriever:
             reverse=True,
         )[:effective_top_k]
 
+        # Graph expansion: follow cross-references from top results
+        sorted_results = self._graph_expand(sorted_results, effective_top_k)
+
         for result in sorted_results:
             result["fused_score"] = result["rrf_score"]
             result["graph_context"] = self._get_graph_context(result)
 
         return sorted_results
+
+    def _graph_expand(
+        self, results: list[dict], max_total: int,
+    ) -> list[dict]:
+        """Follow cross-references from top results to pull in related chunks."""
+        if not results:
+            return results
+
+        # Collect doc_ids from initial results
+        source_doc_ids = set()
+        existing_cids = {r.get("chunk_id", "") for r in results}
+        for r in results[:5]:
+            doc_id = r.get("metadata", {}).get("doc_id", "")
+            if doc_id:
+                cleaned = doc_id.replace("bm25__", "").replace("graph__", "")
+                if cleaned:
+                    source_doc_ids.add(cleaned)
+
+        if not source_doc_ids:
+            return results
+
+        # Look up cross-references for each source doc
+        related_titles: dict[str, str] = {}
+        for doc_id in source_doc_ids:
+            try:
+                xrefs = self.graph.get_cross_document_regulations(doc_id)
+                for ref in xrefs.get("references", [])[:5]:
+                    target_id = ref.get("target_doc_id", "")
+                    title = ref.get("title", "")
+                    if target_id and target_id not in source_doc_ids:
+                        related_titles[target_id] = title
+            except Exception:
+                continue
+
+        if not related_titles:
+            return results
+
+        logger.info(
+            f"[GraphExpand] Found {len(related_titles)} related docs: "
+            f"{list(related_titles.keys())[:5]}"
+        )
+
+        # Fetch related chunks via BM25 using regulation title
+        added = 0
+        for target_doc_id, title in list(related_titles.items())[:5]:
+            if added >= 3:
+                break
+            try:
+                extra = self.bm25.search(query=title[:80], top_k=1)
+                for r in extra:
+                    pseudo_cid = f"graph_expand__{r['doc_id']}"
+                    if pseudo_cid not in existing_cids:
+                        results.append({
+                            "chunk_id": pseudo_cid,
+                            "text": (r.get("body_text") or "")[:2000],
+                            "score": r.get("score", 0),
+                            "metadata": {
+                                "doc_id": r["doc_id"],
+                                "title": r.get("title", ""),
+                                "breadcrumb": r.get("breadcrumb", ""),
+                                "url": r.get("url", ""),
+                            },
+                            "sources": ["graph_expand"],
+                            "rrf_score": 0.005,
+                            "_graph_expanded": True,
+                        })
+                        existing_cids.add(pseudo_cid)
+                        added += 1
+            except Exception:
+                continue
+
+        return results[:max_total]
 
     def _get_graph_context(self, result: dict) -> dict:
         doc_id = result.get("metadata", {}).get("doc_id", "")
