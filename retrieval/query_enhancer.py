@@ -83,6 +83,10 @@ _LSA_KEYWORDS = [
 _LENGTH_RE = re.compile(r"(\d+)\s*[米m]", re.IGNORECASE)
 _APPLICABILITY_KW = ["是否", "需不需要", "是否需要", "必须", "要不要", "需要",
                      "do I need", "is it required", "must", "required"]
+_BILATERAL_KW = [
+    "两边", "两舷", "每舷", "双侧", "两侧", "左右",
+    "both sides", "each side", "port and starboard",
+]
 
 
 class QueryEnhancer:
@@ -141,6 +145,16 @@ class QueryEnhancer:
             # "国际航行" + length → likely cargo ship needing SOLAS III/31
             if "国际航行" in query or "international" in query.lower():
                 relevant_regs.add("SOLAS III/31")
+
+        # Step 5: bilateral/both-sides → inject configuration combination terms
+        has_bilateral = any(kw in query for kw in _BILATERAL_KW)
+        if has_bilateral and has_lsa:
+            matched_terms.add("throw-overboard liferaft")
+            matched_terms.add("davit-launched liferaft")
+            matched_terms.add("each side")
+            matched_terms.add("hydrostatic release")
+            relevant_regs.add("SOLAS III/31.1.4")
+            relevant_regs.add("SOLAS III/31.1.3")
 
         if matched_terms:
             enhanced_parts.append(" ".join(sorted(matched_terms)))

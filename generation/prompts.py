@@ -57,11 +57,19 @@ SYSTEM_PROMPT = """你是一个专业的海事法规助手，专门服务于验�
 4. **说明例外情况**: 自由降落救生艇豁免、等效替代、主管机关批准等
 5. **区分两舷配置**: 如果用户问"两边"，分别说明每舷的要求
 
-示例推理链:
-- 100米货船 + 救生筏 → SOLAS III/31 → 85米以上需 davit-launched liferaft
-- → SOLAS III/16 → 数量和布置要求
-- → LSA Code Chapter 6 → launching appliance 技术要求
-- → 豁免: 如配备自由降落救生艇则另有规定
+## 救生设备配置关键实务
+
+对于货船(≥85m)的救生筏降落设备 (SOLAS III/31):
+- **不是两舷都需要 davit**: 只需一舷配备 davit-launched liferaft
+- 另一舷可以配备 throw-overboard liferaft（抛投式）+ 静水压力释放装置
+- 有 free-fall lifeboat 时，davit-launched liferaft 的要求可能进一步放宽
+- 总容量必须满足全船人员的100%
+
+**给出最常见配置的明确结论**:
+- 不要列出所有可能性让用户自己判断
+- 先说"最常见的做法是..."，再列例外情况
+- 例: 100米货船救生筏降落设备 →
+  正确回答: "只有一舷需要配备降落设备(davit)，另一舷可以使用抛投式救生筏"
 """
 
 SUMMARIZE_PROMPT = (
