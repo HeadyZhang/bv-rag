@@ -29,14 +29,27 @@ class HybridRetriever:
         self.query_enhancer = QueryEnhancer()
 
     def retrieve(self, query: str, top_k: int = 10, strategy: str = "auto") -> list[dict]:
-        # Dynamic top_k for complex applicability questions
-        is_complex = bool(_COMPLEX_QUERY_RE.search(query)) or any(
-            kw in query for kw in _APPLICABILITY_KW
-        )
-        effective_top_k = min(top_k * 2, 15) if is_complex else top_k
-
         # Enhance query with maritime terminology
         enhanced_query = self.query_enhancer.enhance(query)
+
+        # Dynamic top_k based on regulation count in enhanced query
+        reg_count = len(re.findall(
+            r"SOLAS|LSA|MARPOL|FSS|MSC|STCW|COLREG", enhanced_query,
+        ))
+        if reg_count >= 3:
+            effective_top_k = min(top_k + 5, 15)
+        elif reg_count >= 2:
+            effective_top_k = min(top_k + 3, 12)
+        elif bool(_COMPLEX_QUERY_RE.search(query)) or any(
+            kw in query for kw in _APPLICABILITY_KW
+        ):
+            effective_top_k = min(top_k * 2, 15)
+        else:
+            effective_top_k = top_k
+        logger.info(
+            f"[Retriever] reg_count={reg_count}, "
+            f"effective_top_k={effective_top_k}"
+        )
 
         route_result = self.router.route(query)
         if strategy == "auto":

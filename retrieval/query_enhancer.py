@@ -62,6 +62,8 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "lifeboat": ["SOLAS III", "LSA Code"],
     "davit": ["SOLAS III", "LSA Code Chapter 6"],
     "launching appliance": ["SOLAS III", "LSA Code Chapter 6"],
+    "davit-launched liferaft": ["SOLAS III/31", "SOLAS III/16", "LSA Code Chapter 6"],
+    "free-fall": ["SOLAS III/31", "LSA Code Chapter 6"],
     "fire": ["SOLAS II-2", "FSS Code"],
     "stability": ["SOLAS II-1"],
     "pollution": ["MARPOL"],
@@ -71,6 +73,12 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "cargo ship": ["SOLAS III/31", "SOLAS III/32"],
     "passenger ship": ["SOLAS III/21", "SOLAS III/22"],
 }
+
+# Keywords indicating LSA equipment in query
+_LSA_KEYWORDS = [
+    "救生筏", "救生艇", "liferaft", "lifeboat",
+    "起降", "davit", "释放", "降落", "launching",
+]
 
 _LENGTH_RE = re.compile(r"(\d+)\s*[米m]", re.IGNORECASE)
 _APPLICABILITY_KW = ["是否", "需不需要", "是否需要", "必须", "要不要", "需要",
@@ -96,33 +104,46 @@ class QueryEnhancer:
             if zh_term in query:
                 matched_terms.update(en_terms)
 
-        if matched_terms:
-            enhanced_parts.append(" ".join(sorted(matched_terms)))
-
         # Step 2: topic -> regulation chapter mapping
         for en_term in matched_terms:
             for topic, regs in TOPIC_TO_REGULATIONS.items():
                 if topic in en_term.lower():
                     relevant_regs.update(regs)
 
-        # Step 3: ship-type + dimension heuristics
-        if any(kw in query for kw in ["货船", "cargo"]):
-            relevant_regs.add("SOLAS III/31")
-        if any(kw in query for kw in ["客船", "passenger"]):
-            relevant_regs.add("SOLAS III/21")
+        # Step 3: ship-type → configuration regulations
+        has_lsa = any(kw in query for kw in _LSA_KEYWORDS)
 
+        if any(kw in query for kw in ["货船", "cargo"]):
+            relevant_regs.update(["SOLAS III/31", "SOLAS III/32"])
+            if has_lsa:
+                relevant_regs.update(["SOLAS III/16", "LSA Code Chapter 6"])
+                matched_terms.add("davit-launched liferaft")
+                matched_terms.add("free-fall lifeboat")
+
+        if any(kw in query for kw in ["客船", "passenger"]):
+            relevant_regs.update(["SOLAS III/21", "SOLAS III/22", "SOLAS III/16"])
+
+        # Step 4: ship length → configuration thresholds
         length_match = _LENGTH_RE.search(query)
         if length_match:
             length = int(length_match.group(1))
-            if length >= 85:
-                relevant_regs.add("SOLAS III/31")
-            has_lsa = any(
-                kw in query
-                for kw in ["救生筏", "救生艇", "liferaft", "lifeboat"]
-            )
             if has_lsa:
-                relevant_regs.add("SOLAS III/16")
+                if length >= 85:
+                    # 85m+ cargo ships: davit-launched liferaft required
+                    relevant_regs.add("SOLAS III/31")
+                    matched_terms.add("davit-launched liferaft")
+                    matched_terms.add("85 metres")
+                    matched_terms.add("free-fall lifeboat")
+                if length >= 80:
+                    relevant_regs.add("SOLAS III/16")
                 relevant_regs.add("LSA Code Chapter 6")
+
+            # "国际航行" + length → likely cargo ship needing SOLAS III/31
+            if "国际航行" in query or "international" in query.lower():
+                relevant_regs.add("SOLAS III/31")
+
+        if matched_terms:
+            enhanced_parts.append(" ".join(sorted(matched_terms)))
 
         if relevant_regs:
             enhanced_parts.append(" ".join(sorted(relevant_regs)))
