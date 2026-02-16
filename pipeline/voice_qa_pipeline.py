@@ -132,11 +132,14 @@ class VoiceQAPipeline:
         timing["memory_ms"] = int((time.time() - t0) * 1000)
 
         t0 = time.time()
-        retrieved_chunks = self.retriever.retrieve(enhanced_query, top_k=5)
+        # Retrieval uses terminology-enhanced query for better recall
+        retrieved_chunks = self.retriever.retrieve(enhanced_query, top_k=8)
         timing["retrieval_ms"] = int((time.time() - t0) * 1000)
 
         t0 = time.time()
         user_context = self.memory.get_user_context(session.user_id)
+        # LLM sees the natural-language query (with coreference context but
+        # without the appended English terminology), so the prompt reads cleanly
         gen_result = self.generator.generate(
             query=enhanced_query,
             retrieved_chunks=retrieved_chunks,

@@ -111,12 +111,37 @@ class AnswerGenerator:
         if word_count < 15 and not any(kw in query.lower() for kw in RELATION_KEYWORDS):
             use_fast = True
 
-        # Sonnet overrides (complex queries force Sonnet)
+        # --- Sonnet overrides (complex queries force Sonnet) ---
         query_lower = query.lower()
+
         if any(kw in query_lower for kw in COMPLEX_KEYWORDS):
             use_fast = False
 
-        return self.fast_model if use_fast else self.primary_model
+        # Ship parameters or ship type → applicability analysis needs Sonnet
+        has_ship_params = bool(re.search(
+            r"\d+\s*(米|m|吨|GT|DWT|总吨|载重)", query, re.IGNORECASE,
+        ))
+        has_ship_type = any(kw in query_lower for kw in [
+            "货船", "客船", "油轮", "散货", "集装箱", "滚装", "国际航行",
+            "cargo ship", "passenger", "tanker", "bulk carrier",
+        ])
+        if has_ship_params or has_ship_type:
+            use_fast = False
+
+        # Yes/no applicability questions need reasoning
+        if any(kw in query for kw in [
+            "是否", "需不需要", "是否需要", "必须", "要不要",
+            "do I need", "is it required", "must",
+        ]):
+            use_fast = False
+
+        # Long queries (>60 chars for Chinese) are usually complex scenarios
+        if len(query) > 60:
+            use_fast = False
+
+        model = self.fast_model if use_fast else self.primary_model
+        logger.info(f"[ModelRouter] use_fast={use_fast}, model={model}, len={len(query)}")
+        return model
 
     def _build_context(self, chunks: list[dict], max_context_tokens: int = 5000) -> str:
         """Build context with per-chunk and total token limits."""

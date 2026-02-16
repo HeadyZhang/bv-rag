@@ -1,13 +1,18 @@
 """Hybrid retrieval: vector + BM25 + graph with RRF fusion."""
 import logging
+import re
 from collections import defaultdict
 
 from db.bm25_search import BM25Search
 from db.graph_queries import GraphQueries
+from retrieval.query_enhancer import QueryEnhancer
 from retrieval.query_router import QueryRouter
 from retrieval.vector_store import VectorStore
 
 logger = logging.getLogger(__name__)
+
+_COMPLEX_QUERY_RE = re.compile(r"(\d+)\s*(米|m|吨|GT|DWT)", re.IGNORECASE)
+_APPLICABILITY_KW = ["是否", "需不需要", "是否需要", "do I need", "要不要"]
 
 
 class HybridRetriever:
@@ -21,8 +26,18 @@ class HybridRetriever:
         self.bm25 = bm25_search
         self.graph = graph_queries
         self.router = QueryRouter()
+        self.query_enhancer = QueryEnhancer()
 
     def retrieve(self, query: str, top_k: int = 10, strategy: str = "auto") -> list[dict]:
+        # Dynamic top_k for complex applicability questions
+        is_complex = bool(_COMPLEX_QUERY_RE.search(query)) or any(
+            kw in query for kw in _APPLICABILITY_KW
+        )
+        effective_top_k = min(top_k * 2, 15) if is_complex else top_k
+
+        # Enhance query with maritime terminology
+        enhanced_query = self.query_enhancer.enhance(query)
+
         route_result = self.router.route(query)
         if strategy == "auto":
             strategy = route_result["strategy"]
@@ -35,8 +50,8 @@ class HybridRetriever:
 
         if strategy in ("hybrid", "semantic"):
             vector_results = self.vector_store.search(
-                query_text=query,
-                top_k=top_k * 2,
+                query_text=enhanced_query,
+                top_k=effective_top_k * 2,
                 document_filter=doc_filter,
             )
             for rank, r in enumerate(vector_results):
@@ -48,8 +63,8 @@ class HybridRetriever:
 
         if strategy in ("hybrid", "keyword"):
             bm25_results = self.bm25.search(
-                query=query,
-                top_k=top_k * 2,
+                query=enhanced_query,
+                top_k=effective_top_k * 2,
                 document_filter=doc_filter,
             )
             for rank, r in enumerate(bm25_results):
@@ -110,7 +125,7 @@ class HybridRetriever:
             all_results.values(),
             key=lambda x: x["rrf_score"],
             reverse=True,
-        )[:top_k]
+        )[:effective_top_k]
 
         for result in sorted_results:
             result["fused_score"] = result["rrf_score"]
