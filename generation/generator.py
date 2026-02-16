@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 
 import anthropic
+import tiktoken
 
 from generation.prompts import SYSTEM_PROMPT
 
@@ -96,6 +97,47 @@ class AnswerGenerator:
         user_message = "\n\n".join(user_parts)
         messages.append({"role": "user", "content": user_message})
 
+        # === Diagnostic logging: record full retrieval + context details ===
+        logger.info("=" * 80)
+        logger.info("[DIAG] ========== 查询诊断开始 ==========")
+        logger.info(f"[DIAG] 用户查询: {query}")
+
+        if classification:
+            logger.info(f"[DIAG] 意图分类: {classification.get('intent', '?')}")
+            logger.info(f"[DIAG] 船舶信息: {classification.get('ship_info', {})}")
+
+        logger.info(f"[DIAG] 检索到 {len(retrieved_chunks)} 个 chunks:")
+        for i, chunk in enumerate(retrieved_chunks):
+            meta = chunk.get("metadata", {})
+            score = chunk.get("score") or chunk.get("fused_score", 0)
+            text_preview = chunk.get("text", "")[:200].replace("\n", " ")
+            graph_flag = " [GRAPH-EXPANDED]" if chunk.get("_graph_expanded") else ""
+            logger.info(f"[DIAG]   Chunk {i+1}{graph_flag}:")
+            logger.info(f"[DIAG]     Score: {score:.4f}")
+            logger.info(f"[DIAG]     Source: {meta.get('breadcrumb', 'N/A')}")
+            logger.info(f"[DIAG]     RegNum: {meta.get('regulation_number', 'N/A')}")
+            logger.info(f"[DIAG]     Title: {meta.get('title', 'N/A')}")
+            logger.info(f"[DIAG]     Collection: {meta.get('collection', 'N/A')}")
+            logger.info(f"[DIAG]     URL: {meta.get('url', 'N/A')}")
+            logger.info(f"[DIAG]     Text: {text_preview}...")
+
+        if practical_context:
+            logger.info("[DIAG] 实务知识库匹配:")
+            for line in practical_context[:500].split("\n"):
+                if line.strip():
+                    logger.info(f"[DIAG]   {line.strip()}")
+        else:
+            logger.info("[DIAG] 实务知识库: 无匹配")
+
+        try:
+            enc = tiktoken.encoding_for_model("gpt-4")
+            token_count = len(enc.encode(user_message))
+        except Exception:
+            token_count = len(user_message) // 4
+
+        logger.info(f"[DIAG] 发给LLM的上下文: {token_count} tokens ({len(user_message)} chars)")
+        logger.info(f"[DIAG] 模型选择: {model}")
+
         try:
             response = self.client.messages.create(
                 model=model,
@@ -107,6 +149,10 @@ class AnswerGenerator:
         except Exception as e:
             logger.error(f"LLM generation error: {e}")
             raise
+
+        logger.info(f"[DIAG] LLM 回答前200字: {answer[:200].replace(chr(10), ' ')}")
+        logger.info("[DIAG] ========== 查询诊断结束 ==========")
+        logger.info("=" * 80)
 
         citations = self._extract_citations(answer)
         confidence = self._assess_confidence(retrieved_chunks)

@@ -164,9 +164,12 @@ class QueryEnhancer:
 
         enhanced_query = " | ".join(enhanced_parts) if len(enhanced_parts) > 1 else query
 
-        logger.info(f"[QueryEnhancer] Original: {query}")
-        logger.info(f"[QueryEnhancer] Matched terms: {matched_terms}")
-        logger.info(f"[QueryEnhancer] Relevant regs: {relevant_regs}")
-        logger.info(f"[QueryEnhancer] Enhanced: {enhanced_query}")
+        # Store on instance for external access
+        self._last_matched_terms = matched_terms
+        self._last_relevant_regs = relevant_regs
+
+        logger.info(f"[ENHANCE] 匹配术语: {matched_terms}")
+        logger.info(f"[ENHANCE] 关联法规: {relevant_regs}")
+        logger.info(f"[ENHANCE] 增强查询: {enhanced_query[:200]}")
 
         return enhanced_query

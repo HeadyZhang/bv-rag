@@ -32,6 +32,9 @@ class HybridRetriever:
         # Enhance query with maritime terminology
         enhanced_query = self.query_enhancer.enhance(query)
 
+        logger.info(f"[RETRIEVAL] 原始查询: {query[:100]}")
+        logger.info(f"[RETRIEVAL] 增强查询: {enhanced_query[:200]}")
+
         # Dynamic top_k based on regulation count in enhanced query
         reg_count = len(re.findall(
             r"SOLAS|LSA|MARPOL|FSS|MSC|STCW|COLREG", enhanced_query,
@@ -67,6 +70,12 @@ class HybridRetriever:
                 top_k=effective_top_k * 2,
                 document_filter=doc_filter,
             )
+            logger.info(f"[RETRIEVAL] 向量检索返回 {len(vector_results)} 条")
+            for i, r in enumerate(vector_results[:5]):
+                logger.info(
+                    f"[RETRIEVAL]   Vec {i+1}: score={r.get('score', 0):.4f} "
+                    f"title={r.get('metadata', {}).get('title', '?')[:80]}"
+                )
             for rank, r in enumerate(vector_results):
                 cid = r["chunk_id"]
                 if cid not in all_results:
@@ -80,6 +89,12 @@ class HybridRetriever:
                 top_k=effective_top_k * 2,
                 document_filter=doc_filter,
             )
+            logger.info(f"[RETRIEVAL] BM25 检索返回 {len(bm25_results)} 条")
+            for i, r in enumerate(bm25_results[:5]):
+                logger.info(
+                    f"[RETRIEVAL]   BM25 {i+1}: "
+                    f"title={r.get('title', '?')[:80]}"
+                )
             for rank, r in enumerate(bm25_results):
                 doc_id = r["doc_id"]
                 pseudo_cid = f"bm25__{doc_id}"
@@ -140,8 +155,21 @@ class HybridRetriever:
             reverse=True,
         )[:effective_top_k]
 
+        logger.info(f"[RETRIEVAL] RRF 融合后: {len(sorted_results)} 条")
+
         # Graph expansion: follow cross-references from top results
+        before_graph = len(sorted_results)
         sorted_results = self._graph_expand(sorted_results, effective_top_k)
+        graph_added = len(sorted_results) - before_graph
+        if graph_added > 0:
+            logger.info(f"[RETRIEVAL] 图扩展新增 {graph_added} 条:")
+            for r in sorted_results[before_graph:]:
+                logger.info(
+                    f"[RETRIEVAL]   Graph: "
+                    f"title={r.get('metadata', {}).get('title', '?')[:80]}"
+                )
+        else:
+            logger.info("[RETRIEVAL] 图扩展: 无新增")
 
         for result in sorted_results:
             result["fused_score"] = result["rrf_score"]
