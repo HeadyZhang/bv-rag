@@ -64,6 +64,10 @@ class BM25Search:
 
     def search(self, query: str, top_k: int = 10, document_filter: str | None = None) -> list[dict]:
         prepared = self._prepare_query(query)
+        if not prepared or not prepared.strip():
+            logger.warning("[BM25] Empty prepared query after CJK stripping")
+            return []
+
         sql = """
             SELECT doc_id, title, breadcrumb, url, body_text,
                    ts_rank_cd(search_vector, websearch_to_tsquery('english', %s), 32) as score
@@ -77,7 +81,33 @@ class BM25Search:
             with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute(sql, (prepared, prepared, document_filter, document_filter, top_k))
                 results = cur.fetchall()
-                return [dict(r) for r in results]
+                results = [dict(r) for r in results]
+
+                # Fallback: if tsvector search returned nothing, try ILIKE on
+                # body_text for key English terms extracted from the query.
+                # This catches curated chunks with rich English text.
+                if not results:
+                    fallback_terms = self._extract_fallback_terms(query)
+                    if fallback_terms:
+                        like_clauses = " OR ".join(
+                            "body_text ILIKE %s" for _ in fallback_terms
+                        )
+                        fallback_sql = f"""
+                            SELECT doc_id, title, breadcrumb, url, body_text,
+                                   0.01 as score
+                            FROM regulations
+                            WHERE ({like_clauses})
+                              AND (%s::text IS NULL OR document = %s)
+                            LIMIT %s
+                        """
+                        params = [f"%{t}%" for t in fallback_terms]
+                        params.extend([document_filter, document_filter, top_k])
+                        cur.execute(fallback_sql, params)
+                        results = [dict(r) for r in cur.fetchall()]
+                        if results:
+                            logger.info(f"[BM25] Fallback ILIKE found {len(results)} results")
+
+                return results
         except Exception as e:
             logger.error(f"BM25 search error: {e}")
             try:
@@ -85,6 +115,26 @@ class BM25Search:
             except Exception:
                 pass
             return []
+
+    @staticmethod
+    def _extract_fallback_terms(query: str) -> list[str]:
+        """Extract key English phrases from the enhanced query for ILIKE fallback."""
+        # Look for important fire/safety terms that should exist in body_text
+        important_phrases = [
+            "Table 9.1", "Table 9.2", "Table 9.3", "Table 9.4",
+            "Table 9.5", "Table 9.6",
+            "fire integrity", "fire division",
+            "galley", "corridor", "control station",
+            "Category 9", "Category 1", "Category 6",
+            "ODME", "Regulation 34", "1/30000",
+            "air pipe", "Regulation 20",
+        ]
+        found = []
+        query_lower = query.lower()
+        for phrase in important_phrases:
+            if phrase.lower() in query_lower:
+                found.append(phrase)
+        return found[:3]  # limit to avoid slow queries
 
     def search_by_regulation_number(self, reg_number: str, top_k: int = 10) -> list[dict]:
         sql = """

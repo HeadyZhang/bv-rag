@@ -32,10 +32,13 @@ INTENT_TYPES = {
         "triggers_zh": [
             "是否需要", "需不需要", "是否适用", "适用于", "要不要",
             "必须", "强制", "需要配备", "是否要求",
+            "是不是", "是否", "能不能", "还需要",
+            "都不需要", "可以免除",
         ],
         "triggers_en": [
             "do I need", "is it required", "does it apply",
             "must I", "is it mandatory", "applicable to",
+            "do I still need", "is it exempt",
         ],
         "retrieval_strategy": "broad",
         "model": "primary",
@@ -45,14 +48,19 @@ INTENT_TYPES = {
         "triggers_zh": [
             "最小", "最大", "多少", "尺寸", "数量", "间距",
             "高度", "宽度", "面积", "速度", "时间",
+            "什么等级", "什么样的", "应该是什么", "不能超过",
+            "不得超过", "有什么要求", "需要什么", "级别",
+            "什么标准", "什么规定",
         ],
         "triggers_en": [
             "minimum", "maximum", "how many", "dimension",
             "size", "spacing", "height", "width",
+            "what rating", "what grade", "what class", "what standard",
+            "what requirement",
         ],
         "retrieval_strategy": "precise",
-        "model": "fast",
-        "top_k": 5,
+        "model": "primary",
+        "top_k": 8,
     },
     "procedure": {
         "triggers_zh": ["怎么", "如何", "步骤", "流程", "程序", "操作"],
@@ -87,7 +95,7 @@ _TYPE_MAP = {
 }
 
 _LENGTH_RE = re.compile(r"(\d+)\s*(米|m|metres)", re.IGNORECASE)
-_TONNAGE_RE = re.compile(r"(\d+)\s*(吨|GT|总吨|gross tonnage)", re.IGNORECASE)
+_TONNAGE_RE = re.compile(r"(\d+)\s*(?:万)?\s*(吨|GT|总吨|gross tonnage|载重吨|DWT|dwt)", re.IGNORECASE)
 
 
 class QueryClassifier:
@@ -162,6 +170,10 @@ class QueryClassifier:
 
         m = _TONNAGE_RE.search(query)
         if m:
-            info["tonnage"] = int(m.group(1))
+            tonnage = int(m.group(1))
+            # Handle "万" (10,000x) multiplier: "10万载重吨" = 100,000 DWT
+            if "万" in query[m.start():m.end() + 2]:
+                tonnage *= 10000
+            info["tonnage"] = tonnage
 
         return info

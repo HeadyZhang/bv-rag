@@ -33,21 +33,28 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     # Fire safety - structural
     "防火分隔": ["fire division", "fire integrity", "A-class division", "B-class division", "structural fire protection"],
     "防火等级": ["fire rating", "fire integrity", "structural fire protection"],
-    "厨房": ["galley", "cooking area", "service space"],
-    "走廊": ["corridor", "passageway", "escape route"],
-    "驾驶室": ["wheelhouse", "navigation bridge", "control station"],
-    "住舱": ["accommodation space", "cabin", "crew quarters"],
-    "控制站": ["control station", "fire control station"],
+    "厨房": ["galley", "cooking area", "service space high risk", "Category 9"],
+    "走廊": ["corridor", "passageway", "escape route", "Category 2"],
+    "驾驶室": ["wheelhouse", "navigation bridge", "control station", "Category 1"],
+    "住舱": ["accommodation space", "cabin", "crew quarters", "Category 3"],
+    "控制站": ["control station", "fire control station", "Category 1"],
+    "机舱": ["engine room", "machinery space", "machinery space of Category A", "Category 6"],
+    "甲板": ["deck", "fire integrity of decks"],
     # Structure / access
     "通道": ["access", "means of access", "passage", "gangway"],
     "开口": ["opening", "clear opening", "hatchway"],
     "双壳": ["double hull", "double skin", "double bottom"],
     "水密门": ["watertight door", "watertight"],
-    "舱壁": ["bulkhead", "watertight bulkhead"],
-    "干舷": ["freeboard"],
+    "舱壁": ["bulkhead", "watertight bulkhead", "fire integrity of bulkheads"],
+    "干舷": ["freeboard", "freeboard deck"],
+    "干舷甲板": ["freeboard deck"],
     # MARPOL - discharge
     "排油": ["oil discharge", "ODME", "discharge monitoring", "oily mixture"],
+    "排油监控": ["ODME", "oil discharge monitoring and control system"],
+    "排油量": ["oil discharge quantity", "total oil discharge", "discharge limit"],
     "排放": ["discharge", "disposal"],
+    "油水分离": ["OWS", "oily water separator", "15 ppm"],
+    "舱底水": ["bilge water", "bilge", "engine room bilge"],
     # Load Lines - ventilation
     "透气管": ["air pipe", "vent pipe", "tank vent"],
     "上层建筑": ["superstructure", "superstructure deck"],
@@ -104,7 +111,18 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "control station": ["SOLAS II-2/9"],
     "oil discharge": ["MARPOL Annex I/Reg.34", "MARPOL Annex I/Reg.15"],
     "ODME": ["MARPOL Annex I/Reg.34", "MEPC.108(49)"],
+    "oil discharge monitoring": ["MARPOL Annex I/Reg.34", "MEPC.108(49)"],
+    "bilge": ["MARPOL Annex I/Reg.15"],
+    "oily water separator": ["MARPOL Annex I/Reg.15"],
+    "engine room": ["SOLAS II-2/9", "SOLAS II-1"],
+    "machinery space": ["SOLAS II-2/9", "SOLAS II-1"],
+    "accommodation": ["SOLAS II-2/9"],
+    "Category 9": ["SOLAS II-2/9"],
+    "Category 1": ["SOLAS II-2/9"],
+    "Category 6": ["SOLAS II-2/9"],
+    "deck": ["SOLAS II-2/9"],
     "air pipe": ["Load Lines Reg.20", "ILLC 1966/1988"],
+    "freeboard deck": ["Load Lines Convention", "ILLC 1966/1988"],
     "stability": ["SOLAS II-1"],
     "pollution": ["MARPOL"],
     "access": ["SOLAS II-1/3-6"],
@@ -210,12 +228,20 @@ class QueryEnhancer:
 
         # Step 6: topic-specific keyword injection
         # Fire division -> inject table keywords for better retrieval
-        if any(kw in query for kw in ["防火分隔", "防火等级"]):
-            matched_terms.update([
-                "Table 9.3", "Table 9.5",
+        if any(kw in query for kw in ["防火分隔", "防火等级", "厨房", "走廊", "驾驶室", "住舱", "机舱"]):
+            fire_tables = [
                 "fire integrity of bulkheads and decks",
                 "structural fire protection",
-            ])
+            ]
+            # Inject ship-type-specific tables
+            if any(kw in query for kw in ["货船", "cargo"]):
+                fire_tables.extend(["Table 9.5", "Table 9.6"])
+            elif any(kw in query for kw in ["客船", "passenger"]):
+                fire_tables.extend(["Table 9.1", "Table 9.2", "Table 9.3", "Table 9.4"])
+            else:
+                # Default: inject most common tables (cargo + passenger >36)
+                fire_tables.extend(["Table 9.1", "Table 9.5"])
+            matched_terms.update(fire_tables)
             relevant_regs.update(["SOLAS II-2/9", "SOLAS II-2/3"])
 
         # Oil discharge -> inject Reg.34 key data terms

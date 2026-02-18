@@ -4,6 +4,10 @@ Maritime regulatory answers depend on multiple conditional dimensions:
 ship type, tonnage, construction date, voyage type, etc.
 This module detects when critical dimensions are missing and generates
 targeted clarification questions.
+
+Strategy: "tiered answer" (分档回答) over clarification.
+Most queries should be answered directly with scenario tiers rather than
+asking for more information. Clarification is a last resort.
 """
 import re
 
@@ -122,6 +126,63 @@ _DIMENSION_PATTERNS = re.compile(r"\d+\s*(米|m|吨|GT|DWT|总吨|载重吨)", r
 _DATE_PATTERNS = re.compile(r"(19|20)\d{2}\s*年|built\s*(in|before|after)\s*\d{4}", re.IGNORECASE)
 _VOYAGE_PATTERNS = ["国际航行", "国内航行", "international", "domestic"]
 
+# Space category keywords for detecting universal fire division pairs
+_SPACE_CATEGORY_MAP = {
+    "control_station": [
+        "驾驶室", "控制站", "控制室", "消防控制",
+        "wheelhouse", "bridge", "control station", "radio room",
+    ],
+    "accommodation": [
+        "住舱", "起居", "船员舱", "船员住舱",
+        "accommodation", "cabin", "crew quarters", "living quarters",
+    ],
+    "machinery_cat_a": [
+        "机舱", "机器处所", "主机", "锅炉",
+        "engine room", "machinery space", "boiler room",
+    ],
+    "galley_high_risk": [
+        "厨房", "烹饪", "galley", "kitchen", "cooking",
+    ],
+    "corridor": [
+        "走廊", "通道", "corridor", "passageway",
+    ],
+}
+
+# Fire division pairs where the answer is the SAME regardless of ship type
+_UNIVERSAL_FIRE_PAIRS: dict[tuple[str, str], str] = {
+    ("control_station", "accommodation"): "A-60",
+    ("control_station", "machinery_cat_a"): "A-60",
+    ("machinery_cat_a", "accommodation"): "A-60",
+}
+
+
+def _detect_space_categories(query: str) -> list[str]:
+    """Detect which space categories are mentioned in the query."""
+    query_lower = query.lower()
+    found = []
+    for category, keywords in _SPACE_CATEGORY_MAP.items():
+        if any(kw in query_lower for kw in keywords):
+            found.append(category)
+    return found
+
+
+def _is_universal_fire_answer(query: str) -> bool:
+    """Check if the fire division question involves a universal pair.
+
+    Some space-category pairs always have the same fire rating regardless
+    of ship type (e.g. control station vs accommodation = A-60 on ALL ships).
+    """
+    categories = _detect_space_categories(query)
+    if len(categories) < 2:
+        return False
+    # Check all pairs
+    for i in range(len(categories)):
+        for j in range(i + 1, len(categories)):
+            pair = tuple(sorted([categories[i], categories[j]]))
+            if pair in _UNIVERSAL_FIRE_PAIRS:
+                return True
+    return False
+
 
 class ClarificationChecker:
     """Detect missing dimensional slots and generate clarification questions."""
@@ -144,11 +205,36 @@ class ClarificationChecker:
     ) -> tuple[bool, list[dict]]:
         """Check if clarification is needed.
 
+        Strategy: "tiered answer" (分档回答) is preferred over clarification.
+        The system should answer directly with scenario tiers in most cases.
+        Clarification is only used as a last resort for extremely vague queries.
+
         Returns (needs_clarification, questions) where questions is a list of
         dicts with 'slot', 'question', and optional 'options' keys.
         """
         # If query contains clarification supplement, skip re-asking
         if "补充信息" in query or "补充：" in query:
+            return False, []
+
+        # Rule 1: If the fire division answer is universal (same for all ship types),
+        # NEVER clarify — just answer directly
+        if topic == "fire_division" and _is_universal_fire_answer(query):
+            return False, []
+
+        # Rule 2: If the user provided a ship type, NEVER clarify
+        # (the system can give a tiered answer for the remaining unknowns)
+        if ship_info.get("type"):
+            return False, []
+
+        # Rule 3: If the user mentioned specific space types for fire division,
+        # answer with tiers rather than clarifying
+        if topic == "fire_division":
+            categories = _detect_space_categories(query)
+            if len(categories) >= 2:
+                return False, []
+
+        # Rule 4: specification intent should answer with tiers, not clarify
+        if intent == "specification":
             return False, []
 
         # Merge intent slots + topic-specific slots
@@ -159,12 +245,9 @@ class ClarificationChecker:
         if topic and topic in TOPIC_EXTRA_SLOTS:
             extra = TOPIC_EXTRA_SLOTS[topic]
             if extra.get("override_base"):
-                # Topic completely replaces base slots (e.g. air_pipe applies to all ship types)
                 critical = list(extra.get("critical", []))
                 important = list(extra.get("important", []))
             elif intent in ("definition", "comparison"):
-                # For definition/comparison intents, topic extras go to important
-                # (system should answer with declared assumptions, not clarify)
                 for s in extra.get("critical", []):
                     if s not in important:
                         important.append(s)
@@ -180,6 +263,13 @@ class ClarificationChecker:
         missing_critical = [s for s in critical if not self._has_slot(s, ship_info, query)]
 
         if not missing_critical:
+            return False, []
+
+        # Rule 5: Even if critical slots are missing, prefer tiered answers
+        # Only clarify when the query is so vague that listing all scenarios
+        # would produce too many different answers (>5 branches)
+        if len(missing_critical) <= 1:
+            # A single missing slot can be handled by a 2-4 row tier table
             return False, []
 
         questions = []
