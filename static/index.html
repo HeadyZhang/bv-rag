@@ -144,6 +144,17 @@ body {
 .confidence-low { color: #ef4444; }
 .model-tag { color: #8b5cf6; }
 
+/* Clarification UI */
+.clarify-box { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); border-radius: 12px; padding: 14px; margin-top: 4px; }
+.clarify-box p { margin-bottom: 8px; font-size: 14px; }
+.clarify-options { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+.clarify-btn {
+  background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.35);
+  color: #93c5fd; padding: 6px 14px; border-radius: 16px; cursor: pointer;
+  font-size: 13px; transition: all 0.2s;
+}
+.clarify-btn:hover { background: rgba(59,130,246,0.3); border-color: rgba(59,130,246,0.5); }
+
 .hidden { display: none !important; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -499,6 +510,42 @@ function addAIMsg(data, inputMode) {
   }
 }
 
+// ============ Clarification UI ============
+function displayClarification(data) {
+  removeLoading();
+  const d = document.createElement('div');
+  d.className = 'msg ai';
+
+  let html = '<div class="clarify-box">';
+  html += '<p><strong>' + escapeHtml(data.answer_text.split('\n')[0]) + '</strong></p>';
+
+  const questions = data.questions || [];
+  const originalQuery = data._originalQuery || '';
+
+  questions.forEach(function(q, i) {
+    html += '<p>' + (i+1) + '. ' + escapeHtml(q.question) + '</p>';
+    if (q.options) {
+      html += '<div class="clarify-options">';
+      q.options.forEach(function(opt) {
+        html += '<button class="clarify-btn" onclick="submitClarification(\'' +
+          escapeHtml(originalQuery).replace(/'/g, "\\'") + '\', \'' +
+          escapeHtml(opt).replace(/'/g, "\\'") + '\')">' + escapeHtml(opt) + '</button>';
+      });
+      html += '</div>';
+    }
+  });
+  html += '</div>';
+
+  d.innerHTML = html;
+  chatArea.appendChild(d);
+  scrollBottom();
+}
+
+function submitClarification(originalQuery, supplement) {
+  const mergedQuery = originalQuery + '（补充信息：' + supplement + '）';
+  sendText(mergedQuery);
+}
+
 // ============ Send Text Query ============
 async function sendText(text) {
   if (!text.trim()) return;
@@ -518,7 +565,13 @@ async function sendText(text) {
     const res = await fetch('/api/v1/voice/text-query', {method:'POST', body:form});
     const data = await res.json();
     if (data.session_id) SESSION_ID = data.session_id;
-    addAIMsg(data, 'text');
+
+    if (data.action === 'clarify') {
+      data._originalQuery = text;
+      displayClarification(data);
+    } else {
+      addAIMsg(data, 'text');
+    }
   } catch(e) {
     removeLoading();
     addAIMsg({answer_text:'Error: ' + e.message, confidence:'low', timing:{}, sources:[]}, 'text');
@@ -545,7 +598,13 @@ async function sendAudio(blob) {
     if (lastUser && data.transcription) {
       lastUser.innerHTML = '<div class="mode-tag">Voice</div>' + escapeHtml(data.transcription);
     }
-    addAIMsg(data, 'voice');
+
+    if (data.action === 'clarify') {
+      data._originalQuery = data.transcription || '';
+      displayClarification(data);
+    } else {
+      addAIMsg(data, 'voice');
+    }
   } catch(e) {
     removeLoading();
     addAIMsg({answer_text:'Error: ' + e.message, confidence:'low', timing:{}, sources:[]}, 'voice');

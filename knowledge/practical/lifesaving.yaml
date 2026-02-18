@@ -2,20 +2,25 @@
   title: "货船救生筏降落设备配置"
   keywords: ["救生筏", "降落设备", "起降", "davit", "吊车", "释放设备"]
   terms: ["davit-launched liferaft", "throw-overboard", "launching appliance", "free-fall"]
-  regulations: ["SOLAS III/31", "SOLAS III/31.1.4", "SOLAS III/16", "LSA Code 6.1"]
+  regulations: ["SOLAS III/31", "SOLAS III/31.1.4", "SOLAS III/31.1.2.2", "SOLAS III/16", "LSA Code 6.1"]
   ship_types: ["cargo ship", "bulk carrier", "tanker", "container ship", "货船", "散货船", "油轮"]
   common_mistake: "看到 SOLAS III/31.1.4 说 'on each side' 就认为两舷都需要 davit-launched liferaft。实际上只要一舷有 davit 即可，另一舷可以是 throw-overboard 抛投式。"
-  correct_interpretation: "≥85m 货船的标准配置是：一舷配 davit + davit-launched liferaft，另一舷配 throw-overboard liferaft（带静水压力释放）。两舷救生筏总容量需满足全船人员100%。"
+  correct_interpretation: >
+    ≥85m 货船必须在每舷配备救生筏，且至少一舷的救生筏必须由降落设备(davit)提供服务。
+    SOLAS III/31.1.2.2 原文："The liferafts on at least one side of the ship
+    shall be served by launching appliances."
+    即使配备了 free-fall lifeboat，仍需至少一舷有 davit-launched liferaft。
   typical_configurations:
-    - "最常见配置：船尾 free-fall lifeboat（容纳100%人员）+ 两舷 throw-overboard liferafts"
+    - "最常见配置：船尾 free-fall lifeboat + 一舷 davit-launched liferaft + 另一舷 throw-overboard liferafts"
     - "无 free-fall 配置：一舷 davit + davit-launched liferaft，另一舷 throw-overboard liferaft"
     - "客船配置：通常两舷都需要 davit-launched（要求更严格）"
   decision_tree:
     - "Step 1: 确认船型（货船 vs 客船）"
     - "Step 2: 确认船长（≥85m 适用 SOLAS III/31.1.4）"
-    - "Step 3: 是否有 free-fall lifeboat？→ 有：两舷救生筏可以全部是 throw-overboard"
-    - "Step 4: 无 free-fall：一舷必须有 davit-launched，另一舷可 throw-overboard"
-    - "Step 5: 救生筏存放高度 ≥18m → 该位置的救生筏必须有降落设备"
+    - "Step 3: 是否有 free-fall lifeboat？"
+    - "Step 4: 有 free-fall → 仍需至少一舷 davit-launched liferaft（SOLAS III/31.1.2.2）"
+    - "Step 5: 无 free-fall → 一舷必须有 davit-launched，另一舷可 throw-overboard"
+    - "Step 6: 救生筏存放高度 ≥18m → 该位置的救生筏必须有降落设备"
 
 - id: cargo_liferaft_capacity
   title: "货船救生筏容量计算"
@@ -31,8 +36,24 @@
 - id: free_fall_lifeboat_exemption
   title: "自由降落救生艇的配置影响"
   keywords: ["自由降落", "free-fall", "救生艇", "豁免"]
-  terms: ["free-fall lifeboat", "exemption", "in lieu of"]
-  regulations: ["SOLAS III/31.1.4", "SOLAS III/31.1.6"]
+  terms: ["free-fall lifeboat", "exemption", "in lieu of", "launching appliance"]
+  regulations: ["SOLAS III/31.1.2.2", "SOLAS III/31.1.4", "SOLAS III/31.1.6"]
   ship_types: ["cargo ship", "bulk carrier", "tanker", "货船", "散货船", "油轮"]
-  correct_interpretation: "配备了 free-fall lifeboat（容纳100%人员）后，救生筏的要求可以放宽。两舷的救生筏通常只需要 throw-overboard 类型即可，不强制要求 davit。但仍需满足总容量要求。"
-  common_mistake: "认为有了 free-fall lifeboat 就不需要救生筏了。实际上救生筏仍然必须配备，只是不需要 davit-launched 类型。"
+  correct_interpretation: >
+    配备 free-fall lifeboat（容纳100%人员）后，仍需要在每舷配备救生筏，
+    且至少一舷的救生筏必须由降落设备(davit)提供服务。
+    SOLAS III/31.1.2.2 原文："The liferafts on at least one side of the ship
+    shall be served by launching appliances."
+    所以正确配置是：free-fall lifeboat + 至少一舷 davit-launched liferaft + 另一舷可 throw-overboard。
+  common_mistake: >
+    认为有了 free-fall lifeboat 就两舷都不需要 davit。
+    错误！即使有 free-fall，仍需至少一舷 davit-launched liferaft。
+  typical_configurations:
+    - "标准配置：船尾 free-fall lifeboat + 一舷 davit-launched liferaft + 另一舷 throw-overboard liferaft"
+    - "无 free-fall：一舷 davit-launched liferaft + 另一舷 throw-overboard liferaft"
+  decision_tree:
+    - "Step 1: 确认船型（货船 vs 客船）"
+    - "Step 2: 确认船长（≥85m 适用 SOLAS III/31.1.4）"
+    - "Step 3: 是否有 free-fall lifeboat？"
+    - "Step 4: 有 free-fall → 仍需至少一舷 davit-launched liferaft（SOLAS III/31.1.2.2）"
+    - "Step 5: 无 free-fall → 一舷必须有 davit-launched，另一舷可 throw-overboard"

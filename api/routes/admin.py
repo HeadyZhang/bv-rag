@@ -61,6 +61,20 @@ async def debug_session(session_id: str, request: Request):
     }
 
 
+@router.get("/utility-stats")
+async def utility_stats(request: Request):
+    """Show chunk utility learning statistics (MemRL)."""
+    reranker = getattr(request.app.state, "utility_reranker", None)
+    if not reranker:
+        return {"status": "disabled", "message": "Utility reranker not enabled"}
+
+    try:
+        stats = reranker.get_stats()
+        return {"status": "ok", "utility_stats": stats}
+    except Exception as exc:
+        return {"status": "error", "message": str(exc)}
+
+
 @router.post("/reindex")
 async def reindex(request: Request):
     return {

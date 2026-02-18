@@ -1,8 +1,31 @@
-"""Query intent classification with ship info extraction."""
+"""Query intent classification with ship info extraction and topic detection."""
 import logging
 import re
 
 logger = logging.getLogger(__name__)
+
+# Topic detection triggers — which regulatory domain the query targets
+TOPIC_TRIGGERS: dict[str, list[str]] = {
+    "fire_division": [
+        "防火分隔", "防火等级", "A级", "B级", "A-0", "A-15", "A-30", "A-60",
+        "B-0", "B-15", "fire division", "fire integrity", "fire rating",
+        "Table 9", "舱壁.*等级", "甲板.*防火",
+    ],
+    "oil_discharge": [
+        "排油", "ODME", "排放.*油", "discharge.*oil", "cargo tank.*discharge",
+        "1/30000", "30升", "30L",
+    ],
+    "equipment_requirement": [
+        "是否需要配备", "需要多少", "配置要求", "必须配备",
+    ],
+    "lifesaving": [
+        "救生艇", "救生筏", "lifeboat", "liferaft", "davit", "free.?fall",
+        "LSA", "rescue boat",
+    ],
+    "air_pipe": [
+        "透气管", "air pipe", "vent pipe", "tank vent",
+    ],
+}
 
 INTENT_TYPES = {
     "applicability": {
@@ -68,7 +91,7 @@ _TONNAGE_RE = re.compile(r"(\d+)\s*(吨|GT|总吨|gross tonnage)", re.IGNORECASE
 
 
 class QueryClassifier:
-    """Classify user query intent and extract ship parameters."""
+    """Classify user query intent, topic, and extract ship parameters."""
 
     def classify(self, query: str) -> dict:
         query_lower = query.lower()
@@ -90,23 +113,35 @@ class QueryClassifier:
         ship_info = self._extract_ship_info(query)
 
         # Force applicability when ship dimensions + requirement question
-        # (ship type alone is not enough — avoids capturing comparison queries)
         has_dimensions = ship_info.get("length") or ship_info.get("tonnage")
         if has_dimensions and any(kw in query_lower for kw in [
             "是否", "需不需要", "需要", "要不要", "必须", "need", "require", "must",
         ]):
             intent = "applicability"
 
+        # Detect regulatory topic
+        topic = self._detect_topic(query_lower)
+
         config = INTENT_TYPES.get(intent, {})
         result = {
             "intent": intent,
+            "topic": topic,
             "ship_info": ship_info,
             "retrieval_strategy": config.get("retrieval_strategy", "normal"),
             "model": config.get("model", "auto"),
             "top_k": config.get("top_k", 8),
         }
-        logger.info(f"[QueryClassifier] intent={intent}, ship_info={ship_info}")
+        logger.info(f"[QueryClassifier] intent={intent}, topic={topic}, ship_info={ship_info}")
         return result
+
+    @staticmethod
+    def _detect_topic(query_lower: str) -> str | None:
+        """Detect the regulatory topic/domain from query text."""
+        for topic, triggers in TOPIC_TRIGGERS.items():
+            for trigger in triggers:
+                if trigger.lower() in query_lower:
+                    return topic
+        return None
 
     @staticmethod
     def _extract_ship_info(query: str) -> dict:

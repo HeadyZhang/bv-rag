@@ -109,3 +109,28 @@ INSERT INTO concepts (concept_id, name, category) VALUES
     ('ism_audit', 'ISM audit', 'concept'),
     ('port_state_control', 'port state control', 'concept')
 ON CONFLICT DO NOTHING;
+
+-- ==========================================
+-- 5. Chunk utilities (MemRL-inspired utility-aware reranking)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS chunk_utilities (
+    chunk_id TEXT NOT NULL,
+    query_category TEXT NOT NULL DEFAULT 'general',
+    utility_score REAL NOT NULL DEFAULT 0.5,
+    use_count INTEGER NOT NULL DEFAULT 0,
+    success_count INTEGER NOT NULL DEFAULT 0,
+    last_used TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (chunk_id, query_category)
+);
+
+CREATE INDEX IF NOT EXISTS idx_chunk_utilities_score
+    ON chunk_utilities(query_category, utility_score DESC);
+
+-- ==========================================
+-- 6. Add source_type and authority_level to regulations
+-- ==========================================
+-- source_type: 'imo_rules', 'bv_rules', 'iacs_ur', 'iacs_ui', 'iacs_pr', 'iacs_rec'
+-- authority_level: 'convention', 'resolution', 'iacs_ur', 'iacs_ui', 'classification_rule', 'guidance_note'
+ALTER TABLE regulations ADD COLUMN IF NOT EXISTS source_type TEXT DEFAULT 'imo_rules';
+ALTER TABLE regulations ADD COLUMN IF NOT EXISTS authority_level TEXT DEFAULT 'convention';

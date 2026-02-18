@@ -22,7 +22,7 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "救生圈": ["lifebuoy", "life buoy"],
     "救生衣": ["lifejacket", "life-jacket"],
     "起降落": ["launching appliance", "davit", "launching device"],
-    # Fire safety
+    # Fire safety - equipment
     "灭火器": ["fire extinguisher", "portable extinguisher"],
     "消防泵": ["fire pump", "fire main"],
     "喷淋系统": ["sprinkler system", "water spraying system", "fixed fire-extinguishing"],
@@ -30,6 +30,14 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "烟雾探测": ["smoke detector", "fire detection", "smoke detection system"],
     "探火系统": ["fire detection system", "fire alarm"],
     "灭火系统": ["fire-extinguishing system", "fire fighting"],
+    # Fire safety - structural
+    "防火分隔": ["fire division", "fire integrity", "A-class division", "B-class division", "structural fire protection"],
+    "防火等级": ["fire rating", "fire integrity", "structural fire protection"],
+    "厨房": ["galley", "cooking area", "service space"],
+    "走廊": ["corridor", "passageway", "escape route"],
+    "驾驶室": ["wheelhouse", "navigation bridge", "control station"],
+    "住舱": ["accommodation space", "cabin", "crew quarters"],
+    "控制站": ["control station", "fire control station"],
     # Structure / access
     "通道": ["access", "means of access", "passage", "gangway"],
     "开口": ["opening", "clear opening", "hatchway"],
@@ -37,6 +45,12 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "水密门": ["watertight door", "watertight"],
     "舱壁": ["bulkhead", "watertight bulkhead"],
     "干舷": ["freeboard"],
+    # MARPOL - discharge
+    "排油": ["oil discharge", "ODME", "discharge monitoring", "oily mixture"],
+    "排放": ["discharge", "disposal"],
+    # Load Lines - ventilation
+    "透气管": ["air pipe", "vent pipe", "tank vent"],
+    "上层建筑": ["superstructure", "superstructure deck"],
     # Ship types
     "散货船": ["bulk carrier", "bulker"],
     "油轮": ["oil tanker", "tanker"],
@@ -54,6 +68,23 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "导航": ["navigation", "navigational"],
     "雷达": ["radar", "ARPA"],
     "无线电": ["radio", "GMDSS"],
+    # BV Rules terminology
+    "入级": ["classification", "class", "NR467"],
+    "船级社": ["classification society", "Bureau Veritas", "BV"],
+    "入级检验": ["classification survey", "initial survey", "renewal survey"],
+    "附加标志": ["additional class notation", "notation", "class notation"],
+    "结构强度": ["structural strength", "scantling", "hull girder"],
+    "腐蚀余量": ["corrosion addition", "corrosion allowance", "wastage"],
+    "疲劳强度": ["fatigue strength", "fatigue assessment", "fatigue life"],
+    "有限元分析": ["finite element analysis", "FEA", "direct calculation"],
+    "许用应力": ["allowable stress", "permissible stress"],
+    "最小板厚": ["minimum thickness", "minimum plate thickness"],
+    # IACS terminology
+    "统一要求": ["unified requirement", "UR", "IACS UR"],
+    "统一解释": ["unified interpretation", "UI", "IACS UI"],
+    "共同结构规范": ["common structural rules", "CSR", "CSR BC&OT"],
+    "极地船舶": ["polar class", "polar ship", "ice class"],
+    "网络安全": ["cyber resilience", "UR E26", "UR E27", "cybersecurity"],
 }
 
 # Detected topic keywords -> relevant SOLAS/MARPOL chapters
@@ -65,6 +96,15 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "davit-launched liferaft": ["SOLAS III/31", "SOLAS III/16", "LSA Code Chapter 6"],
     "free-fall": ["SOLAS III/31", "LSA Code Chapter 6"],
     "fire": ["SOLAS II-2", "FSS Code"],
+    "fire division": ["SOLAS II-2/9", "SOLAS II-2/3"],
+    "fire integrity": ["SOLAS II-2/9", "SOLAS II-2/3"],
+    "fire rating": ["SOLAS II-2/9", "SOLAS II-2/3"],
+    "galley": ["SOLAS II-2/9"],
+    "corridor": ["SOLAS II-2/9"],
+    "control station": ["SOLAS II-2/9"],
+    "oil discharge": ["MARPOL Annex I/Reg.34", "MARPOL Annex I/Reg.15"],
+    "ODME": ["MARPOL Annex I/Reg.34", "MEPC.108(49)"],
+    "air pipe": ["Load Lines Reg.20", "ILLC 1966/1988"],
     "stability": ["SOLAS II-1"],
     "pollution": ["MARPOL"],
     "access": ["SOLAS II-1/3-6"],
@@ -72,6 +112,20 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "radio": ["SOLAS IV", "GMDSS"],
     "cargo ship": ["SOLAS III/31", "SOLAS III/32"],
     "passenger ship": ["SOLAS III/21", "SOLAS III/22"],
+    # BV Rules
+    "classification": ["BV NR467", "IACS UR Z"],
+    "structural strength": ["BV NR467 Pt.B", "IACS UR S", "CSR"],
+    "scantling": ["BV NR467 Pt.B", "IACS UR S"],
+    "materials welding": ["BV NR216", "IACS UR W"],
+    "corrosion": ["BV NR467 Pt.B", "IACS UR S"],
+    "fatigue": ["BV NR467 Pt.B Ch.7", "IACS UR S"],
+    # IACS UR -> IMO convention links
+    "mooring": ["IACS UR A", "SOLAS II-1"],
+    "anchoring": ["IACS UR A", "SOLAS II-1"],
+    "fire protection iacs": ["IACS UR F", "SOLAS II-2"],
+    "polar": ["IACS UR I", "Polar Code"],
+    "cyber": ["IACS UR E26", "IACS UR E27"],
+    "survey certification": ["IACS UR Z", "SOLAS XI"],
 }
 
 # Keywords indicating LSA equipment in query
@@ -114,7 +168,7 @@ class QueryEnhancer:
                 if topic in en_term.lower():
                     relevant_regs.update(regs)
 
-        # Step 3: ship-type → configuration regulations
+        # Step 3: ship-type -> configuration regulations
         has_lsa = any(kw in query for kw in _LSA_KEYWORDS)
 
         if any(kw in query for kw in ["货船", "cargo"]):
@@ -127,13 +181,12 @@ class QueryEnhancer:
         if any(kw in query for kw in ["客船", "passenger"]):
             relevant_regs.update(["SOLAS III/21", "SOLAS III/22", "SOLAS III/16"])
 
-        # Step 4: ship length → configuration thresholds
+        # Step 4: ship length -> configuration thresholds
         length_match = _LENGTH_RE.search(query)
         if length_match:
             length = int(length_match.group(1))
             if has_lsa:
                 if length >= 85:
-                    # 85m+ cargo ships: davit-launched liferaft required
                     relevant_regs.add("SOLAS III/31")
                     matched_terms.add("davit-launched liferaft")
                     matched_terms.add("85 metres")
@@ -142,11 +195,10 @@ class QueryEnhancer:
                     relevant_regs.add("SOLAS III/16")
                 relevant_regs.add("LSA Code Chapter 6")
 
-            # "国际航行" + length → likely cargo ship needing SOLAS III/31
             if "国际航行" in query or "international" in query.lower():
                 relevant_regs.add("SOLAS III/31")
 
-        # Step 5: bilateral/both-sides → inject configuration combination terms
+        # Step 5: bilateral/both-sides -> inject configuration combination terms
         has_bilateral = any(kw in query for kw in _BILATERAL_KW)
         if has_bilateral and has_lsa:
             matched_terms.add("throw-overboard liferaft")
@@ -155,6 +207,32 @@ class QueryEnhancer:
             matched_terms.add("hydrostatic release")
             relevant_regs.add("SOLAS III/31.1.4")
             relevant_regs.add("SOLAS III/31.1.3")
+
+        # Step 6: topic-specific keyword injection
+        # Fire division -> inject table keywords for better retrieval
+        if any(kw in query for kw in ["防火分隔", "防火等级"]):
+            matched_terms.update([
+                "Table 9.3", "Table 9.5",
+                "fire integrity of bulkheads and decks",
+                "structural fire protection",
+            ])
+            relevant_regs.update(["SOLAS II-2/9", "SOLAS II-2/3"])
+
+        # Oil discharge -> inject Reg.34 key data terms
+        if any(kw in query for kw in ["排油", "ODME"]):
+            matched_terms.update([
+                "Regulation 34", "1/30000", "discharge limit",
+                "30 litres per nautical mile",
+            ])
+            relevant_regs.update(["MARPOL Annex I/Reg.34"])
+
+        # Air pipe -> inject position classification keywords
+        if any(kw in query for kw in ["透气管", "air pipe"]):
+            matched_terms.update([
+                "position 1", "position 2", "760 mm", "450 mm",
+                "freeboard deck", "superstructure deck",
+            ])
+            relevant_regs.update(["Load Lines Reg.20"])
 
         if matched_terms:
             enhanced_parts.append(" ".join(sorted(matched_terms)))

@@ -88,6 +88,14 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         audio_data=audio_data,
                         session_id=session_id,
                     )
+                elif msg_type == "clarify_response":
+                    original = msg.get("original_query", "")
+                    supplement = msg.get("supplement", "")
+                    merged = f"{original}（补充信息：{supplement}）"
+                    result = await pipeline.process_text_query(
+                        text=merged,
+                        session_id=session_id,
+                    )
                 else:
                     text = msg.get("text", "")
                     result = await pipeline.process_text_query(

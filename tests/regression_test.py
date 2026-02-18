@@ -77,6 +77,52 @@ TEST_CASES = [
         "expect_contains": ["60"],
         "expect_not_contains": ["无法回答"],
     },
+    # --- BV Rules / IACS test cases ---
+    {
+        "id": "T009_bv",
+        "query": "BV NR467对散货船结构强度有什么要求？",
+        "expect_contains": ["NR467"],
+        "expect_not_contains": ["无法回答"],
+        "note": "BV classification rules retrieval test",
+    },
+    {
+        "id": "T010_iacs",
+        "query": "IACS UR S对船体梁最小截面模数的要求是什么？",
+        "expect_contains_any": [
+            ["UR S", "IACS", "section modulus", "截面模数", "hull girder"],
+        ],
+        "expect_not_contains": ["无法回答"],
+        "note": "IACS unified requirement retrieval test",
+    },
+    {
+        "id": "T011_multi_source",
+        "query": "油轮腐蚀余量的要求是多少？BV和IACS有区别吗？",
+        "expect_contains_any": [
+            ["corrosion", "腐蚀", "wastage"],
+        ],
+        "expect_not_contains": ["无法回答"],
+        "note": "Multi-collection cross-source comparison test",
+    },
+    # --- Clarification flow test ---
+    {
+        "id": "T012_clarify",
+        "query": "厨房和走廊之间的防火分隔是什么等级？",
+        "expect_contains_any": [
+            ["Table 9", "哪类船舶", "clarify", "船型"],
+        ],
+        "note": "Should either clarify ship type or answer with explicit assumptions",
+    },
+    # --- Corrected KB test (T103 from surveyor exam) ---
+    {
+        "id": "T013_freefall_davit",
+        "query": "一艘90米的货船有free-fall lifeboat，两舷的救生筏是不是都不需要davit了？",
+        "expect_contains_any": [
+            ["至少一舷", "at least one side", "SOLAS III/31.1.2"],
+        ],
+        "expect_not_contains": ["都不需要davit", "不需要任何davit"],
+        "expect_model": "sonnet",
+        "note": "Must correctly state: at least one side still needs davit-launched liferaft",
+    },
 ]
 
 

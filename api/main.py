@@ -37,8 +37,33 @@ async def lifespan(app: FastAPI):
     )
     app.state.bm25 = BM25Search(settings.database_url)
     app.state.graph = GraphQueries(settings.database_url)
+    # Initialize rerankers (optional, graceful degradation)
+    cohere_reranker = None
+    if settings.reranker_enabled and settings.cohere_api_key:
+        try:
+            from retrieval.reranker import CohereReranker
+            cohere_reranker = CohereReranker(settings.cohere_api_key, settings.reranker_model)
+            logger.info("Cohere reranker initialized")
+        except Exception as exc:
+            logger.warning(f"Cohere reranker unavailable: {exc}")
+
+    utility_reranker = None
+    if settings.utility_reranker_enabled:
+        try:
+            from retrieval.utility_reranker import UtilityReranker
+            utility_reranker = UtilityReranker(
+                pg_conn=app.state.bm25.db,
+                alpha=settings.utility_reranker_alpha,
+            )
+            logger.info("Utility reranker initialized")
+        except Exception as exc:
+            logger.warning(f"Utility reranker unavailable: {exc}")
+
+    app.state.utility_reranker = utility_reranker
     app.state.retriever = HybridRetriever(
         app.state.vector_store, app.state.bm25, app.state.graph,
+        cohere_reranker=cohere_reranker,
+        utility_reranker=utility_reranker,
     )
     app.state.generator = AnswerGenerator(
         settings.anthropic_api_key, settings.llm_model_primary, settings.llm_model_fast,

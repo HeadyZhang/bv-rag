@@ -15,6 +15,30 @@
   ship_types: ["all"]
   correct_interpretation: "400GT以上或载客15人以上的国际航行船舶必须配备污水处理装置。距最近陆地12海里以内不得排放未经处理的污水。处理后的污水需满足TSS、大肠杆菌等标准才能排放。"
 
+- id: odme_discharge_limit
+  title: "油轮货舱区排油限制（MARPOL Annex I Reg.34）"
+  keywords: ["排油", "ODME", "油轮", "排放限制", "总排油量", "cargo tank"]
+  terms: ["oil discharge", "ODME", "cargo tank", "1/30000", "discharge limit", "30 litres per nautical mile"]
+  regulations: ["MARPOL Annex I/Reg.34", "MARPOL Annex I/Reg.15"]
+  ship_types: ["tanker", "oil tanker", "油轮"]
+  correct_interpretation: >
+    油轮货舱区排油必须同时满足以下全部条件(MARPOL Annex I Reg.34)：
+    1. 不在特殊区域内；2. 距最近陆地>50海里；3. 航行中；
+    4. 瞬时排油速率≤30升/海里；
+    5. 总排油量：1979年12月31日后交付的船=不超过该批货油总量的1/30,000；
+       1979年12月31日前交付的船=不超过1/15,000；
+    6. 船上ODME和污油舱布置正在运行中。
+    对于10万载重吨油轮(1979后交付)，总排油量上限=货油总量/30,000。
+  common_mistake: >
+    认为油轮排油只要浓度≤15ppm就行。15ppm是机舱舱底水(OWS)的标准(Reg.15)，
+    不是货舱区排油的标准。货舱区排油用的是总量比(1/30,000)和速率(30L/nmile)控制。
+    这是两套完全不同的排放控制体系，绝不能混淆。
+  decision_tree:
+    - "Step 1: 确认是货舱区排油还是机舱舱底水排油"
+    - "Step 2: 货舱区 → MARPOL Reg.34, 总量≤1/30,000, 速率≤30L/nmile"
+    - "Step 3: 机舱舱底水 → MARPOL Reg.15, 浓度≤15ppm"
+    - "Step 4: 确认船舶交付日期(1979年12月31日前/后)决定1/15,000还是1/30,000"
+
 - id: ballast_water
   title: "压载水管理"
   keywords: ["压载水", "置换", "处理系统", "D-1", "D-2"]

@@ -7,6 +7,7 @@ import time
 from generation.generator import AnswerGenerator
 from knowledge.practical_knowledge import PracticalKnowledgeBase
 from memory.conversation_memory import ConversationMemory
+from retrieval.clarification_checker import ClarificationChecker
 from retrieval.hybrid_retriever import HybridRetriever
 from retrieval.query_classifier import QueryClassifier
 from voice.stt_service import STTService
@@ -31,6 +32,7 @@ class VoiceQAPipeline:
         self.generator = generator
         self.practical_kb = PracticalKnowledgeBase()
         self.query_classifier = QueryClassifier()
+        self.clarification_checker = ClarificationChecker()
 
     async def process_voice_query(
         self,
@@ -136,6 +138,46 @@ class VoiceQAPipeline:
         classification = self.query_classifier.classify(text)
         timing["memory_ms"] = int((time.time() - t0) * 1000)
 
+        # Clarification check: detect missing critical dimensions
+        topic = classification.get("topic") or self.clarification_checker.detect_topic(text)
+        needs_clarification, clarify_questions = self.clarification_checker.check(
+            intent=classification["intent"],
+            ship_info=classification.get("ship_info", {}),
+            query=text,
+            topic=topic,
+        )
+
+        if needs_clarification:
+            clarify_text = "为了给您更准确的答案，需要确认以下信息：\n\n"
+            for i, q in enumerate(clarify_questions, 1):
+                clarify_text += f"{i}. {q['question']}\n"
+                if q.get("options"):
+                    clarify_text += f"   选项：{'、'.join(q['options'])}\n"
+
+            session = self.memory.add_turn(
+                session, "assistant", clarify_text, "text",
+                metadata={
+                    "type": "clarification",
+                    "original_query": text,
+                    "missing_slots": [q["slot"] for q in clarify_questions],
+                },
+            )
+
+            return {
+                "session_id": session.session_id,
+                "action": "clarify",
+                "questions": clarify_questions,
+                "enhanced_query": enhanced_query,
+                "answer_text": clarify_text,
+                "answer_audio_base64": None,
+                "citations": [],
+                "confidence": "pending",
+                "model_used": "none",
+                "sources": [],
+                "timing": timing,
+                "input_mode": input_mode,
+            }
+
         t0 = time.time()
         effective_top_k = classification["top_k"]
         retrieved_chunks = self.retriever.retrieve(enhanced_query, top_k=effective_top_k)
@@ -196,6 +238,27 @@ class VoiceQAPipeline:
                 "retrieved_regulations": retrieved_regulations,
             },
         )
+
+        # Update chunk utilities (MemRL runtime learning)
+        if hasattr(self.retriever, 'utility_reranker') and self.retriever.utility_reranker:
+            try:
+                cited_ids = set()
+                for citation in gen_result.get("citations", []):
+                    for source in gen_result.get("sources", []):
+                        cite_text = citation.get("citation", "")
+                        breadcrumb = source.get("breadcrumb", "")
+                        if cite_text and breadcrumb and cite_text.split()[0] in breadcrumb:
+                            cited_ids.add(source.get("chunk_id", ""))
+
+                query_cat = self.retriever._classify_query_category(enhanced_query)
+                self.retriever.utility_reranker.update_utilities(
+                    retrieved_chunks=gen_result.get("sources", []),
+                    cited_chunk_ids=cited_ids,
+                    confidence=gen_result.get("confidence", "low"),
+                    query_category=query_cat,
+                )
+            except Exception as exc:
+                logger.error(f"[Pipeline] Utility update failed: {exc}")
 
         return {
             "session_id": session.session_id,

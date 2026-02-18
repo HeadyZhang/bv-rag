@@ -14,6 +14,18 @@ logger = logging.getLogger(__name__)
 _COMPLEX_QUERY_RE = re.compile(r"(\d+)\s*(米|m|吨|GT|DWT)", re.IGNORECASE)
 _APPLICABILITY_KW = ["是否", "需不需要", "是否需要", "do I need", "要不要"]
 
+# Query category classification for utility reranking
+_QUERY_CATEGORIES: dict[str, list[str]] = {
+    "fire_safety": ["防火", "fire", "A-0", "A-60", "B-15", "防火分隔", "灭火"],
+    "lifesaving": ["救生", "liferaft", "davit", "lifeboat", "救生筏", "救生艇"],
+    "pollution": ["排放", "MARPOL", "排油", "ODME", "OWS", "污水", "压载水"],
+    "stability": ["稳性", "stability", "freeboard", "载重线", "干舷"],
+    "structure": ["结构", "强度", "strength", "scantling", "板厚"],
+    "machinery": ["机械", "machinery", "engine", "boiler", "锅炉"],
+    "navigation": ["航行", "navigation", "ECDIS", "AIS", "雷达"],
+    "survey": ["检验", "survey", "PSC", "certificate", "证书"],
+}
+
 
 class HybridRetriever:
     def __init__(
@@ -21,12 +33,16 @@ class HybridRetriever:
         vector_store: VectorStore,
         bm25_search: BM25Search,
         graph_queries: GraphQueries,
+        cohere_reranker=None,
+        utility_reranker=None,
     ):
         self.vector_store = vector_store
         self.bm25 = bm25_search
         self.graph = graph_queries
         self.router = QueryRouter()
         self.query_enhancer = QueryEnhancer()
+        self.cohere_reranker = cohere_reranker
+        self.utility_reranker = utility_reranker
 
     def retrieve(self, query: str, top_k: int = 10, strategy: str = "auto") -> list[dict]:
         # Enhance query with maritime terminology
@@ -64,11 +80,16 @@ class HybridRetriever:
 
         all_results = {}
 
+        # Determine which Qdrant collections to search
+        search_collections = self._determine_search_collections(enhanced_query)
+        logger.info(f"[RETRIEVAL] Collections: {search_collections}")
+
         if strategy in ("hybrid", "semantic"):
             vector_results = self.vector_store.search(
                 query_text=enhanced_query,
                 top_k=effective_top_k * 2,
                 document_filter=doc_filter,
+                collections=search_collections,
             )
             logger.info(f"[RETRIEVAL] 向量检索返回 {len(vector_results)} 条")
             for i, r in enumerate(vector_results[:5]):
@@ -156,6 +177,27 @@ class HybridRetriever:
         )[:effective_top_k]
 
         logger.info(f"[RETRIEVAL] RRF 融合后: {len(sorted_results)} 条")
+
+        # Phase B-1: Cohere cross-encoder reranking
+        if self.cohere_reranker:
+            try:
+                sorted_results = self.cohere_reranker.rerank(
+                    query=query,
+                    chunks=sorted_results,
+                    top_n=effective_top_k,
+                )
+            except Exception as exc:
+                logger.error(f"[RETRIEVAL] Cohere rerank failed: {exc}")
+
+        # Phase B-2: Utility-aware reranking (MemRL)
+        if self.utility_reranker:
+            try:
+                query_category = self._classify_query_category(enhanced_query)
+                sorted_results = self.utility_reranker.rerank(
+                    sorted_results, query_category,
+                )
+            except Exception as exc:
+                logger.error(f"[RETRIEVAL] Utility rerank failed: {exc}")
 
         # Graph expansion: follow cross-references from top results
         before_graph = len(sorted_results)
@@ -248,6 +290,50 @@ class HybridRetriever:
                 continue
 
         return results[:max_total]
+
+    @staticmethod
+    def _determine_search_collections(enhanced_query: str) -> list[str]:
+        """Determine which Qdrant collections to search based on query content.
+
+        Always searches imo_regulations. Adds bv_rules and/or iacs_resolutions
+        when query content indicates relevance. For generic technical queries,
+        searches all collections.
+        """
+        collections = ["imo_regulations"]
+        query_lower = enhanced_query.lower()
+
+        bv_keywords = [
+            "bv", "bureau veritas", "nr467", "nr216", "nr445", "nr483",
+            "nr217", "nr526", "nr544", "nr580", "入级", "附加标志",
+            "classification rule", "erules",
+        ]
+        iacs_keywords = [
+            "iacs", "ur ", "ur-", "统一要求", "统一解释", "csr",
+            "共同结构", "unified requirement", "unified interpretation",
+        ]
+
+        has_bv = any(kw in query_lower for kw in bv_keywords)
+        has_iacs = any(kw in query_lower for kw in iacs_keywords)
+
+        if has_bv:
+            collections.append("bv_rules")
+        if has_iacs:
+            collections.append("iacs_resolutions")
+
+        # Generic technical queries -> search all collections for broader coverage
+        if not has_bv and not has_iacs:
+            collections.extend(["bv_rules", "iacs_resolutions"])
+
+        return collections
+
+    @staticmethod
+    def _classify_query_category(query: str) -> str:
+        """Classify query into a regulatory domain for utility bucketing."""
+        query_lower = query.lower()
+        for category, keywords in _QUERY_CATEGORIES.items():
+            if any(kw.lower() in query_lower for kw in keywords):
+                return category
+        return "general"
 
     def _get_graph_context(self, result: dict) -> dict:
         doc_id = result.get("metadata", {}).get("doc_id", "")

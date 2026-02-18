@@ -21,12 +21,23 @@ class Settings(BaseSettings):
     tts_model: str = "gpt-4o-mini-tts"
     tts_voice: str = "ash"
 
+    # Reranking configuration
+    cohere_api_key: str = ""
+    reranker_model: str = "rerank-multilingual-v3.0"
+    reranker_enabled: bool = True
+    utility_reranker_enabled: bool = True
+    utility_reranker_alpha: float = 0.3
+
     # System configuration
     port: int = 8000
     environment: str = "production"
     log_level: str = "INFO"
     max_conversation_turns: int = 10
     session_ttl_hours: int = 24
+
+    # IACS crawler credentials (optional)
+    iacs_email: str = ""
+    iacs_password: str = ""
 
     model_config = {"env_file": ".env"}
 
