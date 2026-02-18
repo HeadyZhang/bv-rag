@@ -50,6 +50,11 @@ TOPIC_EXTRA_SLOTS: dict[str, dict[str, list[str]]] = {
         "critical": ["ship_type", "tonnage_or_length"],
         "important": ["voyage_type"],
     },
+    "air_pipe": {
+        "critical": [],
+        "important": [],
+        "override_base": True,  # ILLC air pipe rules apply to all ship types
+    },
 }
 
 # Topic detection patterns
@@ -63,6 +68,9 @@ TOPIC_TRIGGERS: dict[str, list[str]] = {
     ],
     "equipment_requirement": [
         "是否需要配备", "需要多少", "配置要求",
+    ],
+    "air_pipe": [
+        "透气管", "air pipe", "vent pipe", "tank vent",
     ],
 }
 
@@ -139,12 +147,17 @@ class ClarificationChecker:
 
         if topic and topic in TOPIC_EXTRA_SLOTS:
             extra = TOPIC_EXTRA_SLOTS[topic]
-            for s in extra.get("critical", []):
-                if s not in critical:
-                    critical.append(s)
-            for s in extra.get("important", []):
-                if s not in important:
-                    important.append(s)
+            if extra.get("override_base"):
+                # Topic completely replaces base slots (e.g. air_pipe applies to all ship types)
+                critical = list(extra.get("critical", []))
+                important = list(extra.get("important", []))
+            else:
+                for s in extra.get("critical", []):
+                    if s not in critical:
+                        critical.append(s)
+                for s in extra.get("important", []):
+                    if s not in important:
+                        important.append(s)
 
         # Check which critical slots are missing
         missing_critical = [s for s in critical if not self._has_slot(s, ship_info, query)]
@@ -183,8 +196,10 @@ class ClarificationChecker:
 
         if slot == "discharge_source":
             query_lower = query.lower()
+            # ODME is specifically a cargo tank discharge monitoring system
             discharge_indicators = [
                 "货舱", "cargo tank", "机舱", "engine room", "舱底水", "bilge",
+                "odme", "排油监控", "洗舱", "slop tank", "ows", "油水分离",
             ]
             return any(p in query_lower for p in discharge_indicators)
 
