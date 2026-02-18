@@ -52,10 +52,10 @@ async def lifespan(app: FastAPI):
         try:
             from retrieval.utility_reranker import UtilityReranker
             utility_reranker = UtilityReranker(
-                pg_conn=app.state.bm25.db,
+                database_url=settings.database_url,
                 alpha=settings.utility_reranker_alpha,
             )
-            logger.info("Utility reranker initialized")
+            logger.info("Utility reranker initialized (alpha=%.2f)", settings.utility_reranker_alpha)
         except Exception as exc:
             logger.warning(f"Utility reranker unavailable: {exc}")
 
@@ -73,12 +73,18 @@ async def lifespan(app: FastAPI):
         app.state.retriever, app.state.generator,
     )
 
-    logger.info("All services initialized")
+    logger.info(
+        "All services initialized | cohere_reranker=%s | utility_reranker=%s",
+        "active" if cohere_reranker else "disabled",
+        "active" if utility_reranker else "disabled",
+    )
     yield
 
     logger.info("BV-RAG shutting down...")
     app.state.bm25.close()
     app.state.graph.close()
+    if utility_reranker:
+        utility_reranker.close()
 
 
 app = FastAPI(title="BV-RAG Maritime Regulations", lifespan=lifespan)

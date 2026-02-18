@@ -149,34 +149,42 @@ class ExternalDataIngestor:
                 continue
 
             # Write to PostgreSQL regulations table
-            for chunk in batch:
-                doc_id = chunk.get("doc_id", chunk.get("chunk_id", ""))
-                try:
-                    self.db.conn.cursor().execute(
-                        """INSERT INTO regulations
-                        (doc_id, url, title, breadcrumb, collection, document,
-                         body_text, page_type, source_type, authority_level, parent_doc_id)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                        ON CONFLICT (doc_id) DO NOTHING""",
-                        (
-                            doc_id,
-                            chunk.get("url", ""),
-                            chunk.get("title", ""),
-                            chunk.get("breadcrumb", ""),
-                            chunk.get("collection", source_type),
-                            chunk.get("document", ""),
-                            chunk.get("body_text", chunk.get("text", "")),
-                            chunk.get("page_type", "regulation"),
-                            source_type,
-                            authority_level,
-                            chunk.get("parent_doc_id", ""),
-                        ),
-                    )
-                except Exception as exc:
-                    logger.error(f"PG insert failed for {doc_id}: {exc}")
-                    stats["errors"] += 1
+            try:
+                for chunk in batch:
+                    doc_id = chunk.get("doc_id", chunk.get("chunk_id", ""))
+                    try:
+                        self.db.conn.cursor().execute(
+                            """INSERT INTO regulations
+                            (doc_id, url, title, breadcrumb, collection, document,
+                             body_text, page_type, source_type, authority_level, parent_doc_id)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            ON CONFLICT (doc_id) DO NOTHING""",
+                            (
+                                doc_id,
+                                chunk.get("url", ""),
+                                chunk.get("title", ""),
+                                chunk.get("breadcrumb", ""),
+                                chunk.get("collection", source_type),
+                                chunk.get("document", ""),
+                                chunk.get("body_text", chunk.get("text", "")),
+                                chunk.get("page_type", "regulation"),
+                                source_type,
+                                authority_level,
+                                chunk.get("parent_doc_id", ""),
+                            ),
+                        )
+                    except Exception as exc:
+                        logger.error(f"PG insert failed for {doc_id}: {exc}")
+                        stats["errors"] += 1
 
-            self.db.conn.commit()
+                self.db.conn.commit()
+            except Exception as exc:
+                logger.warning(f"PG batch commit failed (reconnecting): {exc}")
+                try:
+                    self.db._conn = None
+                    self.db.conn  # Force reconnect
+                except Exception:
+                    pass
 
             # Write to Qdrant
             points = []

@@ -29,6 +29,63 @@ AUTHORITY_MAP = {
     "imo": "international_convention",
 }
 
+# Common CID-to-character mappings from PDF font substitution
+_CID_MAP = {
+    129: "\u2022",   # bullet (used as list marker in BV PDFs)
+    130: "\u2018",   # left single quote
+    131: "\u2019",   # right single quote
+    132: "\u201c",   # left double quote
+    133: "\u201d",   # right double quote
+    134: "\u2022",   # bullet
+    135: "\u2026",   # ellipsis
+    136: "\u2020",   # dagger
+    137: "\u2021",   # double dagger
+    138: "\u02c6",   # circumflex
+    139: "\u2030",   # per mille
+    140: "\u0160",   # S-caron
+    141: "\u2039",   # single left angle quote
+    142: "\u0152",   # OE ligature
+    145: "\u2018",   # left single quote (dup)
+    146: "\u2019",   # right single quote (dup)
+    147: "\u201c",   # left double quote (dup)
+    148: "\u201d",   # right double quote (dup)
+    149: "\u2022",   # bullet (dup)
+    150: "\u2013",   # en-dash (dup)
+    151: "\u2014",   # em-dash
+    153: "\u2122",   # trademark
+}
+
+_CID_PATTERN = re.compile(r"\(cid:(\d+)\)")
+
+# Common formula patterns: "k1/2" → "k^(1/2)", "σcr" → "σ_cr"
+_FORMULA_FIXES = [
+    # Superscript numbers after variable (t2 → t², but not in words)
+    (re.compile(r"(?<=[a-zA-Zσδτε])(\d+/\d+)"), r"^(\1)"),
+    # Subscript patterns: σcr → σ_cr, Kcr → K_cr
+    (re.compile(r"([σδτεΣ])([a-z]{1,3})(?=[^a-z])"), r"\1_\2"),
+]
+
+
+def clean_pdf_text(text: str) -> str:
+    """Clean PDF extraction artifacts from text.
+
+    Handles:
+    - (cid:NNN) font substitution artifacts
+    - Common formula normalization
+    - Excessive whitespace
+    """
+    def _replace_cid(match):
+        cid_num = int(match.group(1))
+        return _CID_MAP.get(cid_num, "")
+
+    text = _CID_PATTERN.sub(_replace_cid, text)
+
+    for pattern, replacement in _FORMULA_FIXES:
+        text = pattern.sub(replacement, text)
+
+    text = re.sub(r" {3,}", "  ", text)
+    return text
+
 
 @dataclass
 class ParsedPDFRegulation:
@@ -138,16 +195,16 @@ class PDFParser:
         """Convert Docling result into structured regulation entries."""
         doc = result.document
         document_name = self._build_document_name(source, nr_code, path.stem)
-        edition = self._extract_edition_from_text(
-            doc.export_to_markdown()[:2000],
-        )
+        raw_markdown = doc.export_to_markdown()
+        cleaned_markdown = clean_pdf_text(raw_markdown)
+        edition = self._extract_edition_from_text(cleaned_markdown[:2000])
 
-        tables = self._parse_tables(result)
+        tables = self._parse_tables(result, pdf_path=path)
 
-        sections = self._split_into_sections(doc.export_to_markdown(), source)
+        sections = self._split_into_sections(cleaned_markdown, source)
 
         if not sections:
-            sections = [{"title": document_name, "body": doc.export_to_markdown(), "hierarchy": {}}]
+            sections = [{"title": document_name, "body": cleaned_markdown, "hierarchy": {}}]
 
         entries = []
         for idx, section in enumerate(sections):
@@ -190,7 +247,7 @@ class PDFParser:
 
         return entries
 
-    def _parse_tables(self, docling_result) -> list[dict]:
+    def _parse_tables(self, docling_result, pdf_path: Path | None = None) -> list[dict]:
         """Extract tables and convert to multiple formats.
 
         Produces:
@@ -202,6 +259,7 @@ class PDFParser:
         individual searchable entries.
         """
         tables = []
+        garbled_count = 0
         try:
             doc = docling_result.document
             for table_idx, table_item in enumerate(
@@ -209,6 +267,13 @@ class PDFParser:
             ):
                 table_data = self._extract_table_data(table_item)
                 if not table_data.get("rows"):
+                    continue
+
+                if self._is_empty_table(table_data):
+                    continue
+
+                if self._is_garbled_table(table_data):
+                    garbled_count += 1
                     continue
 
                 markdown = self._table_to_markdown(table_data)
@@ -227,32 +292,153 @@ class PDFParser:
         except Exception as exc:
             logger.error("Table extraction failed: %s", exc)
 
+        if garbled_count > 0 and pdf_path:
+            logger.info(
+                "Detected %d garbled tables in %s, attempting pdfplumber recovery",
+                garbled_count, pdf_path.name,
+            )
+            recovered = self._try_pdfplumber_table_recovery(pdf_path, scan_all=True)
+            if recovered:
+                logger.info("Recovered %d tables via pdfplumber", len(recovered))
+                tables.extend(recovered)
+
         return tables
+
+    def _is_empty_table(self, table_data: dict) -> bool:
+        """Check if a table is an empty artifact (figure/formula misidentified as table).
+
+        Returns True if the table has no meaningful textual content.
+        """
+        headers = table_data.get("headers", [])
+        rows = table_data.get("rows", [])
+
+        all_cells = [str(h) for h in headers]
+        for row in rows:
+            all_cells.extend(str(cell) for cell in row)
+
+        non_empty_cells = sum(
+            1 for cell in all_cells
+            if cell.strip() and cell.strip() not in ("-", "—", "N/A")
+        )
+        if non_empty_cells < 2:
+            return True
+
+        total_cells = len(all_cells)
+        if total_cells > 4 and non_empty_cells / total_cells < 0.1:
+            return True
+
+        return False
+
+    def _is_garbled_table(self, table_data: dict) -> bool:
+        """Detect if a Docling-parsed table is garbled (figure misidentified as table).
+
+        Indicators of garbled tables:
+        - All headers are empty or single characters
+        - Most cells are single digits or empty
+        - Very low ratio of text content to cell count
+        """
+        headers = table_data.get("headers", [])
+        rows = table_data.get("rows", [])
+
+        if not headers or not rows:
+            return False
+
+        empty_headers = sum(
+            1 for h in headers
+            if not str(h).strip() or len(str(h).strip()) <= 1
+        )
+        if len(headers) > 2 and empty_headers / len(headers) > 0.7:
+            return True
+
+        all_cells = []
+        for row in rows:
+            all_cells.extend(str(cell).strip() for cell in row)
+
+        if not all_cells:
+            return False
+
+        short_cells = sum(1 for c in all_cells if len(c) <= 2)
+        if len(all_cells) > 5 and short_cells / len(all_cells) > 0.8:
+            total_text = sum(len(c) for c in all_cells)
+            if total_text / len(all_cells) < 3:
+                return True
+
+        return False
+
+    def _try_pdfplumber_table_recovery(
+        self, pdf_path: Path, page_hint: int = 0, scan_all: bool = False,
+    ) -> list[dict]:
+        """Attempt to re-extract tables from specific pages using pdfplumber.
+
+        Used as fallback when Docling produces garbled tables.
+
+        Args:
+            pdf_path: Path to the PDF file.
+            page_hint: Starting page number for targeted recovery.
+            scan_all: If True, scan all pages in the PDF.
+        """
+        if not self.pdfplumber_available:
+            return []
+
+        import pdfplumber
+
+        recovered = []
+        try:
+            with pdfplumber.open(str(pdf_path)) as pdf:
+                if scan_all:
+                    search_range = range(len(pdf.pages))
+                else:
+                    search_range = range(
+                        max(0, page_hint - 1),
+                        min(len(pdf.pages), page_hint + 2),
+                    )
+                for page_num in search_range:
+                    page = pdf.pages[page_num]
+                    for raw_table in (page.extract_tables() or []):
+                        table_data = self._normalize_pdfplumber_table(raw_table)
+                        if table_data.get("rows") and not self._is_empty_table(table_data):
+                            markdown = self._table_to_markdown(table_data)
+                            descriptions = self._generate_table_descriptions(table_data)
+                            recovered.append({
+                                "table_index": len(recovered),
+                                "caption": "",
+                                "headers": table_data["headers"],
+                                "rows": table_data["rows"],
+                                "markdown": markdown,
+                                "descriptions": descriptions,
+                                "row_count": len(table_data["rows"]),
+                                "col_count": len(table_data["headers"]),
+                                "page": page_num + 1,
+                                "source": "pdfplumber_recovery",
+                            })
+        except Exception as exc:
+            logger.warning("pdfplumber table recovery failed: %s", exc)
+
+        return recovered
 
     def _extract_table_data(self, table_item) -> dict:
         """Extract structured data from a Docling table element."""
         try:
             if hasattr(table_item, "export_to_dataframe"):
                 df = table_item.export_to_dataframe()
-                headers = list(df.columns)
-                rows = df.values.tolist()
-                caption = getattr(table_item, "caption", "") or ""
+                headers = [clean_pdf_text(str(h)) for h in df.columns]
+                rows = [
+                    [clean_pdf_text(str(cell)) for cell in row]
+                    for row in df.values.tolist()
+                ]
+                caption = clean_pdf_text(getattr(table_item, "caption", "") or "")
                 return {
                     "caption": caption,
                     "headers": headers,
-                    "rows": [list(row) for row in rows],
+                    "rows": rows,
                 }
 
             if hasattr(table_item, "data"):
                 data = table_item.data
                 if isinstance(data, list) and data:
-                    headers = (
-                        [str(cell) for cell in data[0]]
-                        if data
-                        else []
-                    )
+                    headers = [clean_pdf_text(str(cell)) for cell in data[0]]
                     rows = [
-                        [str(cell) for cell in row]
+                        [clean_pdf_text(str(cell)) for cell in row]
                         for row in data[1:]
                     ]
                     return {
@@ -524,7 +710,7 @@ class PDFParser:
                 for page_num in range(batch_start, batch_end):
                     page = pdf.pages[page_num]
 
-                    text = page.extract_text() or ""
+                    text = clean_pdf_text(page.extract_text() or "")
                     batch_text_parts.append(text)
 
                     for raw_table in (page.extract_tables() or []):
@@ -609,9 +795,9 @@ class PDFParser:
         if not raw_table or len(raw_table) < 2:
             return {"caption": "", "headers": [], "rows": []}
 
-        headers = [str(cell or "") for cell in raw_table[0]]
+        headers = [clean_pdf_text(str(cell or "")) for cell in raw_table[0]]
         rows = [
-            [str(cell or "") for cell in row]
+            [clean_pdf_text(str(cell or "")) for cell in row]
             for row in raw_table[1:]
         ]
         return {"caption": "", "headers": headers, "rows": rows}

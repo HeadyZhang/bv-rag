@@ -102,6 +102,8 @@ class PDFChunker:
             chunk_counter += len(text_chunks)
 
         for table in tables:
+            if self._is_empty_table_chunk(table):
+                continue
             table_chunks = self._chunk_table(
                 table=table,
                 doc_id=doc_id,
@@ -397,6 +399,29 @@ class PDFChunker:
             chunk_type="regulation",
             token_count=self.count_tokens(text),
         )
+
+    def _is_empty_table_chunk(self, table: dict) -> bool:
+        """Check if a table has no meaningful content for chunking."""
+        headers = table.get("headers", [])
+        rows = table.get("rows", [])
+        if not rows and not headers:
+            return True
+
+        non_empty = sum(
+            1 for h in headers if str(h).strip() and str(h).strip() not in ("-", "—")
+        )
+        for row in rows:
+            non_empty += sum(
+                1 for cell in row if str(cell).strip() and str(cell).strip() not in ("-", "—")
+            )
+        if non_empty < 2:
+            return True
+
+        total = len(headers) + sum(len(row) for row in rows)
+        if total > 4 and non_empty / total < 0.1:
+            return True
+
+        return False
 
     def _chunk_table(
         self,

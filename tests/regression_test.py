@@ -123,6 +123,17 @@ TEST_CASES = [
         "expect_model": "sonnet",
         "note": "Must correctly state: at least one side still needs davit-launched liferaft",
     },
+    # --- ODME discharge limit (T104 from surveyor exam) ---
+    {
+        "id": "T014_odme_discharge",
+        "query": "油轮每航次允许排放多少含油污水？请说明具体限制标准。",
+        "expect_contains_any": [
+            ["1/30,000", "1/30000"],
+            ["30升", "30 升", "30 litres", "30L"],
+        ],
+        "expect_not_contains": ["无法回答"],
+        "note": "Must give 1/30,000 total limit and 30L/nmile rate (MARPOL Annex I Reg.34)",
+    },
 ]
 
 

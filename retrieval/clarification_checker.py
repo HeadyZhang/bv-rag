@@ -15,9 +15,9 @@ REQUIRED_SLOTS: dict[str, dict[str, list[str]]] = {
         "optional": ["construction_date", "voyage_type"],
     },
     "specification": {
-        "critical": ["ship_type"],
-        "important": [],
-        "optional": ["tonnage_or_length"],
+        "critical": [],
+        "important": ["ship_type", "tonnage_or_length"],
+        "optional": [],
     },
     "procedure": {
         "critical": [],
@@ -106,7 +106,18 @@ CLARIFICATION_TEMPLATES: dict[str, dict] = {
 _SHIP_TYPE_PATTERNS = [
     "货船", "客船", "油轮", "散货船", "集装箱船", "滚装船", "化学品船", "气体船",
     "cargo ship", "passenger ship", "tanker", "bulk carrier", "container",
+    "FPSO", "FSO", "MODU",
 ]
+
+# When a specific regulation section is referenced, ship type context is implicit
+_SPECIFIC_REG_RE = re.compile(
+    r"SOLAS\s+[IVX]{1,4}-?\d+[/.\-]\d*"
+    r"|MARPOL\s+Annex\s+[IVX]+"
+    r"|IACS\s+UR\s+[A-Z]"
+    r"|LSA\s+Code|FSS\s+Code"
+    r"|COLREG|STCW|ISM\s+Code|ISPS",
+    re.IGNORECASE,
+)
 _DIMENSION_PATTERNS = re.compile(r"\d+\s*(米|m|吨|GT|DWT|总吨|载重吨)", re.IGNORECASE)
 _DATE_PATTERNS = re.compile(r"(19|20)\d{2}\s*年|built\s*(in|before|after)\s*\d{4}", re.IGNORECASE)
 _VOYAGE_PATTERNS = ["国际航行", "国内航行", "international", "domestic"]
@@ -151,6 +162,12 @@ class ClarificationChecker:
                 # Topic completely replaces base slots (e.g. air_pipe applies to all ship types)
                 critical = list(extra.get("critical", []))
                 important = list(extra.get("important", []))
+            elif intent in ("definition", "comparison"):
+                # For definition/comparison intents, topic extras go to important
+                # (system should answer with declared assumptions, not clarify)
+                for s in extra.get("critical", []):
+                    if s not in important:
+                        important.append(s)
             else:
                 for s in extra.get("critical", []):
                     if s not in critical:
@@ -181,7 +198,12 @@ class ClarificationChecker:
         if slot == "ship_type":
             if ship_info.get("type"):
                 return True
-            return any(p in query for p in _SHIP_TYPE_PATTERNS)
+            if any(p in query for p in _SHIP_TYPE_PATTERNS):
+                return True
+            # A specific regulation reference implies the user knows the context
+            if _SPECIFIC_REG_RE.search(query):
+                return True
+            return False
 
         if slot == "tonnage_or_length":
             if ship_info.get("tonnage") or ship_info.get("length"):

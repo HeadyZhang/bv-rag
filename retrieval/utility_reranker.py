@@ -13,24 +13,65 @@ Runtime Learning:
 """
 import logging
 
+import psycopg2
+
 logger = logging.getLogger(__name__)
+
+_CREATE_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS chunk_utilities (
+    chunk_id TEXT NOT NULL,
+    query_category TEXT NOT NULL DEFAULT 'general',
+    utility_score REAL NOT NULL DEFAULT 0.5,
+    use_count INTEGER NOT NULL DEFAULT 0,
+    success_count INTEGER NOT NULL DEFAULT 0,
+    last_used TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (chunk_id, query_category)
+);
+CREATE INDEX IF NOT EXISTS idx_chunk_utilities_score
+    ON chunk_utilities(query_category, utility_score DESC);
+"""
 
 
 class UtilityReranker:
     """Rerank chunks based on historical utility scores."""
 
-    def __init__(self, pg_conn, alpha: float = 0.3, learning_rate: float = 0.1):
+    def __init__(self, database_url: str, alpha: float = 0.3, learning_rate: float = 0.1):
         """Initialize the utility reranker.
 
         Args:
-            pg_conn: PostgreSQL connection with execute/fetchall methods.
+            database_url: PostgreSQL connection string.
             alpha: Weight of utility in final score (0.3 = 70% RRF + 30% utility).
                    Start low when utility data is sparse, increase as data accumulates.
             learning_rate: EMA update rate for utility scores.
         """
-        self.pg_conn = pg_conn
+        self.database_url = database_url
+        self._conn = None
         self.alpha = alpha
         self.lr = learning_rate
+        self._ensure_table()
+
+    @property
+    def conn(self):
+        """Get or create a psycopg2 connection."""
+        if self._conn is None or self._conn.closed:
+            self._conn = psycopg2.connect(self.database_url)
+            self._conn.autocommit = True
+        return self._conn
+
+    def close(self):
+        """Close the database connection."""
+        if self._conn and not self._conn.closed:
+            self._conn.close()
+
+    def _ensure_table(self):
+        """Auto-create chunk_utilities table if it doesn't exist."""
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(_CREATE_TABLE_SQL)
+            logger.info("[UtilityReranker] chunk_utilities table ensured")
+        except Exception as exc:
+            logger.error("[UtilityReranker] Failed to create table: %s", exc)
 
     def rerank(
         self,
@@ -133,12 +174,13 @@ class UtilityReranker:
             last_used = NOW()
         """
         try:
-            self.pg_conn.execute(sql, (
-                chunk_id, category, initial_utility, success,
-                self.lr, self.lr, reward, success,
-            ))
+            with self.conn.cursor() as cur:
+                cur.execute(sql, (
+                    chunk_id, category, initial_utility, success,
+                    self.lr, self.lr, reward, success,
+                ))
         except Exception as exc:
-            logger.error(f"[UtilityReranker] Failed to update utility for {chunk_id}: {exc}")
+            logger.error("[UtilityReranker] Failed to update utility for %s: %s", chunk_id, exc)
 
     def _batch_get_utilities(self, chunk_ids: list[str], category: str) -> dict[str, float]:
         """Batch-fetch utility scores from PostgreSQL."""
@@ -152,10 +194,12 @@ class UtilityReranker:
         WHERE chunk_id IN ({placeholders}) AND query_category = %s
         """
         try:
-            results = self.pg_conn.fetchall(sql, (*chunk_ids, category))
+            with self.conn.cursor() as cur:
+                cur.execute(sql, (*chunk_ids, category))
+                results = cur.fetchall()
             return {r[0]: r[1] for r in results}
         except Exception as exc:
-            logger.error(f"[UtilityReranker] Failed to fetch utilities: {exc}")
+            logger.error("[UtilityReranker] Failed to fetch utilities: %s", exc)
             return {}
 
     def get_stats(self) -> list[dict]:
@@ -172,7 +216,9 @@ class UtilityReranker:
         ORDER BY total_chunks DESC
         """
         try:
-            results = self.pg_conn.fetchall(sql)
+            with self.conn.cursor() as cur:
+                cur.execute(sql)
+                results = cur.fetchall()
             return [
                 {
                     "category": r[0],
@@ -185,5 +231,5 @@ class UtilityReranker:
                 for r in results
             ]
         except Exception as exc:
-            logger.error(f"[UtilityReranker] Failed to get stats: {exc}")
+            logger.error("[UtilityReranker] Failed to get stats: %s", exc)
             return []

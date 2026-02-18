@@ -59,7 +59,13 @@ class PracticalKnowledgeBase:
         matched_terms: set[str] | None = None,
         relevant_regs: set[str] | None = None,
     ) -> list[dict]:
-        """Return up to 3 practical knowledge entries ranked by relevance."""
+        """Return up to 3 practical knowledge entries ranked by relevance.
+
+        Entries with a ``scope_required`` field are only included when at
+        least one scope keyword matches in the query.  This prevents broad
+        ship-type matches from injecting topic-specific knowledge into
+        unrelated queries (e.g. liferaft knowledge into ventilation queries).
+        """
         scores: dict[str, int] = {}
         query_lower = user_query.lower()
 
@@ -86,16 +92,33 @@ class PracticalKnowledgeBase:
                     if term.lower() in matched_terms:
                         scores[eid] = scores.get(eid, 0) + 1
 
-        # ship_type hits
+        # ship_type hits (only +1 to prevent ship-type-only matches
+        # from dominating the ranking)
         for eid, entry in self._by_id.items():
             for st in entry.get("ship_types", []):
                 if st.lower() in query_lower:
-                    scores[eid] = scores.get(eid, 0) + 2
+                    scores[eid] = scores.get(eid, 0) + 1
 
+        # Scope gate: entries with scope_required must match at least one
+        # scope keyword, otherwise they are excluded regardless of score.
+        for eid, entry in list(self._by_id.items()):
+            scope_words = entry.get("scope_required")
+            if not scope_words:
+                continue
+            if eid not in scores:
+                continue
+            has_scope = any(sw.lower() in query_lower for sw in scope_words)
+            if not has_scope:
+                del scores[eid]
+
+        # Minimum relevance threshold: require at least one keyword/reg
+        # match (score >= 2) to prevent ship-type-only injections
+        _MIN_SCORE = 2
         ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
         results = []
-        for eid, _score in ranked[:3]:
-            results.append(self._by_id[eid])
+        for eid, score in ranked[:3]:
+            if score >= _MIN_SCORE:
+                results.append(self._by_id[eid])
         return results
 
     # ------------------------------------------------------------------
