@@ -6,6 +6,8 @@ based on cross-attention relevance rather than cosine similarity.
 import logging
 import re
 
+from generation.generator import record_service_call
+
 logger = logging.getLogger(__name__)
 
 # Signals that a chunk contains configuration/carriage requirements
@@ -57,8 +59,9 @@ class CohereReranker:
     def __init__(self, api_key: str, model: str = "rerank-multilingual-v3.0"):
         import cohere
 
-        self.client = cohere.ClientV2(api_key=api_key)
+        self.client = cohere.ClientV2(api_key=api_key, timeout=30.0)
         self.model = model
+        logger.info("Cohere reranker client: timeout=30s")
 
     def rerank(
         self,
@@ -95,6 +98,7 @@ class CohereReranker:
                 documents=doc_texts,
                 top_n=min(top_n, len(chunks)),
             )
+            record_service_call("cohere_reranker", f"docs={len(chunks)}")
         except Exception as exc:
             logger.error(f"[Reranker] API error, returning original order: {exc}")
             return chunks[:top_n]

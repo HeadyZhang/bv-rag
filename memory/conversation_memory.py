@@ -7,8 +7,10 @@ import uuid
 from dataclasses import asdict, dataclass, field
 
 import anthropic
+import httpx
 import redis
 
+from generation.generator import record_llm_usage
 from generation.prompts import SUMMARIZE_PROMPT
 
 logger = logging.getLogger(__name__)
@@ -70,10 +72,15 @@ class ConversationMemory:
         session_ttl_hours: int = 24,
     ):
         self.redis_client = redis.from_url(redis_url, decode_responses=True)
-        self.anthropic_client = anthropic.Anthropic(api_key=anthropic_api_key)
+        self.anthropic_client = anthropic.Anthropic(
+            api_key=anthropic_api_key,
+            max_retries=3,
+            timeout=httpx.Timeout(120.0, connect=10.0),
+        )
         self.max_turns = max_turns
         self.session_ttl = session_ttl_hours * 3600
         self.fast_model = "claude-haiku-4-5-20251001"
+        logger.info("ConversationMemory Anthropic client: max_retries=3, timeout=120s")
 
     def create_session(
         self, user_id: str = "anonymous", session_id: str | None = None,
@@ -280,6 +287,12 @@ class ConversationMemory:
                         ),
                     }],
                 )
+                record_llm_usage(
+                    model=self.fast_model,
+                    input_tokens=response.usage.input_tokens,
+                    output_tokens=response.usage.output_tokens,
+                    query_preview=f"[coreference] {query}",
+                )
                 result = response.content[0].text.strip().strip("\"'")
                 if len(result) < len(query) * 3 and len(result) > 5:
                     logger.info(f"[Coreference] Enhanced query (Layer 3 LLM): {result}")
@@ -301,6 +314,12 @@ class ConversationMemory:
                     "role": "user",
                     "content": f"{SUMMARIZE_PROMPT}\n\n{conversation_text}",
                 }],
+            )
+            record_llm_usage(
+                model=self.fast_model,
+                input_tokens=response.usage.input_tokens,
+                output_tokens=response.usage.output_tokens,
+                query_preview="[summarize]",
             )
             return response.content[0].text.strip()
         except Exception as e:

@@ -5,6 +5,8 @@ import openai
 from qdrant_client import QdrantClient
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
+from generation.generator import record_service_call
+
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "imo_regulations"
@@ -20,9 +22,10 @@ COLLECTIONS = {
 class VectorStore:
     def __init__(self, qdrant_url: str, qdrant_api_key: str, openai_api_key: str):
         self.client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
-        self.oai = openai.OpenAI(api_key=openai_api_key)
+        self.oai = openai.OpenAI(api_key=openai_api_key, max_retries=3, timeout=30.0)
         self.model = "text-embedding-3-large"
         self.dimensions = 1024
+        logger.info("OpenAI embedding client: max_retries=3, timeout=30s")
 
     def search(
         self,
@@ -39,6 +42,7 @@ class VectorStore:
                 dimensions=self.dimensions,
             )
             query_vector = response.data[0].embedding
+            record_service_call("openai_embedding")
         except Exception as e:
             logger.error(f"Embedding error: {e}")
             return []

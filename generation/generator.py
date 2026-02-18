@@ -1,14 +1,95 @@
 """Claude LLM answer generation with smart model routing."""
 import logging
 import re
+import threading
 from collections import defaultdict
 
 import anthropic
+import httpx
 import tiktoken
 
 from generation.prompts import SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
+
+# === Usage tracking (process-level, thread-safe) ===
+_usage_lock = threading.Lock()
+_usage_stats: dict = {
+    "total_requests": 0,
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "by_model": {},
+    "by_service": {},
+}
+
+MODEL_PRICES: dict[str, dict[str, float]] = {
+    "claude-sonnet-4-20250514": {"input": 3.0 / 1_000_000, "output": 15.0 / 1_000_000},
+    "claude-haiku-4-5-20251001": {"input": 0.80 / 1_000_000, "output": 4.0 / 1_000_000},
+}
+_DEFAULT_PRICE: dict[str, float] = {"input": 3.0 / 1_000_000, "output": 15.0 / 1_000_000}
+
+
+def record_llm_usage(
+    model: str,
+    input_tokens: int,
+    output_tokens: int,
+    session_id: str = "",
+    query_preview: str = "",
+) -> None:
+    """Record a single LLM call's token usage."""
+    with _usage_lock:
+        _usage_stats["total_requests"] += 1
+        _usage_stats["total_input_tokens"] += input_tokens
+        _usage_stats["total_output_tokens"] += output_tokens
+
+        if model not in _usage_stats["by_model"]:
+            _usage_stats["by_model"][model] = {
+                "requests": 0, "input_tokens": 0, "output_tokens": 0,
+            }
+        _usage_stats["by_model"][model]["requests"] += 1
+        _usage_stats["by_model"][model]["input_tokens"] += input_tokens
+        _usage_stats["by_model"][model]["output_tokens"] += output_tokens
+
+    logger.info(
+        f"[USAGE] model={model} "
+        f"input_tokens={input_tokens} "
+        f"output_tokens={output_tokens} "
+        f"total_tokens={input_tokens + output_tokens} "
+        f"session={session_id} "
+        f"query={query_preview[:50]}"
+    )
+
+
+def record_service_call(service: str, extra: str = "") -> None:
+    """Record an external service call (embedding, reranker, etc.)."""
+    with _usage_lock:
+        if service not in _usage_stats["by_service"]:
+            _usage_stats["by_service"][service] = 0
+        _usage_stats["by_service"][service] += 1
+
+    logger.info(f"[USAGE] service={service} calls=1 {extra}".strip())
+
+
+def get_usage_stats() -> dict:
+    """Return cumulative usage statistics with cost estimation."""
+    with _usage_lock:
+        stats = {
+            "total_requests": _usage_stats["total_requests"],
+            "total_input_tokens": _usage_stats["total_input_tokens"],
+            "total_output_tokens": _usage_stats["total_output_tokens"],
+            "by_model": {k: dict(v) for k, v in _usage_stats["by_model"].items()},
+            "by_service": dict(_usage_stats["by_service"]),
+        }
+
+    total_cost = 0.0
+    for model, usage in stats["by_model"].items():
+        prices = MODEL_PRICES.get(model, _DEFAULT_PRICE)
+        total_cost += (
+            usage["input_tokens"] * prices["input"]
+            + usage["output_tokens"] * prices["output"]
+        )
+    stats["estimated_cost_usd"] = round(total_cost, 4)
+    return stats
 
 CITATION_PATTERN = re.compile(
     r"\[(SOLAS|MARPOL|MSC|MEPC|ISM|ISPS|Resolution|LSA|FSS|FTP|STCW|COLREG)[^\]]*\]"
@@ -71,9 +152,14 @@ RELATION_KEYWORDS = [
 
 class AnswerGenerator:
     def __init__(self, anthropic_api_key: str, primary_model: str, fast_model: str):
-        self.client = anthropic.Anthropic(api_key=anthropic_api_key)
+        self.client = anthropic.Anthropic(
+            api_key=anthropic_api_key,
+            max_retries=3,
+            timeout=httpx.Timeout(120.0, connect=10.0),
+        )
         self.primary_model = primary_model
         self.fast_model = fast_model
+        logger.info("Anthropic client initialized: max_retries=3, timeout=120s")
 
     def generate(
         self,
@@ -185,6 +271,13 @@ class AnswerGenerator:
                 messages=messages,
             )
             answer = response.content[0].text
+
+            record_llm_usage(
+                model=model,
+                input_tokens=response.usage.input_tokens,
+                output_tokens=response.usage.output_tokens,
+                query_preview=query,
+            )
         except Exception as e:
             logger.error(f"LLM generation error: {e}")
             raise

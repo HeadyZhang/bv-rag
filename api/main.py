@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 from contextlib import asynccontextmanager
 
@@ -99,6 +100,20 @@ app.add_middleware(
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "bv-rag"}
+
+
+@app.get("/api/v1/status")
+async def system_status():
+    from api.routes.voice import MAX_CONCURRENT_REQUESTS, _active_requests, _start_time
+    from generation.generator import get_usage_stats
+
+    return {
+        "current_requests": _active_requests,
+        "max_concurrent": MAX_CONCURRENT_REQUESTS,
+        "uptime_seconds": round(time.time() - _start_time),
+        "usage": get_usage_stats(),
+        "status": "healthy",
+    }
 
 
 # Register API routes
