@@ -25,6 +25,45 @@ COMPLEX_KEYWORDS = [
     "适用", "apply", "applicable", "豁免", "exempt",
 ]
 
+# Safety-critical answer patterns: catch dangerous LLM outputs
+SAFETY_RULES = [
+    {
+        "id": "liferaft_davit",
+        "trigger_query": re.compile(
+            r"(free.?fall|自由抛落|自由降落).*(davit|降落|救生筏)", re.IGNORECASE,
+        ),
+        "dangerous_answer": re.compile(
+            r"(都不需要|都无需|均不需要|不需要.{0,5}davit|无需.{0,10}davit"
+            r"|两舷.{0,10}不需要|两舷.{0,10}无需|都可以.{0,5}throw)",
+            re.IGNORECASE,
+        ),
+        "correction": (
+            "⚠️ **安全修正**：即使配备了 free-fall lifeboat，根据 SOLAS III/31.1.2.2，"
+            "≥85m 货船仍须在**至少一舷**配备 davit-launched 救生筏。"
+            "Free-fall lifeboat 不免除 davit 要求。\n\n---\n\n"
+        ),
+        "action": "prepend",
+    },
+    {
+        "id": "odme_no_limit",
+        "trigger_query": re.compile(
+            r"(ODME|排油|oil discharge|总排油量|排放.*油轮)", re.IGNORECASE,
+        ),
+        "dangerous_answer": re.compile(
+            r"(没有.{0,10}(总量|排油量|排油).{0,10}(限制|限值|要求)"
+            r"|无.{0,5}(总量|排油).{0,5}限"
+            r"|不存在.{0,10}排油.{0,5}限)",
+            re.IGNORECASE,
+        ),
+        "correction": (
+            "\n\n⚠️ **重要补充**：MARPOL Annex I Regulation 34 明确规定了货舱区排油限制——"
+            "每航次总排油量不得超过该批货油总量的 **1/30,000**（新船）或 1/15,000（旧船），"
+            "且瞬时排放率 ≤30 升/海里。"
+        ),
+        "action": "append",
+    },
+]
+
 RELATION_KEYWORDS = [
     "所有", "哪些", "all", "which", "compare", "区别", "关系", "relationship",
 ]
@@ -151,6 +190,10 @@ class AnswerGenerator:
             raise
 
         logger.info(f"[DIAG] LLM 回答前200字: {answer[:200].replace(chr(10), ' ')}")
+
+        # Safety post-check: catch dangerous patterns in LLM output
+        answer = self._safety_post_check(answer, query)
+
         logger.info("[DIAG] ========== 查询诊断结束 ==========")
         logger.info("=" * 80)
 
@@ -165,6 +208,27 @@ class AnswerGenerator:
             "model_used": model,
             "sources": sources,
         }
+
+    @staticmethod
+    def _safety_post_check(answer: str, query: str) -> str:
+        """Post-check LLM output for safety-critical errors.
+
+        If the query matches a safety rule's trigger and the answer contains
+        a dangerous pattern, prepend or append a correction.
+        """
+        for rule in SAFETY_RULES:
+            if not rule["trigger_query"].search(query):
+                continue
+            if rule["dangerous_answer"].search(answer):
+                logger.warning(
+                    f"[SAFETY] Rule '{rule['id']}' triggered — "
+                    f"dangerous pattern found in LLM answer"
+                )
+                if rule["action"] == "prepend":
+                    answer = rule["correction"] + answer
+                elif rule["action"] == "append":
+                    answer = answer + rule["correction"]
+        return answer
 
     def _select_model(self, query: str, chunks: list[dict]) -> str:
         """Smart model routing: Haiku for simple, Sonnet for complex."""

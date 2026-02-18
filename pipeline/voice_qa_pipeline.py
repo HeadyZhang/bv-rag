@@ -180,7 +180,11 @@ class VoiceQAPipeline:
 
         t0 = time.time()
         effective_top_k = classification["top_k"]
-        retrieved_chunks = self.retriever.retrieve(enhanced_query, top_k=effective_top_k)
+        retrieved_chunks = self.retriever.retrieve(
+            enhanced_query,
+            top_k=effective_top_k,
+            query_intent=classification.get("intent"),
+        )
         timing["retrieval_ms"] = int((time.time() - t0) * 1000)
 
         t0 = time.time()

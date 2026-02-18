@@ -44,7 +44,7 @@ class HybridRetriever:
         self.cohere_reranker = cohere_reranker
         self.utility_reranker = utility_reranker
 
-    def retrieve(self, query: str, top_k: int = 10, strategy: str = "auto") -> list[dict]:
+    def retrieve(self, query: str, top_k: int = 10, strategy: str = "auto", query_intent: str | None = None) -> list[dict]:
         # Enhance query with maritime terminology
         enhanced_query = self.query_enhancer.enhance(query)
 
@@ -185,6 +185,7 @@ class HybridRetriever:
                     query=query,
                     chunks=sorted_results,
                     top_n=effective_top_k,
+                    query_intent=query_intent,
                 )
             except Exception as exc:
                 logger.error(f"[RETRIEVAL] Cohere rerank failed: {exc}")
