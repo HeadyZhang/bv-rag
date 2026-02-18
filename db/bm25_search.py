@@ -128,6 +128,10 @@ class BM25Search:
             "Category 9", "Category 1", "Category 6",
             "ODME", "Regulation 34", "1/30000",
             "air pipe", "Regulation 20",
+            "superstructure", "superstructure deck", "deckhouse",
+            "freeboard deck", "first tier", "760 mm", "450 mm",
+            "Regulation 3", "enclosed superstructure",
+            "load lines", "ICLL",
         ]
         found = []
         query_lower = query.lower()

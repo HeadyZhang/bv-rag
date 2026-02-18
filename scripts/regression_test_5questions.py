@@ -77,8 +77,16 @@ GROUND_TRUTH = {
             "请问在第3层上层建筑上方的透气管（Air pipe），"
             "其离甲板的开口高度有什么要求？"
         ),
-        "correct_answer": "760mm or 450mm depending on position",
+        "correct_answer": (
+            "第3层不属于上层建筑定义范围，ICLL Reg.20无强制高度要求。"
+            "干舷甲板760mm，上层建筑甲板(第一层顶)450mm。"
+        ),
         "must_contain": ["760", "450"],
+        "must_contain_any": [
+            "无强制", "无要求", "不适用", "没有强制",
+            "no mandatory", "not covered", "not applicable",
+            "不属于", "不是上层建筑", "第一层",
+        ],
         "should_clarify": False,
         "expected_intent": "specification",
         "expected_topic": "air_pipe",
@@ -123,9 +131,11 @@ def test_query_enhancer():
                     issues.append(f"missing term: {term}")
 
         elif tid == "T105":
-            for term in ["air pipe", "superstructure"]:
+            for term in ["air pipe", "superstructure", "first tier"]:
                 if not any(term.lower() in t.lower() for t in matched):
                     issues.append(f"missing term: {term}")
+            if not any("ICLL" in r or "Load Lines" in r for r in regs):
+                issues.append("missing ICLL/Load Lines regulation reference")
 
         status = "PASS" if not issues else "FAIL"
         results[tid] = {"status": status, "issues": issues, "matched": len(matched)}
@@ -271,6 +281,15 @@ def test_api(api_url: str):
                 score += 1
             else:
                 issues.append(f"missing keyword: {kw}")
+
+        # Check: must_contain_any (at least one must be present)
+        any_kws = truth.get("must_contain_any", [])
+        if any_kws:
+            max_score += 2
+            if any(kw.lower() in answer.lower() for kw in any_kws):
+                score += 2
+            else:
+                issues.append(f"missing any of: {any_kws[:5]}")
 
         # Check: must_not_contain
         for kw in truth.get("must_not_contain", []):

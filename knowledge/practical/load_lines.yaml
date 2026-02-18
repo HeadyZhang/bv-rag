@@ -1,0 +1,63 @@
+- id: superstructure_strict_definition
+  title: "上层建筑的法规严格定义（ICLL Reg.3(10)）"
+  keywords: ["上层建筑", "superstructure", "甲板室", "deckhouse", "第二层", "第三层", "第一层"]
+  terms: ["superstructure", "superstructure deck", "deckhouse", "first tier", "Regulation 3(10)"]
+  regulations: ["ICLL Reg.3(10)", "ICLL Reg.20", "Load Lines Convention"]
+  ship_types: ["all"]
+  scope_required: ["上层建筑", "superstructure", "甲板室", "deckhouse", "透气管", "air pipe", "干舷", "freeboard", "载重线"]
+  correct_interpretation: >
+    上层建筑的法规定义仅指干舷甲板上的第一层围蔽结构（宽度达到或接近船宽）。
+    第二层、第三层及以上不属于"上层建筑"定义范围，它们是"甲板室"或"上层建筑上方的层"。
+    Regulation 20 的透气管高度要求（760mm/450mm）仅适用于干舷甲板和上层建筑甲板（第一层顶部）。
+    更高位置的透气管不受 Reg.20 的强制高度限制，但仍需配备自动关闭装置。
+  common_mistake: >
+    将所有干舷甲板上方的层都视为"上层建筑"，对第2/3层也套用450mm透气管高度要求。
+    这是错误的。日常用语中的"上层建筑"比法规定义宽泛得多。
+  decision_tree:
+    - "Step 1: 确认讨论的结构是否在干舷甲板上方"
+    - "Step 2: 是否是第一层且宽度延伸至两舷（或内缩 <4%B）？"
+    - "Step 3: 是第一层 → 属于上层建筑（Reg.3(10)定义）"
+    - "Step 4: 不是第一层 → 不属于上层建筑，是甲板室或上层建筑上方的层"
+    - "Step 5: 上层建筑甲板 = 第一层顶部甲板，不是更高层的甲板"
+
+- id: air_pipe_height_decision
+  title: "透气管高度快速判断（ICLL Reg.20）"
+  keywords: ["透气管", "air pipe", "开口高度", "760", "450", "透气管高度"]
+  terms: ["air pipe", "air pipe height", "vent pipe", "760mm", "450mm", "Regulation 20"]
+  regulations: ["ICLL Reg.20", "Load Lines Convention"]
+  ship_types: ["all"]
+  scope_required: ["透气管", "air pipe", "vent pipe", "开口高度", "760", "450"]
+  correct_interpretation: >
+    透气管高度快速判断：
+    1. 在干舷甲板上？ → 最低 760mm
+    2. 在上层建筑甲板上（第一层顶）？ → 最低 450mm
+    3. 在第二层或更高？ → ICLL 无强制高度要求（但船级社可能有额外要求）
+    4. 在围蔽空间内？ → 无高度要求
+    所有位置的透气管均需配备自动关闭装置（Reg.20(3)）。
+  common_mistake: >
+    对所有"上层建筑上方"的透气管统一要求450mm。这是错误的。
+    Reg.20 仅覆盖两个位置：干舷甲板和上层建筑甲板（第一层顶）。
+    第二层以上不在 Reg.20 的覆盖范围内。
+  decision_tree:
+    - "Step 1: 确认透气管位置 — 在哪层甲板上？"
+    - "Step 2: 干舷甲板 → 760mm"
+    - "Step 3: 上层建筑甲板（仅第一层顶） → 450mm"
+    - "Step 4: 第二层或更高 → ICLL 无强制高度，检查船级社规则"
+    - "Step 5: 围蔽空间内 → 无高度要求"
+    - "Step 6: 所有位置均需自动关闭装置（Reg.20(3)）"
+
+- id: definition_boundary_check
+  title: "法规定义边界检查（通用原则）"
+  keywords: ["定义", "范围", "适用", "上层建筑", "机器处所", "服务处所", "客船"]
+  terms: ["definition", "scope", "applicability", "strict definition"]
+  regulations: ["ICLL", "SOLAS", "MARPOL"]
+  ship_types: ["all"]
+  correct_interpretation: >
+    回答法规问题前，必须检查：
+    1. 用户描述的场景是否落在法规条款的定义范围内？
+    2. 日常用语是否比法规定义更宽泛？
+    3. 如果超出定义范围，该条款不适用（回答"无此要求"而非强行套用）。
+  common_mistake: >
+    高频陷阱：上层建筑(仅第一层)、A类机器处所(仅含内燃机/锅炉)、
+    高火险服务处所(仅含烹饪/加热设备)、客船(>12非船员乘客)。
+    用日常理解套用法规条文是最常见的错误。

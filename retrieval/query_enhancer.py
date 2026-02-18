@@ -55,9 +55,17 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "排放": ["discharge", "disposal"],
     "油水分离": ["OWS", "oily water separator", "15 ppm"],
     "舱底水": ["bilge water", "bilge", "engine room bilge"],
-    # Load Lines - ventilation
-    "透气管": ["air pipe", "vent pipe", "tank vent"],
-    "上层建筑": ["superstructure", "superstructure deck"],
+    # Load Lines - ventilation / structures
+    "透气管": ["air pipe", "vent pipe", "tank vent", "Regulation 20"],
+    "上层建筑": ["superstructure", "superstructure deck", "first tier", "Regulation 3(10)"],
+    "甲板室": ["deckhouse", "deck house"],
+    "围蔽": ["enclosed", "enclosed superstructure", "weathertight"],
+    "开口高度": ["opening height", "height above deck", "air pipe height"],
+    "通风筒": ["ventilator", "ventilation opening"],
+    "舱口盖": ["hatch cover", "hatchway"],
+    "风雨密": ["weathertight", "weathertight closing"],
+    "水密": ["watertight", "watertight closing"],
+    "载重线": ["load line", "load lines convention", "ICLL"],
     # Ship types
     "散货船": ["bulk carrier", "bulker"],
     "油轮": ["oil tanker", "tanker"],
@@ -121,8 +129,18 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "Category 1": ["SOLAS II-2/9"],
     "Category 6": ["SOLAS II-2/9"],
     "deck": ["SOLAS II-2/9"],
-    "air pipe": ["Load Lines Reg.20", "ILLC 1966/1988"],
-    "freeboard deck": ["Load Lines Convention", "ILLC 1966/1988"],
+    "air pipe": ["Load Lines Reg.20", "ICLL 1966/1988"],
+    "air pipe height": ["Load Lines Reg.20", "ICLL Reg.20"],
+    "vent pipe": ["Load Lines Reg.20", "ICLL 1966/1988"],
+    "freeboard deck": ["Load Lines Convention", "ICLL 1966/1988"],
+    "superstructure": ["ICLL Reg.3(10)", "ICLL Reg.20", "Load Lines Convention"],
+    "deckhouse": ["ICLL Reg.3", "Load Lines Convention"],
+    "freeboard": ["ICLL", "Load Lines Convention"],
+    "enclosed superstructure": ["ICLL Reg.12", "ICLL Reg.37"],
+    "ventilator": ["Load Lines Reg.22", "ICLL 1966/1988"],
+    "hatch cover": ["ICLL Reg.13-16", "Load Lines Convention"],
+    "weathertight": ["ICLL Reg.12", "ICLL Reg.18"],
+    "load line": ["ICLL 1966/1988", "Load Lines Convention"],
     "stability": ["SOLAS II-1"],
     "pollution": ["MARPOL"],
     "access": ["SOLAS II-1/3-6"],
@@ -252,13 +270,29 @@ class QueryEnhancer:
             ])
             relevant_regs.update(["MARPOL Annex I/Reg.34"])
 
-        # Air pipe -> inject position classification keywords
-        if any(kw in query for kw in ["透气管", "air pipe"]):
+        # Air pipe -> inject position classification + definition boundary keywords
+        if any(kw in query for kw in ["透气管", "air pipe", "开口高度"]):
             matched_terms.update([
                 "position 1", "position 2", "760 mm", "450 mm",
                 "freeboard deck", "superstructure deck",
+                "first tier", "Regulation 20", "Regulation 3(10)",
             ])
-            relevant_regs.update(["Load Lines Reg.20"])
+            relevant_regs.update(["Load Lines Reg.20", "ICLL Reg.3(10)"])
+            # If query mentions tiers above 1st, inject boundary condition terms
+            if any(kw in query for kw in ["第二层", "第三层", "第2层", "第3层",
+                                          "2nd tier", "3rd tier", "上方"]):
+                matched_terms.update([
+                    "no mandatory height", "not covered by Reg.20",
+                    "deckhouse", "above superstructure",
+                ])
+
+        # Load lines / superstructure definition -> inject ICLL terms
+        if any(kw in query for kw in ["上层建筑", "甲板室", "载重线"]):
+            matched_terms.update([
+                "superstructure definition", "first tier",
+                "freeboard deck", "deckhouse",
+            ])
+            relevant_regs.update(["ICLL Reg.3(10)", "Load Lines Convention"])
 
         if matched_terms:
             enhanced_parts.append(" ".join(sorted(matched_terms)))
