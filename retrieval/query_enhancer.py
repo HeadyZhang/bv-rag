@@ -29,7 +29,7 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "防火门": ["fire door", "fire-resistant division", "A-class division"],
     "烟雾探测": ["smoke detector", "fire detection", "smoke detection system"],
     "探火系统": ["fire detection system", "fire alarm"],
-    "灭火系统": ["fire-extinguishing system", "fire fighting"],
+    "灭火系统": ["fire-extinguishing system", "fire fighting", "firefighting system", "CO2 system"],
     # Fire safety - structural
     "防火分隔": ["fire division", "fire integrity", "A-class division", "B-class division", "structural fire protection"],
     "防火等级": ["fire rating", "fire integrity", "structural fire protection"],
@@ -114,13 +114,28 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "蒸汽回收": ["vapour return", "vapour-return line", "shore installation"],
     "IBC": ["IBC Code", "International Code for Construction and Equipment of Ships Carrying Dangerous Chemicals in Bulk"],
     "IBC规则": ["IBC Code", "chemical tanker code"],
+    # MARPOL Annex VI — air pollution
+    "氮氧化物": ["NOx", "nitrogen oxides", "emission"],
+    "硫氧化物": ["SOx", "sulphur oxides", "sulfur oxides"],
+    "排放控制区": ["ECA", "SECA", "emission control area"],
+    "低硫燃油": ["VLSFO", "LSFO", "low sulphur fuel oil", "low sulfur"],
+    # Firefighting / fire division definitions
+    "消防总管": ["fire main", "fire pump", "hydrant"],
+    "防火分隔定义": ["A-class division", "B-class division", "fire division definition"],
+    # OWS (separate from 油水分离)
+    "油水分离器": ["oily water separator", "OWS", "15 ppm"],
+    # Tanker cargo tank protection (SOLAS II-2/11.6)
+    "货舱保护": ["cargo tank protection", "tank protection"],
+    "压力真空阀": ["pressure vacuum valve", "P/V valve", "PV valve"],
+    "压力报警": ["pressure alarm", "overpressure alarm", "high pressure alarm"],
+    "真空报警": ["vacuum alarm", "underpressure alarm", "low pressure alarm"],
 }
 
 # Detected topic keywords -> relevant SOLAS/MARPOL chapters
 TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
-    "liferaft": ["SOLAS III", "LSA Code"],
+    "liferaft": ["SOLAS III", "SOLAS III/31", "LSA Code"],
     "lifeboat": ["SOLAS III", "LSA Code"],
-    "davit": ["SOLAS III", "LSA Code Chapter 6"],
+    "davit": ["SOLAS III", "SOLAS III/31", "LSA Code Chapter 6"],
     "launching appliance": ["SOLAS III", "LSA Code Chapter 6"],
     "davit-launched liferaft": ["SOLAS III/31", "SOLAS III/16", "LSA Code Chapter 6"],
     "free-fall": ["SOLAS III/31", "LSA Code Chapter 6"],
@@ -193,6 +208,27 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "exhaust opening": ["IBC Code 15.12"],
     "IBC Code": ["IBC Code Ch.15", "IBC Code Ch.17"],
     "vapour return": ["IBC Code 15.12"],
+    # Batch-2 audit fixes
+    "1/30000": ["MARPOL Annex I/Reg.29", "MARPOL Annex I/Reg.34"],
+    "NOx": ["MARPOL Annex VI/Reg.13"],
+    "SOx": ["MARPOL Annex VI/Reg.14"],
+    "sulphur content": ["MARPOL Annex VI/Reg.14"],
+    "ECA": ["MARPOL Annex VI"],
+    "SECA": ["MARPOL Annex VI"],
+    "A-class": ["SOLAS II-2/3", "SOLAS II-2/9"],
+    "B-class": ["SOLAS II-2/3", "SOLAS II-2/9"],
+    "A-60": ["SOLAS II-2/3", "SOLAS II-2/9"],
+    "fire division definition": ["SOLAS II-2/3"],
+    "CO2 system": ["SOLAS II-2/10", "FSS Code"],
+    "fire extinguishing": ["SOLAS II-2/10", "FSS Code"],
+    "fire main": ["SOLAS II-2/10"],
+    # Tanker cargo tank protection (SOLAS II-2/11.6)
+    "pressure alarm": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
+    "P/V valve": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
+    "cargo tank protection": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
+    "tanker venting": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
+    "cargo tank pressure": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
+    "vacuum protection": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
 }
 
 # Keywords indicating LSA equipment in query
@@ -334,6 +370,20 @@ class QueryEnhancer:
                 "accommodation", "air intake",
             ])
             relevant_regs.update(["IBC Code 15.12", "IBC Code Ch.15"])
+
+        # Tanker cargo tank pressure/vacuum protection -> inject SOLAS II-2/11.6 terms
+        if any(kw in query for kw in ["货舱保护", "压力真空阀", "压力报警", "真空报警",
+                                       "cargo tank protection", "P/V valve", "pressure alarm",
+                                       "vacuum alarm", "cargo tank pressure", "tanker venting",
+                                       "vacuum protection", "overpressure"]):
+            matched_terms.update([
+                "SOLAS II-2/11.6", "cargo tank protection",
+                "pressure vacuum valve", "P/V valve",
+                "pressure alarm", "vacuum alarm",
+                "overpressure", "underpressure",
+                "pressure sensor", "cargo control room",
+            ])
+            relevant_regs.update(["SOLAS II-2/11.6", "SOLAS II-2/11"])
 
         if matched_terms:
             enhanced_parts.append(" ".join(sorted(matched_terms)))
