@@ -74,6 +74,11 @@ async def lifespan(app: FastAPI):
         app.state.retriever, app.state.generator,
     )
 
+    # Auth DB
+    from db.auth import AuthDB
+    app.state.auth_db = AuthDB(settings.database_url)
+    logger.info("Auth DB initialized")
+
     logger.info(
         "All services initialized | cohere_reranker=%s | utility_reranker=%s",
         "active" if cohere_reranker else "disabled",
@@ -86,6 +91,8 @@ async def lifespan(app: FastAPI):
     app.state.graph.close()
     if utility_reranker:
         utility_reranker.close()
+    if hasattr(app.state, "auth_db"):
+        app.state.auth_db.close()
 
 
 app = FastAPI(title="BV-RAG Maritime Regulations", lifespan=lifespan)
@@ -120,10 +127,12 @@ async def system_status():
 from api.routes.voice import router as voice_router
 from api.routes.search import router as search_router
 from api.routes.admin import router as admin_router
+from api.routes.auth import router as auth_router
 
 app.include_router(voice_router)
 app.include_router(search_router)
 app.include_router(admin_router)
+app.include_router(auth_router)
 
 # Serve frontend (must be after API routes)
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")

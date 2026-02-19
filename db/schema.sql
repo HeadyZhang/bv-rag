@@ -128,7 +128,47 @@ CREATE INDEX IF NOT EXISTS idx_chunk_utilities_score
     ON chunk_utilities(query_category, utility_score DESC);
 
 -- ==========================================
--- 6. Add source_type and authority_level to regulations
+-- 6. Users table
+-- ==========================================
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    display_name VARCHAR(100),
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_login TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- ==========================================
+-- 7. Chat sessions table
+-- ==========================================
+CREATE TABLE IF NOT EXISTS chat_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    title VARCHAR(200),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_chat_sessions_user ON chat_sessions(user_id, updated_at DESC);
+
+-- ==========================================
+-- 8. Chat messages table
+-- ==========================================
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID REFERENCES chat_sessions(id) ON DELETE CASCADE,
+    role VARCHAR(20) NOT NULL,
+    content TEXT NOT NULL,
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_chat_messages_session ON chat_messages(session_id, created_at);
+
+-- ==========================================
+-- 9. Add source_type and authority_level to regulations
 -- ==========================================
 -- source_type: 'imo_rules', 'bv_rules', 'iacs_ur', 'iacs_ui', 'iacs_pr', 'iacs_rec'
 -- authority_level: 'convention', 'resolution', 'iacs_ur', 'iacs_ui', 'classification_rule', 'guidance_note'

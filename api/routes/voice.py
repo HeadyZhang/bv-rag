@@ -4,8 +4,11 @@ import base64
 import json
 import logging
 import time
+from typing import Optional
 
-from fastapi import APIRouter, Form, Request, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Form, Header, Request, UploadFile, WebSocket, WebSocketDisconnect
+
+from api.jwt_utils import decode_token
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +54,7 @@ async def text_query(
     session_id: str = Form(default=None),
     generate_audio: bool = Form(default=False),
     input_mode: str = Form(default="text"),
+    authorization: Optional[str] = Header(None),
 ):
     global _active_requests
     _active_requests += 1
@@ -59,13 +63,54 @@ async def text_query(
         async with _request_semaphore:
             logger.info(f"[CONCURRENCY] Text query processing ({_active_requests}/{MAX_CONCURRENT_REQUESTS})")
             pipeline = request.app.state.pipeline
-            return await pipeline.process_text_query(
+            result = await pipeline.process_text_query(
                 text=text,
                 session_id=session_id,
                 generate_audio=generate_audio,
             )
+
+            # Persist chat for logged-in users
+            _persist_chat_message(request, authorization, session_id, text, result)
+
+            return result
     finally:
         _active_requests -= 1
+
+
+def _persist_chat_message(
+    request: Request,
+    authorization: Optional[str],
+    session_id: Optional[str],
+    user_text: str,
+    result: dict,
+) -> None:
+    """Save chat messages for authenticated users (best-effort, non-blocking)."""
+    if not authorization:
+        return
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        return
+    user_id = decode_token(parts[1])
+    if not user_id:
+        return
+
+    try:
+        auth_db = request.app.state.auth_db
+        # Create or reuse chat session
+        chat_session_id = session_id or result.get("session_id", "")
+        if chat_session_id:
+            auth_db.create_chat_session(user_id, user_text[:100])
+        # Save user message
+        auth_db.add_chat_message(chat_session_id, "user", user_text)
+        # Save assistant message
+        answer = result.get("answer_text", "")
+        if answer:
+            auth_db.add_chat_message(
+                chat_session_id, "assistant", answer,
+                metadata={"confidence": result.get("confidence"), "model_used": result.get("model_used")},
+            )
+    except Exception as e:
+        logger.warning(f"[Auth] Failed to persist chat: {e}")
 
 
 @router.post("/tts")

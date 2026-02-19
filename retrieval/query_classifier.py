@@ -101,6 +101,20 @@ _TONNAGE_RE = re.compile(r"(\d+)\s*(?:万)?\s*(吨|GT|总吨|gross tonnage|载�
 class QueryClassifier:
     """Classify user query intent, topic, and extract ship parameters."""
 
+    @staticmethod
+    def detect_language(query: str) -> str:
+        """Detect query language. Returns 'zh', 'en', or 'mixed'."""
+        chinese_chars = sum(1 for c in query if '\u4e00' <= c <= '\u9fff')
+        total_chars = len(query.strip())
+        if total_chars == 0:
+            return "en"
+        ratio = chinese_chars / total_chars
+        if ratio > 0.3:
+            return "zh"
+        if ratio < 0.05:
+            return "en"
+        return "mixed"
+
     def classify(self, query: str) -> dict:
         query_lower = query.lower()
 
@@ -130,16 +144,23 @@ class QueryClassifier:
         # Detect regulatory topic
         topic = self._detect_topic(query_lower)
 
+        # Detect language
+        language = self.detect_language(query)
+
         config = INTENT_TYPES.get(intent, {})
         result = {
             "intent": intent,
             "topic": topic,
+            "language": language,
             "ship_info": ship_info,
             "retrieval_strategy": config.get("retrieval_strategy", "normal"),
             "model": config.get("model", "auto"),
             "top_k": config.get("top_k", 8),
         }
-        logger.info(f"[QueryClassifier] intent={intent}, topic={topic}, ship_info={ship_info}")
+        logger.info(
+            f"[QueryClassifier] intent={intent}, topic={topic}, "
+            f"language={language}, ship_info={ship_info}"
+        )
         return result
 
     @staticmethod

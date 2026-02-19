@@ -8,7 +8,8 @@ import anthropic
 import httpx
 import tiktoken
 
-from generation.prompts import SYSTEM_PROMPT
+from config.bv_rules_urls import generate_reference_url
+from generation.prompts import LANGUAGE_INSTRUCTIONS, SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
 
@@ -187,6 +188,11 @@ class AnswerGenerator:
         context_text = self._build_context(retrieved_chunks, max_context_tokens)
 
         system = SYSTEM_PROMPT
+
+        # Dynamic language instruction based on detected language
+        language = classification.get("language", "zh")
+        system += LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["zh"])
+
         if is_fast:
             system += (
                 "\n\n重要：请简洁回答，直接给出关键数值和法规引用，"
@@ -434,10 +440,17 @@ class AnswerGenerator:
                 continue
             seen.add(cid)
             meta = chunk.get("metadata", {})
+            url = meta.get("url", "")
+            breadcrumb = meta.get("breadcrumb", "")
+
+            # If no URL from crawled data, try to generate one from the reference
+            if not url and breadcrumb:
+                url = generate_reference_url(breadcrumb)
+
             sources.append({
                 "chunk_id": cid,
-                "url": meta.get("url", ""),
-                "breadcrumb": meta.get("breadcrumb", ""),
+                "url": url,
+                "breadcrumb": breadcrumb,
                 "score": chunk.get("score") or chunk.get("fused_score", 0),
             })
         return sources

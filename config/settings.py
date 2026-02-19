@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     max_conversation_turns: int = 10
     session_ttl_hours: int = 24
 
+    # Auth
+    jwt_secret: str = "change-me-in-production"
+    jwt_expiry_days: int = 7
+
     # IACS crawler credentials (optional)
     iacs_email: str = ""
     iacs_password: str = ""

@@ -189,20 +189,123 @@ body {
 }
 .voice-btn.recording { animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
+/* Table styles */
+.msg .answer-content .md-table-wrap { overflow-x: auto; margin: 12px 0; }
+.msg .answer-content table {
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 280px;
+  max-width: 100%;
+}
+.msg .answer-content table thead tr {
+  background-color: rgba(59, 130, 246, 0.15);
+  font-weight: 600;
+}
+.msg .answer-content table th,
+.msg .answer-content table td {
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  text-align: left;
+  white-space: nowrap;
+}
+.msg .answer-content table tbody tr:nth-child(even) {
+  background-color: rgba(255,255,255,0.03);
+}
+.msg .answer-content table tbody tr:hover {
+  background-color: rgba(59, 130, 246, 0.08);
+}
 .welcome { text-align: center; color: var(--text-muted); padding: 40px 20px; }
 .welcome h2 { font-size: 18px; margin-bottom: 8px; color: var(--text); }
+/* Auth UI */
+.auth-btn {
+  position: absolute; right: 16px; top: 16px;
+  background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3);
+  color: #93c5fd; padding: 6px 14px; border-radius: 8px; cursor: pointer;
+  font-size: 12px;
+}
+.auth-btn:hover { background: rgba(59,130,246,0.35); }
+.auth-dropdown {
+  position: absolute; right: 16px; top: 44px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 0; min-width: 160px; z-index: 100;
+}
+.auth-dropdown a {
+  display: block; padding: 8px 16px; color: var(--text); text-decoration: none; font-size: 13px;
+}
+.auth-dropdown a:hover { background: rgba(59,130,246,0.1); }
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 200; align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; width: 340px; max-width: 90vw;
+}
+.modal h3 { margin-bottom: 16px; text-align: center; }
+.modal-tabs { display: flex; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.modal-tab {
+  flex: 1; padding: 8px; text-align: center; cursor: pointer;
+  color: var(--text-muted); border-bottom: 2px solid transparent; font-size: 14px;
+}
+.modal-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.modal input[type="email"], .modal input[type="password"] {
+  width: 100%; padding: 10px 12px; margin-bottom: 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font-size: 14px; box-sizing: border-box;
+}
+.modal .submit-btn {
+  width: 100%; padding: 10px; border: none; border-radius: 8px;
+  background: var(--primary); color: #fff; font-size: 14px; cursor: pointer;
+  margin-top: 4px;
+}
+.modal .submit-btn:hover { background: var(--primary-hover); }
+.modal .error-msg { color: var(--danger); font-size: 12px; margin-bottom: 8px; }
+.modal .guest-link {
+  display: block; text-align: center; margin-top: 12px;
+  color: var(--text-muted); font-size: 12px; cursor: pointer;
+}
+.modal .guest-link:hover { color: var(--text); }
+/* History sidebar (simple list) */
+.history-list { max-height: 300px; overflow-y: auto; }
+.history-item {
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+  cursor: pointer; font-size: 13px; color: var(--text-muted);
+}
+.history-item:hover { background: rgba(59,130,246,0.08); color: var(--text); }
+.history-item .title { font-weight: 500; }
+.history-item .date { font-size: 11px; margin-top: 2px; }
 </style>
 </head>
 <body>
-<div class="header">
+<div class="header" style="position:relative;">
   <h1>BV-RAG</h1>
   <p>Maritime Regulation AI Assistant</p>
+  <button class="auth-btn" id="authBtn" onclick="toggleAuthMenu()">Login</button>
+  <div class="auth-dropdown hidden" id="authDropdown"></div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <div class="modal-tabs">
+      <div class="modal-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
+      <div class="modal-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</div>
+    </div>
+    <div id="authError" class="error-msg hidden"></div>
+    <form id="authForm" onsubmit="handleAuth(event)">
+      <input type="email" id="authEmail" placeholder="Email" required>
+      <input type="password" id="authPassword" placeholder="Password (8+ chars, letters + digits)" required>
+      <button type="submit" class="submit-btn" id="authSubmitBtn">Login</button>
+    </form>
+    <span class="guest-link" onclick="closeAuthModal()">Continue as guest</span>
+  </div>
 </div>
 
 <div class="chat-area" id="chatArea">
   <div class="welcome">
     <h2>Welcome, Surveyor</h2>
-    <p>Ask about IMO regulations by text or voice.</p>
+    <p>Ask about maritime regulations by text or voice — IMO Conventions, BV Rules, IACS Resolutions and more.</p>
     <p style="margin-top:8px;font-size:12px">Try: "What are the requirements of SOLAS II-1/3-6?"</p>
   </div>
 </div>
@@ -380,9 +483,63 @@ function renderConfidence(level) {
   return '<span class="confidence">' + dots + ' ' + (level || 'unknown') + '</span>';
 }
 
+function parseMarkdownTables(text) {
+  // Parse markdown pipe tables into HTML tables
+  var lines = text.split('\n');
+  var result = [];
+  var i = 0;
+  while (i < lines.length) {
+    // Detect table: line with |, followed by separator line with |---
+    if (i + 1 < lines.length &&
+        lines[i].trim().indexOf('|') !== -1 &&
+        /^\s*\|?\s*[-:]+[-| :]*$/.test(lines[i+1].trim())) {
+      var tableLines = [];
+      var j = i;
+      while (j < lines.length && lines[j].trim().indexOf('|') !== -1 && lines[j].trim() !== '') {
+        tableLines.push(lines[j]);
+        j++;
+      }
+      if (tableLines.length >= 2) {
+        var html = '<div class="md-table-wrap"><table>';
+        // Header
+        var hdrCells = tableLines[0].split('|').map(function(c) { return c.trim(); }).filter(function(c) { return c !== ''; });
+        html += '<thead><tr>';
+        hdrCells.forEach(function(c) { html += '<th>' + c + '</th>'; });
+        html += '</tr></thead><tbody>';
+        // Skip separator (tableLines[1])
+        for (var k = 2; k < tableLines.length; k++) {
+          var cells = tableLines[k].split('|').map(function(c) { return c.trim(); }).filter(function(c) { return c !== ''; });
+          html += '<tr>';
+          cells.forEach(function(c) { html += '<td>' + c + '</td>'; });
+          html += '</tr>';
+        }
+        html += '</tbody></table></div>';
+        result.push(html);
+        i = j;
+        continue;
+      }
+    }
+    result.push(lines[i]);
+    i++;
+  }
+  return result.join('\n');
+}
+
 function renderMarkdown(text, sources) {
   if (!text) return '';
-  let h = escapeHtml(text);
+  // Parse tables BEFORE escaping HTML (tables need raw | chars)
+  text = parseMarkdownTables(text);
+  // Escape HTML but preserve already-rendered table tags
+  var tableParts = [];
+  var parts = text.split(/(<div class="md-table-wrap">.*?<\/div>)/gs);
+  for (var pi = 0; pi < parts.length; pi++) {
+    if (parts[pi].indexOf('<div class="md-table-wrap">') === 0) {
+      tableParts.push(parts[pi]); // keep table HTML as-is
+    } else {
+      tableParts.push(escapeHtml(parts[pi]));
+    }
+  }
+  let h = tableParts.join('');
   h = h.replace(/^### (.+)$/gm, '<h3>$1</h3>');
   h = h.replace(/^## (.+)$/gm, '<h2>$1</h2>');
   h = h.replace(/^# (.+)$/gm, '<h1>$1</h1>');
@@ -391,9 +548,32 @@ function renderMarkdown(text, sources) {
   h = h.replace(/^- (.+)$/gm, '<li>$1</li>');
   h = h.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
   h = h.replace(/\[([A-Z][^\]]*)\]/g, function(m, p1) {
-    const src = sources.find(s => s.url && s.breadcrumb && s.breadcrumb.includes(p1.split(' ')[0]));
-    const url = src ? src.url : '#';
-    return '<a class="citation-link" href="' + url + '" target="_blank" rel="noopener">[' + p1 + ']</a>';
+    // Try matching against sources from API
+    var src = sources.find(function(s) {
+      return s.url && s.breadcrumb && s.breadcrumb.includes(p1.split(' ')[0]);
+    });
+    var url = src ? src.url : '';
+    // Fallback: generate URL from citation text
+    if (!url) {
+      var nrMatch = p1.match(/NR\s*(\d+)/i);
+      if (nrMatch) {
+        var nrUrls = {
+          'NR467': 'https://marine-offshore.bureauveritas.com/nr467-rules-classification-steel-ships',
+          'NR670': 'https://marine-offshore.bureauveritas.com/nr670-rules-classification-methanol-fuelled-ships',
+          'NR529': 'https://marine-offshore.bureauveritas.com/nr529',
+          'NR217': 'https://marine-offshore.bureauveritas.com/nr217',
+          'NR216': 'https://marine-offshore.bureauveritas.com/nr216'
+        };
+        var key = 'NR' + nrMatch[1];
+        url = nrUrls[key] || ('https://marine-offshore.bureauveritas.com/rules-guidelines?search=' + key);
+      } else if (/SOLAS|MARPOL|STCW|COLREG|LSA|FSS|ISM|ISPS|ICLL|MSC|MEPC/i.test(p1)) {
+        url = 'https://www.imorules.com';
+      }
+    }
+    if (!url) url = '#';
+    var domain = '';
+    try { domain = url !== '#' ? ' → ' + new URL(url).hostname : ''; } catch(e) {}
+    return '<a class="citation-link" href="' + url + '" target="_blank" rel="noopener" title="' + url + '">[' + p1 + ']' + domain + '</a>';
   });
   h = h.replace(/\n/g, '<br>');
   return h;
@@ -562,7 +742,12 @@ async function sendText(text) {
   form.append('input_mode', 'text');
 
   try {
-    const res = await fetch('/api/v1/voice/text-query', {method:'POST', body:form});
+    var fetchOpts = {method:'POST', body:form};
+    var token = localStorage.getItem('bvrag_token');
+    if (token) {
+      fetchOpts.headers = {'Authorization': 'Bearer ' + token};
+    }
+    const res = await fetch('/api/v1/voice/text-query', fetchOpts);
     const data = await res.json();
     if (data.session_id) SESSION_ID = data.session_id;
 
@@ -661,6 +846,157 @@ voiceBtn.onmousedown = voiceBtn.ontouchstart = (e) => { e.preventDefault(); star
 voiceBtn.onmouseup = voiceBtn.onmouseleave = voiceBtn.ontouchend = (e) => { e.preventDefault(); stopRec(); };
 
 initRecorder();
+
+// ============ Auth System ============
+var authMode = 'login'; // 'login' or 'register'
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  document.getElementById('tabLogin').className = 'modal-tab' + (mode === 'login' ? ' active' : '');
+  document.getElementById('tabRegister').className = 'modal-tab' + (mode === 'register' ? ' active' : '');
+  document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Login' : 'Register';
+  document.getElementById('authError').classList.add('hidden');
+}
+
+function toggleAuthMenu() {
+  var token = localStorage.getItem('bvrag_token');
+  if (token) {
+    var dd = document.getElementById('authDropdown');
+    if (dd.classList.contains('hidden')) {
+      var user = JSON.parse(localStorage.getItem('bvrag_user') || '{}');
+      dd.innerHTML = '<a style="color:var(--text-muted);pointer-events:none;">' + (user.email || 'User') + '</a>' +
+        '<a href="#" onclick="loadHistory();return false;">Chat History</a>' +
+        '<a href="#" onclick="logoutUser();return false;">Logout</a>';
+      dd.classList.remove('hidden');
+    } else {
+      dd.classList.add('hidden');
+    }
+  } else {
+    document.getElementById('authModal').classList.add('show');
+    switchAuthTab('login');
+  }
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('show');
+  document.getElementById('authError').classList.add('hidden');
+}
+
+async function handleAuth(e) {
+  e.preventDefault();
+  var email = document.getElementById('authEmail').value;
+  var password = document.getElementById('authPassword').value;
+  var errorEl = document.getElementById('authError');
+  errorEl.classList.add('hidden');
+
+  var endpoint = authMode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register';
+  try {
+    var res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: email, password: password})
+    });
+    var data = await res.json();
+    if (!res.ok) {
+      errorEl.textContent = data.detail || 'Error';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    localStorage.setItem('bvrag_token', data.token);
+    localStorage.setItem('bvrag_user', JSON.stringify(data.user));
+    updateAuthUI(data.user);
+    closeAuthModal();
+  } catch(err) {
+    errorEl.textContent = 'Network error';
+    errorEl.classList.remove('hidden');
+  }
+}
+
+function updateAuthUI(user) {
+  var btn = document.getElementById('authBtn');
+  if (user) {
+    btn.textContent = user.email.split('@')[0];
+  } else {
+    btn.textContent = 'Login';
+  }
+  document.getElementById('authDropdown').classList.add('hidden');
+}
+
+function logoutUser() {
+  localStorage.removeItem('bvrag_token');
+  localStorage.removeItem('bvrag_user');
+  updateAuthUI(null);
+  document.getElementById('authDropdown').classList.add('hidden');
+}
+
+async function loadHistory() {
+  var token = localStorage.getItem('bvrag_token');
+  if (!token) return;
+  document.getElementById('authDropdown').classList.add('hidden');
+  try {
+    var res = await fetch('/api/v1/chat/sessions', {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+    var data = await res.json();
+    if (data.sessions && data.sessions.length > 0) {
+      var welcome = chatArea.querySelector('.welcome');
+      if (welcome) welcome.remove();
+      var d = document.createElement('div');
+      d.className = 'msg ai';
+      var html = '<div class="answer-content"><h3>Chat History</h3><div class="history-list">';
+      data.sessions.forEach(function(s) {
+        var dt = new Date(s.updated_at || s.created_at).toLocaleDateString();
+        html += '<div class="history-item" onclick="loadSession(\'' + s.id + '\')">' +
+          '<div class="title">' + escapeHtml(s.title || 'Untitled') + '</div>' +
+          '<div class="date">' + dt + '</div></div>';
+      });
+      html += '</div></div>';
+      d.innerHTML = html;
+      chatArea.appendChild(d);
+      scrollBottom();
+    }
+  } catch(e) {}
+}
+
+async function loadSession(sessionId) {
+  var token = localStorage.getItem('bvrag_token');
+  if (!token) return;
+  try {
+    var res = await fetch('/api/v1/chat/sessions/' + sessionId + '/messages', {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+    var data = await res.json();
+    if (data.messages) {
+      // Clear chat area and replay messages
+      chatArea.innerHTML = '';
+      data.messages.forEach(function(m) {
+        if (m.role === 'user') {
+          addUserMsg(m.content, 'text');
+        } else {
+          addAIMsg({answer_text: m.content, confidence: 'medium', timing: {}, sources: []}, 'text');
+        }
+      });
+    }
+  } catch(e) {}
+}
+
+// Restore login state on page load
+(function() {
+  var token = localStorage.getItem('bvrag_token');
+  if (token) {
+    var user = JSON.parse(localStorage.getItem('bvrag_user') || 'null');
+    if (user) updateAuthUI(user);
+    // Verify token is still valid
+    fetch('/api/v1/auth/me', {headers: {'Authorization': 'Bearer ' + token}})
+      .then(function(r) { if (!r.ok) logoutUser(); })
+      .catch(function() {});
+  }
+})();
+
+// Close modal on overlay click
+document.getElementById('authModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAuthModal();
+});
 </script>
 </body>
 </html>

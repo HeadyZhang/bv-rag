@@ -84,8 +84,14 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "雷达": ["radar", "ARPA"],
     "无线电": ["radio", "GMDSS"],
     # BV Rules terminology
-    "入级": ["classification", "class", "NR467"],
+    "入级": ["classification", "class", "NR467", "BV Rules for Classification of Steel Ships"],
     "船级社": ["classification society", "Bureau Veritas", "BV"],
+    "调速器": ["governor", "speed governor", "governing characteristics"],
+    "并联运行": ["parallel operation", "operating in parallel", "load sharing"],
+    "功率分配": ["load sharing", "power distribution", "proportionate share"],
+    "发电机": ["generator", "generating set", "alternating current generating set"],
+    "NR467": ["BV Rules for Classification of Steel Ships", "NR467", "BV NR467"],
+    "NR670": ["BV Rules for Classification of Methanol-fuelled Ships", "NR670", "BV NR670"],
     "入级检验": ["classification survey", "initial survey", "renewal survey"],
     "附加标志": ["additional class notation", "notation", "class notation"],
     "结构强度": ["structural strength", "scantling", "hull girder"],
@@ -100,6 +106,14 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "共同结构规范": ["common structural rules", "CSR", "CSR BC&OT"],
     "极地船舶": ["polar class", "polar ship", "ice class"],
     "网络安全": ["cyber resilience", "UR E26", "UR E27", "cybersecurity"],
+    # IBC Code terminology
+    "有毒货物": ["toxic products", "toxic cargo", "toxic chemical", "IBC Code 15.12"],
+    "有毒产品": ["toxic products", "toxic cargo", "IBC Code 15.12"],
+    "透气管排气口": ["exhaust opening", "tank vent outlet", "vent outlet", "IBC Code 15.12"],
+    "高速透气阀": ["high velocity vent valve", "high-velocity vent valve", "30 m/s"],
+    "蒸汽回收": ["vapour return", "vapour-return line", "shore installation"],
+    "IBC": ["IBC Code", "International Code for Construction and Equipment of Ships Carrying Dangerous Chemicals in Bulk"],
+    "IBC规则": ["IBC Code", "chemical tanker code"],
 }
 
 # Detected topic keywords -> relevant SOLAS/MARPOL chapters
@@ -162,6 +176,23 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "polar": ["IACS UR I", "Polar Code"],
     "cyber": ["IACS UR E26", "IACS UR E27"],
     "survey certification": ["IACS UR Z", "SOLAS XI"],
+    # BV Rules — specific NR numbers
+    "governor": ["BV NR467 Part C", "BV NR467 2.7.6"],
+    "generating set": ["BV NR467 Part C", "BV NR467 2.7"],
+    "parallel operation": ["BV NR467 Part C", "BV NR467 2.7.6"],
+    "load sharing": ["BV NR467 Part C", "BV NR467 2.7.6"],
+    "NR467": ["BV NR467", "BV Rules for Classification of Steel Ships"],
+    "NR670": ["BV NR670", "BV Rules for Classification of Methanol-fuelled Ships"],
+    "methanol": ["BV NR670", "IGF Code"],
+    "electrical installation": ["BV NR467 Part C", "SOLAS II-1"],
+    # IBC Code
+    "toxic cargo": ["IBC Code 15.12", "IBC Code Ch.15"],
+    "toxic products": ["IBC Code 15.12", "IBC Code Ch.15"],
+    "chemical tanker": ["IBC Code", "SOLAS VII"],
+    "tank vent": ["IBC Code 15.12", "IBC Code Ch.8"],
+    "exhaust opening": ["IBC Code 15.12"],
+    "IBC Code": ["IBC Code Ch.15", "IBC Code Ch.17"],
+    "vapour return": ["IBC Code 15.12"],
 }
 
 # Keywords indicating LSA equipment in query
@@ -293,6 +324,16 @@ class QueryEnhancer:
                 "freeboard deck", "deckhouse",
             ])
             relevant_regs.update(["ICLL Reg.3(10)", "Load Lines Convention"])
+
+        # IBC Code / chemical tanker -> inject IBC-specific terms
+        if any(kw in query for kw in ["有毒货物", "有毒产品", "化学品船", "IBC", "toxic cargo",
+                                       "toxic products", "chemical tanker"]):
+            matched_terms.update([
+                "IBC Code", "Chapter 15", "15.12", "toxic products",
+                "exhaust opening", "tank vent", "15 metres",
+                "accommodation", "air intake",
+            ])
+            relevant_regs.update(["IBC Code 15.12", "IBC Code Ch.15"])
 
         if matched_terms:
             enhanced_parts.append(" ".join(sorted(matched_terms)))
