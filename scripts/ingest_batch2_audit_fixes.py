@@ -424,6 +424,11 @@ CURATED_BATCH2_DATA = [
             "ship_type": "all",
             "curated": True,
         },
+        "embedding_prefix": (
+            "CO2 carbon dioxide fire extinguishing system requirements for cargo ships "
+            "SOLAS II-2/10 firefighting fire main fire pump portable extinguisher "
+            "fixed foam sprinkler"
+        ),
         "keywords_en": [
             "SOLAS II-2/10", "firefighting", "fire main", "fire pump", "hydrant",
             "fire extinguisher", "CO2", "carbon dioxide", "foam", "sprinkler",
@@ -461,7 +466,10 @@ def _build_chunk_row(entry: dict) -> dict:
     """Build a dict matching the chunks table schema."""
     keywords_en = entry.get("keywords_en", [])
     keywords_zh = entry.get("keywords_zh", [])
+    prefix = entry.get("embedding_prefix", "")
     text_for_embedding = (
+        f"{prefix}\n\n" if prefix else ""
+    ) + (
         f"{entry['title']}\n\n{entry['body_text']}\n\n"
         f"Keywords: {' '.join(keywords_en)} {' '.join(keywords_zh)}"
     )
