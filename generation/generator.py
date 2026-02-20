@@ -9,6 +9,7 @@ import httpx
 import tiktoken
 
 from config.bv_rules_urls import generate_reference_url
+from config.solas_regulation_mapping import annotate_obsolete_refs
 from generation.prompts import LANGUAGE_INSTRUCTIONS, SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
@@ -389,6 +390,8 @@ class AnswerGenerator:
             text = chunk.get("text", "")
             if len(text) > 1600:
                 text = text[:1600] + "..."
+            # Annotate chunks that reference obsolete SOLAS II-2 numbers
+            text = annotate_obsolete_refs(text)
             chunk_tokens = len(text) // 4
             if total_tokens + chunk_tokens > max_context_tokens:
                 break

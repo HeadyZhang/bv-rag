@@ -134,6 +134,61 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "压力真空阀": ["pressure vacuum valve", "P/V valve", "PV valve"],
     "压力报警": ["pressure alarm", "overpressure alarm", "high pressure alarm"],
     "真空报警": ["vacuum alarm", "underpressure alarm", "low pressure alarm"],
+    # === Batch-3 numerical chunk terms (Workflow 2) ===
+    # SOLAS III/32 — personal LSA
+    "浸水服": ["immersion suit"],
+    "保温用具": ["thermal protective aid"],
+    "火箭降落伞信号": ["rocket parachute flare"],
+    "自亮灯": ["self-igniting light"],
+    "自发烟雾信号": ["self-activating smoke signal", "buoyant smoke signal"],
+    "儿童救生衣": ["child lifejacket", "infant lifejacket"],
+    "个人救生设备": ["personal life-saving appliance", "personal LSA"],
+    # SOLAS V/19 — navigation equipment
+    "电子海图": ["ECDIS", "electronic chart display"],
+    "航行数据记录仪": ["VDR", "voyage data recorder"],
+    "自动识别系统": ["AIS", "automatic identification system"],
+    "航行设备": ["navigation equipment", "navigational equipment"],
+    "回声测深仪": ["echo sounder", "echo-sounding device"],
+    "陀螺罗经": ["gyro compass", "gyroscopic compass"],
+    "磁罗经": ["magnetic compass"],
+    "测速仪": ["speed log", "speed and distance measuring device"],
+    # SOLAS II-1/29 — steering gear
+    "舵机": ["steering gear", "rudder"],
+    "操舵装置": ["steering gear", "steering apparatus"],
+    "主舵机": ["main steering gear"],
+    "辅助舵机": ["auxiliary steering gear"],
+    "应急舵机": ["emergency steering gear"],
+    "转舵时间": ["rudder angle time", "35 degrees to 30 degrees"],
+    # SOLAS II-2/7 — fire detection
+    "烟感探测器": ["smoke detector"],
+    "温感探测器": ["heat detector", "thermal detector"],
+    "探测器间距": ["detector spacing", "37 square metres"],
+    "手动报警按钮": ["manual call point", "manual alarm"],
+    "报警确认时间": ["alarm confirmation time", "2 minutes"],
+    "火灾报警系统": ["fire alarm system"],
+    # MARPOL Annex IV — sewage
+    "生活污水": ["sewage", "black water"],
+    "污水处理装置": ["sewage treatment plant", "STP"],
+    "污水排放": ["sewage discharge"],
+    "黑水": ["black water", "sewage"],
+    # MARPOL Annex V — garbage
+    "垃圾排放": ["garbage discharge", "garbage disposal"],
+    "垃圾管理计划": ["garbage management plan"],
+    "垃圾记录簿": ["garbage record book"],
+    "食物废弃物": ["food waste"],
+    "塑料禁排": ["plastic prohibition", "no plastic discharge"],
+    "货物残余": ["cargo residue"],
+    # SOLAS II-1/22 — watertight doors
+    "水密完整性": ["watertight integrity", "subdivision integrity"],
+    "远程关闭": ["remote closing", "central closing"],
+    # === Workflow 6 routing terms ===
+    "航行安全": ["safety of navigation"],
+    "弃船": ["abandon ship"],
+    "集合站": ["muster station", "assembly station"],
+    "登乘站": ["embarkation station"],
+    "油类记录簿": ["Oil Record Book", "ORB"],
+    "安全管理": ["safety management", "ISM"],
+    "船舶安保": ["ship security", "ISPS"],
 }
 
 # Detected topic keywords -> relevant SOLAS/MARPOL chapters
@@ -241,6 +296,45 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "crude oil washing": ["SOLAS II-2/4.5.5"],
     "COW": ["SOLAS II-2/4.5.5"],
     "8000 DWT": ["SOLAS II-2/4.5.5"],
+    # === Batch-3 topic mappings (Workflow 2) ===
+    "lifebuoy": ["SOLAS III/32"],
+    "lifejacket": ["SOLAS III/32"],
+    "immersion suit": ["SOLAS III/32"],
+    "personal LSA": ["SOLAS III/32"],
+    "rocket parachute flare": ["SOLAS III/32"],
+    "ECDIS": ["SOLAS V/19"],
+    "AIS": ["SOLAS V/19"],
+    "VDR": ["SOLAS V/20"],
+    "voyage data recorder": ["SOLAS V/20"],
+    "gyro compass": ["SOLAS V/19"],
+    "echo sounder": ["SOLAS V/19"],
+    "BNWAS": ["SOLAS V/19"],
+    "steering gear": ["SOLAS II-1/29"],
+    "rudder": ["SOLAS II-1/29"],
+    "smoke detector": ["SOLAS II-2/7", "FSS Code Ch.9"],
+    "heat detector": ["SOLAS II-2/7", "FSS Code Ch.9"],
+    "fire detection": ["SOLAS II-2/7"],
+    "fire alarm": ["SOLAS II-2/7"],
+    "detector spacing": ["SOLAS II-2/7", "FSS Code Ch.9"],
+    "bilge water": ["MARPOL Annex I/Reg.15"],
+    "oily water separator": ["MARPOL Annex I/Reg.15"],
+    "15 ppm": ["MARPOL Annex I/Reg.15"],
+    "sewage": ["MARPOL Annex IV/Reg.11"],
+    "sewage treatment": ["MARPOL Annex IV/Reg.11"],
+    "STP": ["MARPOL Annex IV/Reg.11"],
+    "garbage": ["MARPOL Annex V/Reg.4"],
+    "garbage discharge": ["MARPOL Annex V/Reg.4"],
+    "plastic": ["MARPOL Annex V/Reg.4"],
+    "garbage record book": ["MARPOL Annex V"],
+    "watertight door": ["SOLAS II-1/22"],
+    "watertight bulkhead": ["SOLAS II-1/22"],
+    # === Workflow 6 routing topic mappings ===
+    "safety of navigation": ["SOLAS V"],
+    "ISM": ["SOLAS IX", "ISM Code"],
+    "ISPS": ["SOLAS XI-2", "ISPS Code"],
+    "muster station": ["SOLAS III/11", "SOLAS III/25"],
+    "abandon ship": ["SOLAS III"],
+    "Oil Record Book": ["MARPOL Annex I"],
 }
 
 # Keywords indicating LSA equipment in query
@@ -396,6 +490,78 @@ class QueryEnhancer:
                 "pressure sensor", "cargo control room",
             ])
             relevant_regs.update(["SOLAS II-2/11.6", "SOLAS II-2/11"])
+
+        # Steering gear -> inject SOLAS II-1/29 terms
+        if any(kw in query for kw in ["舵机", "操舵装置", "主舵机", "辅助舵机", "转舵",
+                                       "steering gear", "rudder angle"]):
+            matched_terms.update([
+                "steering gear", "rudder", "35 degrees", "28 seconds",
+                "auxiliary steering", "main steering gear",
+                "power actuating system", "tanker steering",
+            ])
+            relevant_regs.update(["SOLAS II-1/29"])
+
+        # Fire detection -> inject SOLAS II-2/7 + FSS Code terms
+        if any(kw in query for kw in ["烟感探测器", "温感探测器", "探测器间距", "火灾探测",
+                                       "探火系统", "手动报警", "fire detection", "smoke detector",
+                                       "detector spacing"]):
+            matched_terms.update([
+                "SOLAS II-2/7", "fire detection", "smoke detector",
+                "heat detector", "37 square metres", "11 metres",
+                "manual call point", "FSS Code Chapter 9",
+            ])
+            relevant_regs.update(["SOLAS II-2/7", "FSS Code Ch.9"])
+
+        # Sewage -> inject MARPOL Annex IV terms
+        if any(kw in query for kw in ["生活污水", "污水处理", "污水排放", "黑水",
+                                       "sewage", "STP", "black water"]):
+            matched_terms.update([
+                "sewage", "sewage treatment plant", "STP",
+                "12 nautical miles", "3 nautical miles", "holding tank",
+                "comminuting", "disinfecting",
+            ])
+            relevant_regs.update(["MARPOL Annex IV/Reg.11"])
+
+        # Garbage -> inject MARPOL Annex V terms
+        if any(kw in query for kw in ["垃圾排放", "垃圾管理", "垃圾记录簿", "食物废弃物",
+                                       "塑料禁排", "garbage", "plastic prohibition"]):
+            matched_terms.update([
+                "garbage", "garbage discharge", "garbage management plan",
+                "garbage record book", "plastic", "food waste",
+                "special area", "12 nautical miles",
+            ])
+            relevant_regs.update(["MARPOL Annex V/Reg.4"])
+
+        # Watertight doors -> inject SOLAS II-1/22 terms
+        if any(kw in query for kw in ["水密门", "水密舱壁", "水密完整性", "远程关闭",
+                                       "watertight door", "watertight bulkhead"]):
+            matched_terms.update([
+                "watertight door", "watertight bulkhead",
+                "40 seconds", "central closing", "bridge indicator",
+                "sliding door", "power operated", "weekly test",
+            ])
+            relevant_regs.update(["SOLAS II-1/22"])
+
+        # Navigation equipment -> inject SOLAS V/19 terms
+        if any(kw in query for kw in ["电子海图", "航行设备", "航行数据记录仪",
+                                       "自动识别系统", "ECDIS", "VDR", "AIS carriage",
+                                       "navigation equipment carriage"]):
+            matched_terms.update([
+                "SOLAS V/19", "ECDIS", "AIS", "VDR", "S-VDR",
+                "radar", "gyro compass", "echo sounder", "BNWAS",
+                "carriage requirements", "300 GT", "3000 GT",
+            ])
+            relevant_regs.update(["SOLAS V/19", "SOLAS V/20"])
+
+        # Personal LSA -> inject SOLAS III/32 terms
+        if any(kw in query for kw in ["救生圈", "救生衣", "浸水服", "个人救生设备",
+                                       "lifebuoy", "lifejacket", "immersion suit"]):
+            matched_terms.update([
+                "lifebuoy", "lifejacket", "immersion suit",
+                "thermal protective aid", "rocket parachute flare",
+                "self-igniting light", "personal LSA",
+            ])
+            relevant_regs.update(["SOLAS III/32"])
 
         # Inert gas system -> inject SOLAS II-2/4.5.5 terms
         if any(kw in query for kw in ["惰气系统", "惰性气体", "原油洗舱", "甲板水封",

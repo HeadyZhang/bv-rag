@@ -14,6 +14,19 @@ logger = logging.getLogger(__name__)
 _COMPLEX_QUERY_RE = re.compile(r"(\d+)\s*(米|m|吨|GT|DWT)", re.IGNORECASE)
 _APPLICABILITY_KW = ["是否", "需不需要", "是否需要", "do I need", "要不要"]
 
+# Source-type weight multipliers for reranking (Workflow 3: P3 fix)
+# Convention/Code text is the primary source; Circulars are supplementary.
+SOURCE_WEIGHT: dict[str, float] = {
+    "curated": 1.30,       # curated chunks — highest priority
+    "convention": 1.15,     # SOLAS/MARPOL/ICLL convention text
+    "code": 1.10,           # IBC/IGC/FSS/LSA/ISM Code
+    "resolution": 0.95,     # MSC/MEPC resolutions
+    "circular": 0.85,       # MSC/MEPC circulars — supplementary, downweighted
+    "bv_rules": 1.05,       # BV classification rules
+    "iacs": 1.00,           # IACS unified requirements
+    "default": 1.00,
+}
+
 # Query category classification for utility reranking
 _QUERY_CATEGORIES: dict[str, list[str]] = {
     "fire_safety": ["防火", "fire", "A-0", "A-60", "B-15", "防火分隔", "灭火"],
@@ -200,6 +213,9 @@ class HybridRetriever:
             except Exception as exc:
                 logger.error(f"[RETRIEVAL] Utility rerank failed: {exc}")
 
+        # Source weight adjustment: boost conventions, downweight circulars
+        sorted_results = self._apply_source_weights(sorted_results)
+
         # Graph expansion: follow cross-references from top results
         before_graph = len(sorted_results)
         sorted_results = self._graph_expand(sorted_results, effective_top_k)
@@ -335,6 +351,69 @@ class HybridRetriever:
             if any(kw.lower() in query_lower for kw in keywords):
                 return category
         return "general"
+
+    @staticmethod
+    def _apply_source_weights(results: list[dict]) -> list[dict]:
+        """Apply source-type weight multipliers to reranked results.
+
+        Boosts convention/code chunks and downweights circulars so that
+        primary regulatory text outranks supplementary material.
+        """
+        if not results:
+            return results
+
+        for chunk in results:
+            payload = chunk.get("metadata", {})
+            collection = payload.get("collection", "")
+            is_curated = payload.get("curated", False)
+
+            # Determine source type from collection/breadcrumb
+            if is_curated:
+                weight = SOURCE_WEIGHT["curated"]
+            elif "circular" in collection.lower():
+                weight = SOURCE_WEIGHT["circular"]
+            elif "resolution" in collection.lower():
+                weight = SOURCE_WEIGHT["resolution"]
+            elif collection in ("bv_rules",):
+                weight = SOURCE_WEIGHT["bv_rules"]
+            elif collection in ("iacs_resolutions",):
+                weight = SOURCE_WEIGHT["iacs"]
+            else:
+                # Infer from breadcrumb for imo_regulations collection
+                breadcrumb = payload.get("breadcrumb", "").lower()
+                title = payload.get("title", "").lower()
+                combined = f"{breadcrumb} {title}"
+
+                if "circular" in combined or "circ." in combined:
+                    weight = SOURCE_WEIGHT["circular"]
+                elif "resolution" in combined:
+                    weight = SOURCE_WEIGHT["resolution"]
+                elif any(kw in combined for kw in [
+                    "ibc code", "igc code", "fss code", "lsa code",
+                    "ism code", "isps code",
+                ]):
+                    weight = SOURCE_WEIGHT["code"]
+                elif any(kw in combined for kw in [
+                    "solas", "marpol", "icll", "load line", "colreg", "stcw",
+                ]):
+                    weight = SOURCE_WEIGHT["convention"]
+                else:
+                    weight = SOURCE_WEIGHT["default"]
+
+            original_score = chunk.get("rrf_score", 0)
+            weighted_score = original_score * weight
+            chunk["rrf_score"] = weighted_score
+
+            if weight != 1.0:
+                chunk_id = chunk.get("chunk_id", "?")
+                logger.debug(
+                    f"[SourceWeight] {chunk_id}: "
+                    f"original={original_score:.4f} weight={weight:.2f} "
+                    f"adjusted={weighted_score:.4f}"
+                )
+
+        results.sort(key=lambda x: x.get("rrf_score", 0), reverse=True)
+        return results
 
     def _get_graph_context(self, result: dict) -> dict:
         doc_id = result.get("metadata", {}).get("doc_id", "")
