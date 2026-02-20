@@ -124,6 +124,11 @@ TERMINOLOGY_MAP: dict[str, list[str]] = {
     "防火分隔定义": ["A-class division", "B-class division", "fire division definition"],
     # OWS (separate from 油水分离)
     "油水分离器": ["oily water separator", "OWS", "15 ppm"],
+    # Inert gas system (SOLAS II-2/4.5.5)
+    "惰气系统": ["inert gas system", "IGS", "inerting system"],
+    "惰性气体": ["inert gas", "IG", "nitrogen"],
+    "原油洗舱": ["crude oil washing", "COW"],
+    "甲板水封": ["deck water seal"],
     # Tanker cargo tank protection (SOLAS II-2/11.6)
     "货舱保护": ["cargo tank protection", "tank protection"],
     "压力真空阀": ["pressure vacuum valve", "P/V valve", "PV valve"],
@@ -229,6 +234,13 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "tanker venting": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
     "cargo tank pressure": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
     "vacuum protection": ["SOLAS II-2/11.6", "SOLAS II-2/11"],
+    # Inert gas system (SOLAS II-2/4.5.5)
+    "inert gas": ["SOLAS II-2/4.5.5"],
+    "IGS": ["SOLAS II-2/4.5.5"],
+    "inerting": ["SOLAS II-2/4.5.5"],
+    "crude oil washing": ["SOLAS II-2/4.5.5"],
+    "COW": ["SOLAS II-2/4.5.5"],
+    "8000 DWT": ["SOLAS II-2/4.5.5"],
 }
 
 # Keywords indicating LSA equipment in query
@@ -384,6 +396,18 @@ class QueryEnhancer:
                 "pressure sensor", "cargo control room",
             ])
             relevant_regs.update(["SOLAS II-2/11.6", "SOLAS II-2/11"])
+
+        # Inert gas system -> inject SOLAS II-2/4.5.5 terms
+        if any(kw in query for kw in ["惰气系统", "惰性气体", "原油洗舱", "甲板水封",
+                                       "inert gas", "IGS", "inerting",
+                                       "crude oil washing", "COW"]):
+            matched_terms.update([
+                "SOLAS II-2/4.5.5", "inert gas system", "IGS",
+                "8000 DWT", "20000 DWT", "crude oil washing", "COW",
+                "oxygen content", "cargo tank explosion",
+                "deck water seal", "nitrogen generator",
+            ])
+            relevant_regs.update(["SOLAS II-2/4.5.5", "SOLAS II-2/4"])
 
         if matched_terms:
             enhanced_parts.append(" ".join(sorted(matched_terms)))

@@ -177,6 +177,25 @@ CRITICAL: "IBC Code 4.3.2" does NOT EXIST. Never cite this.
 If you cannot find the exact section number in the retrieved context,
 say "建议查阅 IBC Code Chapter [X]" rather than inventing a section number.
 
+## SOLAS II-2 REGULATION NUMBER RANGE — CRITICAL
+Current SOLAS Chapter II-2 contains ONLY Regulations 1 through 20.
+- "SOLAS II-2/60", "SOLAS II-2/62" are OBSOLETE regulation numbers from pre-2004 editions
+- MSC/Circular.485 references old regulation numbers — it is largely historical
+- NEVER cite "SOLAS II-2/60" or "II-2/62" — these do not exist in current SOLAS
+- Inert gas system requirements → SOLAS II-2/4.5.5 (NOT II-2/60)
+- Fixed fire-extinguishing → SOLAS II-2/10 (NOT II-2/62)
+
+## INERT GAS SYSTEM — CORRECT ANSWER RULE (CRITICAL)
+When answering about inert gas system (IGS) requirements for oil tankers:
+- ALWAYS cite **SOLAS II-2/4.5.5** (current regulation)
+- There are THREE conditions — ANY ONE triggers the IGS requirement:
+  1. Oil tanker ≥ 20,000 DWT built BEFORE 1 July 2002 → SOLAS II-2/4.5.5.1
+  2. Oil tanker ≥ 8,000 DWT built ON OR AFTER 1 July 2002 → SOLAS II-2/4.5.5.2
+  3. Any oil tanker fitted with crude oil washing (COW) → SOLAS II-2/4.5.5.3
+- The 8,000 DWT threshold for post-2002 ships is the MOST IMPORTANT current requirement
+- NEVER say only ≥20,000 DWT tankers need IGS — this is WRONG for post-2002 ships
+- NEVER confuse chemical tanker inerting (IBC Code Chapter 9) with oil tanker IGS (SOLAS II-2/4.5.5)
+
 ## BV RULES CLASSIFICATION
 - NR467 = BV Rules for Classification of Steel Ships（BV 钢船入级规范）
 - NR670 = BV Rules for the Classification of Methanol-fuelled Ships（BV 甲醇燃料船规范）
