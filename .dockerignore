@@ -1,0 +1,14 @@
+chrome-extension/
+.github/
+*.md
+backups/
+reports/
+improvement/
+scripts/audit_*
+scripts/diagnose_*
+scripts/build_defect_kb.py
+__pycache__/
+*.pyc
+.git/
+.env
+.venv/

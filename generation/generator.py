@@ -1,4 +1,5 @@
 """Claude LLM answer generation with smart model routing."""
+import json
 import logging
 import re
 import threading
@@ -10,7 +11,14 @@ import tiktoken
 
 from config.bv_rules_urls import generate_reference_url
 from config.solas_regulation_mapping import annotate_obsolete_refs
+from generation.extension_prompts import (
+    COMPLETE_SYSTEM_PROMPT,
+    EXPLAIN_SYSTEM_PROMPT,
+    FILL_SYSTEM_PROMPT,
+    PREDICT_SYSTEM_PROMPT,
+)
 from generation.prompts import LANGUAGE_INSTRUCTIONS, SYSTEM_PROMPT
+from generation.table_post_check import post_check_table_lookup
 
 logger = logging.getLogger(__name__)
 
@@ -294,6 +302,44 @@ class AnswerGenerator:
         # Safety post-check: catch dangerous patterns in LLM output
         answer = self._safety_post_check(answer, query)
 
+        # Table lookup post-check: catch table/ship-type mismatches and wrong values
+        table_check = post_check_table_lookup(answer, query, retrieved_chunks)
+        if table_check["should_regenerate"]:
+            logger.warning(
+                f"[TABLE_CHECK] Regenerating — "
+                f"{len(table_check['warnings'])} error(s): "
+                f"{table_check['correction_context'][:200]}"
+            )
+            corrected_user_message = (
+                user_message
+                + "\n\nIMPORTANT CORRECTIONS:\n"
+                + table_check["correction_context"]
+                + "\n\nPlease regenerate your answer with these corrections applied."
+            )
+            corrected_messages = messages[:-1] + [
+                {"role": "user", "content": corrected_user_message}
+            ]
+            try:
+                corrected_response = self.client.messages.create(
+                    model=model,
+                    max_tokens=max_tokens,
+                    system=system,
+                    messages=corrected_messages,
+                )
+                answer = corrected_response.content[0].text
+                record_llm_usage(
+                    model=model,
+                    input_tokens=corrected_response.usage.input_tokens,
+                    output_tokens=corrected_response.usage.output_tokens,
+                    query_preview=f"table_correction:{query[:30]}",
+                )
+                logger.info(
+                    f"[TABLE_CHECK] Corrected answer: "
+                    f"{answer[:200].replace(chr(10), ' ')}"
+                )
+            except Exception as exc:
+                logger.error(f"[TABLE_CHECK] Regeneration failed: {exc}")
+
         logger.info("[DIAG] ========== 查询诊断结束 ==========")
         logger.info("=" * 80)
 
@@ -457,3 +503,203 @@ class AnswerGenerator:
                 "score": chunk.get("score") or chunk.get("fused_score", 0),
             })
         return sources
+
+    # ------------------------------------------------------------------
+    # Extension endpoint methods (L1/L2/L3)
+    # ------------------------------------------------------------------
+
+    def generate_predict_suggestions(
+        self,
+        *,
+        chunks: list[dict],
+        ship_type: str = "",
+        area: str = "",
+        inspection_type: str = "",
+        form_context: dict | None = None,
+        existing_ids: list[str] | None = None,
+    ) -> list[dict]:
+        """Generate LLM-based defect predictions (L1 fallback).
+
+        Returns a list of suggestion dicts with text_en, text_zh,
+        regulation_ref, category, confidence.
+        """
+        context_text = self._build_context(chunks, max_context_tokens=2000)
+        prompt = PREDICT_SYSTEM_PROMPT.format(
+            ship_type=ship_type or "unknown",
+            inspection_area=area or "general",
+            inspection_type=inspection_type or "PSC",
+            form_context=json.dumps(form_context or {}, ensure_ascii=False),
+            context_chunks=context_text,
+        )
+
+        return self._call_llm_json_array(
+            prompt=prompt,
+            model=self.fast_model,
+            max_tokens=800,
+            query_preview=f"predict:{ship_type}/{area}",
+        )
+
+    def generate_completions(
+        self,
+        *,
+        partial_input: str,
+        chunks: list[dict],
+        field_label: str = "",
+        ship_type: str = "",
+        area: str = "",
+        form_context: dict | None = None,
+    ) -> list[dict]:
+        """Generate LLM-based autocomplete suggestions (L2 fallback).
+
+        Returns a list of suggestion dicts.
+        """
+        context_text = self._build_context(chunks, max_context_tokens=2000)
+        prompt = COMPLETE_SYSTEM_PROMPT.format(
+            partial_input=partial_input,
+            field_label=field_label or "Defect Description",
+            ship_type=ship_type or "unknown",
+            inspection_area=area or "general",
+            form_context=json.dumps(form_context or {}, ensure_ascii=False),
+            context_chunks=context_text,
+        )
+
+        return self._call_llm_json_array(
+            prompt=prompt,
+            model=self.fast_model,
+            max_tokens=800,
+            query_preview=f"complete:{partial_input[:30]}",
+        )
+
+    def generate_fill_text(
+        self,
+        *,
+        user_input: str,
+        target_lang: str,
+        chunks: list[dict],
+        field_label: str = "",
+        form_context: dict | None = None,
+    ) -> dict:
+        """Generate standardized fill text from informal input (L3).
+
+        Returns a dict with filled_text, regulation_ref, confidence.
+        """
+        context_text = self._build_context(chunks, max_context_tokens=3000)
+        prompt = FILL_SYSTEM_PROMPT.format(
+            selected_text=user_input,
+            target_lang=target_lang,
+            field_label=field_label or "Defect Description",
+            form_context=json.dumps(form_context or {}, ensure_ascii=False),
+            context_chunks=context_text,
+        )
+
+        try:
+            response = self.client.messages.create(
+                model=self.fast_model,
+                max_tokens=512,
+                system=prompt,
+                messages=[{"role": "user", "content": user_input}],
+            )
+            filled_text = response.content[0].text.strip()
+            record_llm_usage(
+                model=self.fast_model,
+                input_tokens=response.usage.input_tokens,
+                output_tokens=response.usage.output_tokens,
+                query_preview=f"fill:{user_input[:30]}",
+            )
+        except Exception as exc:
+            logger.error("[Extension] fill generation failed: %s", exc)
+            raise
+
+        # Extract regulation ref from the filled text
+        ref_match = re.search(r"\(Ref:\s*([^)]+)\)", filled_text)
+        regulation_ref = ref_match.group(1) if ref_match else ""
+
+        return {
+            "filled_text": filled_text,
+            "regulation_ref": regulation_ref,
+            "confidence": "high" if regulation_ref else "medium",
+            "model_used": self.fast_model,
+        }
+
+    def generate_explanation(
+        self,
+        *,
+        selected_text: str,
+        chunks: list[dict],
+        page_context: str = "",
+    ) -> dict:
+        """Generate chinese explanation of selected regulation text.
+
+        Returns a dict with explanation, regulation_refs.
+        """
+        context_text = self._build_context(chunks, max_context_tokens=2000)
+        prompt = EXPLAIN_SYSTEM_PROMPT.format(
+            selected_text=selected_text,
+            page_context=page_context or "N/A",
+            context_chunks=context_text,
+        )
+
+        try:
+            response = self.client.messages.create(
+                model=self.fast_model,
+                max_tokens=512,
+                system=prompt,
+                messages=[{"role": "user", "content": selected_text}],
+            )
+            explanation = response.content[0].text.strip()
+            record_llm_usage(
+                model=self.fast_model,
+                input_tokens=response.usage.input_tokens,
+                output_tokens=response.usage.output_tokens,
+                query_preview=f"explain:{selected_text[:30]}",
+            )
+        except Exception as exc:
+            logger.error("[Extension] explain generation failed: %s", exc)
+            raise
+
+        return {
+            "explanation": explanation,
+            "model_used": self.fast_model,
+        }
+
+    def _call_llm_json_array(
+        self,
+        *,
+        prompt: str,
+        model: str,
+        max_tokens: int,
+        query_preview: str,
+    ) -> list[dict]:
+        """Call LLM expecting a JSON array response; parse with fallback."""
+        try:
+            response = self.client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                system=prompt,
+                messages=[{"role": "user", "content": "Generate suggestions."}],
+            )
+            raw = response.content[0].text.strip()
+            record_llm_usage(
+                model=model,
+                input_tokens=response.usage.input_tokens,
+                output_tokens=response.usage.output_tokens,
+                query_preview=query_preview,
+            )
+        except Exception as exc:
+            logger.error("[Extension] LLM call failed: %s", exc)
+            return []
+
+        # Strip markdown fences if present
+        if raw.startswith("```"):
+            raw = re.sub(r"^```(?:json)?\n?", "", raw)
+            raw = re.sub(r"\n?```$", "", raw)
+
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return parsed
+            logger.warning("[Extension] LLM returned non-array JSON: %s", type(parsed))
+            return []
+        except json.JSONDecodeError as exc:
+            logger.warning("[Extension] Failed to parse LLM JSON: %s | raw=%s", exc, raw[:200])
+            return []

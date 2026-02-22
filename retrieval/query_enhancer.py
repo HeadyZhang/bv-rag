@@ -424,14 +424,17 @@ class QueryEnhancer:
                 "fire integrity of bulkheads and decks",
                 "structural fire protection",
             ]
-            # Inject ship-type-specific tables
-            if any(kw in query for kw in ["货船", "cargo"]):
-                fire_tables.extend(["Table 9.5", "Table 9.6"])
-            elif any(kw in query for kw in ["客船", "passenger"]):
+            # Inject ship-type-specific tables based on detected ship type
+            detected_ship = self.extract_ship_type_from_query(query)
+            if detected_ship == "tanker":
+                fire_tables.extend(["Table 9.7", "Table 9.8", "Regulation 9/2.4 Tankers"])
+            elif detected_ship == "passenger_ship":
                 fire_tables.extend(["Table 9.1", "Table 9.2", "Table 9.3", "Table 9.4"])
+            elif detected_ship == "cargo_ship_non_tanker":
+                fire_tables.extend(["Table 9.5", "Table 9.6", "Regulation 9/2.3"])
             else:
-                # Default: inject most common tables (cargo + passenger >36)
-                fire_tables.extend(["Table 9.1", "Table 9.5"])
+                # No ship type detected: inject most common tables
+                fire_tables.extend(["Table 9.1", "Table 9.5", "Table 9.7"])
             matched_terms.update(fire_tables)
             relevant_regs.update(["SOLAS II-2/9", "SOLAS II-2/3"])
 
@@ -592,3 +595,56 @@ class QueryEnhancer:
         logger.info(f"[ENHANCE] 增强查询: {enhanced_query[:200]}")
 
         return enhanced_query
+
+    @staticmethod
+    def extract_ship_type_from_query(query: str) -> str | None:
+        """Extract ship type from a user query (Chinese or English).
+
+        Returns one of:
+          - "tanker"
+          - "passenger_ship"
+          - "cargo_ship_non_tanker"
+          - None (cannot determine)
+        """
+        lower = query.lower()
+
+        # --- Tanker detection (highest priority — SOLAS Ch I, Reg 2(h)) ---
+        # Explicit tanker keywords
+        cn_tanker = ["油轮", "化学品船", "成品油轮", "原油轮", "tanker"]
+        if any(kw in lower for kw in cn_tanker):
+            return "tanker"
+
+        # Descriptive phrases: "运输可燃液体货物的轮船"
+        if "可燃" in lower and ("液体" in lower or "液货" in lower):
+            return "tanker"
+        if "运输" in lower and "液体" in lower and "货物" in lower:
+            return "tanker"
+
+        en_tanker = [
+            "oil tanker", "chemical tanker", "product tanker",
+            "flammable liquid", "inflammable liquid",
+            "oil carrier", "chemical carrier",
+        ]
+        if any(kw in lower for kw in en_tanker):
+            return "tanker"
+
+        # --- Passenger ship detection ---
+        cn_passenger = ["客船", "客轮", "邮轮", "cruise"]
+        if any(kw in lower for kw in cn_passenger):
+            return "passenger_ship"
+        if "passenger" in lower:
+            return "passenger_ship"
+
+        # --- Non-tanker cargo ship detection ---
+        cn_cargo_non_tanker = [
+            "散货船", "集装箱船", "杂货船", "多用途船",
+            "bulk carrier", "container ship", "general cargo",
+        ]
+        if any(kw in lower for kw in cn_cargo_non_tanker):
+            return "cargo_ship_non_tanker"
+
+        # Generic "cargo ship" without further qualification → non-tanker
+        if "货船" in lower or "cargo ship" in lower:
+            return "cargo_ship_non_tanker"
+
+        return None

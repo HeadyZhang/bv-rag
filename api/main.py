@@ -74,6 +74,15 @@ async def lifespan(app: FastAPI):
         app.state.retriever, app.state.generator,
     )
 
+    # Defect Knowledge Base (for Chrome extension)
+    from knowledge.defect_kb import DefectKnowledgeBase
+    app.state.defect_kb = DefectKnowledgeBase()
+    logger.info(
+        "Defect KB initialized: %d defects (v%s)",
+        app.state.defect_kb.get_version()["defect_count"],
+        app.state.defect_kb.get_version()["version"],
+    )
+
     # Auth DB
     from db.auth import AuthDB
     app.state.auth_db = AuthDB(settings.database_url)
@@ -128,11 +137,13 @@ from api.routes.voice import router as voice_router
 from api.routes.search import router as search_router
 from api.routes.admin import router as admin_router
 from api.routes.auth import router as auth_router
+from api.routes.extension import router as extension_router
 
 app.include_router(voice_router)
 app.include_router(search_router)
 app.include_router(admin_router)
 app.include_router(auth_router)
+app.include_router(extension_router)
 
 # Serve frontend (must be after API routes)
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")

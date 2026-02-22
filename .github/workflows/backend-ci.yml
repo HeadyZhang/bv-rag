@@ -1,0 +1,48 @@
+name: Backend CI
+on:
+  push:
+    paths:
+      - 'api/**'
+      - 'generation/**'
+      - 'retrieval/**'
+      - 'knowledge/**'
+      - 'pipeline/**'
+      - 'config/**'
+      - 'db/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'generation/**'
+      - 'retrieval/**'
+      - 'knowledge/**'
+      - 'pipeline/**'
+      - 'config/**'
+      - 'db/**'
+      - 'tests/**'
+
+jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check Python syntax
+        run: |
+          python -m py_compile api/main.py
+          python -m py_compile api/routes/extension.py
+          python -m py_compile generation/generator.py
+          python -m py_compile knowledge/defect_kb.py
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install ruff
+      - run: ruff check api/ generation/ retrieval/ knowledge/ pipeline/

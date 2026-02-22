@@ -40,6 +40,41 @@ _QUERY_CATEGORIES: dict[str, list[str]] = {
 }
 
 
+def normalize_ship_type_for_regulation(ship_type: str) -> str:
+    """Normalize a user-provided ship type string into a regulation category.
+
+    Categories:
+      - "tanker" — oil tankers, chemical tankers, product tankers
+      - "passenger_ship_gt36" — passenger ships carrying >36 passengers
+      - "passenger_ship_le36" — passenger ships carrying ≤36 passengers
+      - "passenger_ship" — passenger ship (unspecified count)
+      - "cargo_ship_non_tanker" — bulk carriers, container ships, general cargo, etc.
+    """
+    lower = ship_type.lower()
+
+    tanker_keywords = [
+        "tanker", "oil tanker", "chemical tanker", "product tanker",
+        "油轮", "化学品船", "成品油轮", "原油轮",
+        "可燃液体", "flammable liquid", "inflammable",
+    ]
+    if any(kw in lower for kw in tanker_keywords):
+        return "tanker"
+
+    passenger_keywords = ["passenger", "客船", "客轮", "cruise", "邮轮"]
+    if any(kw in lower for kw in passenger_keywords):
+        if "36" in lower:
+            # Check ≤36 FIRST (because "不超过36" contains "超过36")
+            le36_markers = ["≤36", "<=36", "不超过36", "不多于36", "le36", "36人以下"]
+            if any(marker in lower for marker in le36_markers):
+                return "passenger_ship_le36"
+            gt36_markers = [">36", "超过36", "多于36", "gt36", "36人以上"]
+            if any(marker in lower for marker in gt36_markers):
+                return "passenger_ship_gt36"
+        return "passenger_ship"
+
+    return "cargo_ship_non_tanker"
+
+
 class HybridRetriever:
     def __init__(
         self,
@@ -56,6 +91,76 @@ class HybridRetriever:
         self.query_enhancer = QueryEnhancer()
         self.cohere_reranker = cohere_reranker
         self.utility_reranker = utility_reranker
+
+    def retrieve_with_applicability(
+        self,
+        query: str,
+        ship_type: str | None = None,
+        top_k: int = 10,
+        strategy: str = "auto",
+        query_intent: str | None = None,
+    ) -> list[dict]:
+        """Retrieve chunks with applicability-aware filtering.
+
+        If a ship_type is provided (or can be extracted from the query),
+        prioritize chunks whose metadata.applicability matches the ship type
+        and deprioritize chunks that explicitly exclude it.
+        """
+        # Auto-detect ship type from query if not provided
+        if not ship_type:
+            ship_type = self.query_enhancer.extract_ship_type_from_query(query)
+
+        # Fetch extra candidates for filtering headroom
+        raw_chunks = self.retrieve(
+            query=query,
+            top_k=top_k * 2 if ship_type else top_k,
+            strategy=strategy,
+            query_intent=query_intent,
+        )
+
+        if not ship_type:
+            return raw_chunks[:top_k]
+
+        normalized = normalize_ship_type_for_regulation(ship_type)
+        logger.info(f"[APPLICABILITY] ship_type='{ship_type}' → normalized='{normalized}'")
+
+        matched: list[dict] = []
+        neutral: list[dict] = []
+        conflicting: list[dict] = []
+
+        for chunk in raw_chunks:
+            app = chunk.get("metadata", {}).get("applicability", {})
+
+            if not app or not app.get("ship_types"):
+                neutral.append(chunk)
+                continue
+
+            exclusions = app.get("ship_type_exclusions", [])
+            if any(normalized in exc or exc in normalized for exc in exclusions):
+                conflicting.append(chunk)
+                continue
+
+            types = app.get("ship_types", [])
+            if any(normalized in t or t in normalized for t in types):
+                matched.append(chunk)
+            else:
+                neutral.append(chunk)
+
+        result = matched + neutral
+        if len(result) < top_k:
+            for c in conflicting:
+                ship_types_label = c.get("metadata", {}).get("applicability", {}).get("ship_types", [])
+                c["_applicability_warning"] = (
+                    f"This chunk is for {ship_types_label}, not for {ship_type}"
+                )
+            result.extend(conflicting)
+
+        logger.info(
+            f"[APPLICABILITY] matched={len(matched)} neutral={len(neutral)} "
+            f"conflicting={len(conflicting)} → returning {min(len(result), top_k)}"
+        )
+
+        return result[:top_k]
 
     def retrieve(self, query: str, top_k: int = 10, strategy: str = "auto", query_intent: str | None = None) -> list[dict]:
         # Enhance query with maritime terminology

@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "BV Maritime Regulation Assistant",
+  "version": "0.2.0",
+  "description": "Surveyor's intelligent form-filling assistant — auto-predict defect descriptions, one-click fill with standard regulation text",
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "sidePanel",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.up.railway.app/*",
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["lib/api-client.js", "lib/defect-cache.js", "lib/suggestion-dropdown.js", "content.js"],
+      "css": ["styles/content.css"]
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
