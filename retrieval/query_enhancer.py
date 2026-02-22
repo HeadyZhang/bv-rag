@@ -317,7 +317,6 @@ TOPIC_TO_REGULATIONS: dict[str, list[str]] = {
     "fire alarm": ["SOLAS II-2/7"],
     "detector spacing": ["SOLAS II-2/7", "FSS Code Ch.9"],
     "bilge water": ["MARPOL Annex I/Reg.15"],
-    "oily water separator": ["MARPOL Annex I/Reg.15"],
     "15 ppm": ["MARPOL Annex I/Reg.15"],
     "sewage": ["MARPOL Annex IV/Reg.11"],
     "sewage treatment": ["MARPOL Annex IV/Reg.11"],

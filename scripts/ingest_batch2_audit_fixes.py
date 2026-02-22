@@ -564,7 +564,7 @@ def verify_postgres(db: PostgresDB):
         expected_ids,
     )
     found = {r[0] for r in cur.fetchall()}
-    logger.info(f"\n=== PostgreSQL Verification ===")
+    logger.info("\n=== PostgreSQL Verification ===")
     for doc_id in expected_ids:
         status = "OK" if doc_id in found else "MISSING"
         logger.info(f"  {status}: {doc_id}")

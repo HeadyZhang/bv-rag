@@ -18,7 +18,6 @@ import re
 import sys
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -319,7 +318,7 @@ async def crawl_iacs_catalog() -> list[dict]:
     index_urls = _build_index_urls()
     all_documents: list[IACSDocument] = []
 
-    console.print(f"[bold blue]IACS Catalog Crawler[/bold blue]")
+    console.print("[bold blue]IACS Catalog Crawler[/bold blue]")
     console.print(f"Index pages to crawl: {len(index_urls)}")
     console.print()
 

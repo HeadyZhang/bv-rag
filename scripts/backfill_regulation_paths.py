@@ -716,7 +716,7 @@ def validate_plan(plan_file: Path, sample_size: int = 50):
         print(f"  new:      {entry['new_text_preview']}...")
         print()
 
-    print(f"\nConfidence distribution:")
+    print("\nConfidence distribution:")
     print(f"  HIGH:   {len(high):5d} ({100 * len(high) / total:.1f}%)")
     print(f"  MEDIUM: {len(medium):5d} ({100 * len(medium) / total:.1f}%)")
     print(f"  LOW:    {len(low):5d} ({100 * len(low) / total:.1f}%)")
@@ -996,7 +996,7 @@ def execute_enrichment(
         time.sleep(1)
 
     cur.close()
-    logger.info(f"\n=== Enrichment Complete ===")
+    logger.info("\n=== Enrichment Complete ===")
     logger.info(f"Total processed: {processed_count}")
     logger.info(f"Total errors: {error_count}")
     logger.info(f"Checkpoint: {checkpoint_file}")

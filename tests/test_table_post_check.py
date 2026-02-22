@@ -1,6 +1,5 @@
 """Tests for table lookup post-check validation — badcase 260222 fix."""
 
-import pytest
 
 from generation.table_post_check import (
     extract_categories_from_answer,

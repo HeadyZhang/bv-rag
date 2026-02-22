@@ -15,9 +15,7 @@ Strategy:
 - retriever.retrieve is mocked (avoids DB/Qdrant dependency).
 - pipeline.process_text_query is mocked (avoids full stack).
 """
-import asyncio
-from types import SimpleNamespace
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from fastapi.testclient import TestClient

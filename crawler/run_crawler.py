@@ -1,10 +1,8 @@
 """Run the IMO Rules spider."""
 import os
-import sys
 
 from rich.console import Console
 from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
 
 console = Console()
 

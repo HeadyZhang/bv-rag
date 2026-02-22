@@ -1,9 +1,6 @@
 import hashlib
-import json
-import os
 from urllib.parse import urljoin
 
-import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 

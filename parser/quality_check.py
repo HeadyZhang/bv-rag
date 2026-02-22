@@ -53,7 +53,7 @@ def run_quality_check(input_path: str = "data/parsed/regulations.jsonl"):
         table3.add_row(pt or "(empty)", str(count))
     console.print(table3)
 
-    console.print(f"\n[bold]Quality Issues:[/bold]")
+    console.print("\n[bold]Quality Issues:[/bold]")
     console.print(f"  Empty body_text: [yellow]{len(empty_body)}[/yellow] ({len(empty_body)*100//total}%)")
     console.print(f"  Empty breadcrumb: [yellow]{len(empty_breadcrumb)}[/yellow] ({len(empty_breadcrumb)*100//total}%)")
     console.print(f"  No collection: [yellow]{len(no_collection)}[/yellow]")
@@ -63,7 +63,7 @@ def run_quality_check(input_path: str = "data/parsed/regulations.jsonl"):
     if content_docs:
         lengths = [len(d["body_text"]) for d in content_docs]
         avg_len = sum(lengths) // len(lengths)
-        console.print(f"\n[bold]Content Pages Stats:[/bold]")
+        console.print("\n[bold]Content Pages Stats:[/bold]")
         console.print(f"  Count: {len(content_docs)}")
         console.print(f"  Avg body length: {avg_len} chars")
         console.print(f"  Min: {min(lengths)}, Max: {max(lengths)}")

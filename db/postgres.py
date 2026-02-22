@@ -1,7 +1,6 @@
 """PostgreSQL connection and data operations."""
 import json
 import logging
-import os
 from pathlib import Path
 from urllib.parse import urlparse
 

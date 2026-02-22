@@ -1,7 +1,6 @@
 """Hybrid retrieval: vector + BM25 + graph with RRF fusion."""
 import logging
 import re
-from collections import defaultdict
 
 from db.bm25_search import BM25Search
 from db.graph_queries import GraphQueries

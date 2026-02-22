@@ -3,7 +3,6 @@
 Usage:
     python scripts/run_external_ingest.py [--bv-only | --iacs-only]
 """
-import sys
 
 from pipeline.ingest_external import main
 

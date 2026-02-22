@@ -11,9 +11,7 @@ Usage:
     python -m scripts.regression_test_5questions --api http://localhost:8000
 """
 import argparse
-import json
 import logging
-import re
 import sys
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")

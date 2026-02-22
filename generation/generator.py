@@ -3,7 +3,6 @@ import json
 import logging
 import re
 import threading
-from collections import defaultdict
 
 import anthropic
 import httpx

@@ -5,7 +5,6 @@ Dual semaphore isolation:
 - LLM_SEMAPHORE (3): Anthropic API calls, 1-5s, shared with chatbot
 """
 import asyncio
-import json
 import logging
 import time
 

@@ -17,7 +17,7 @@ from qdrant_client.models import (
     VectorParams,
 )
 from rich.console import Console
-from rich.progress import track
+
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from config.settings import settings
@@ -151,7 +151,7 @@ def ingest_to_qdrant(chunks: list[dict]):
             logger.warning(f"Index creation for {field}: {e}")
 
     estimated_cost = total_cost_tokens / 1_000_000 * 0.13
-    console.print(f"\n[bold green]Qdrant ingestion complete![/bold green]")
+    console.print("\n[bold green]Qdrant ingestion complete![/bold green]")
     console.print(f"  Total points: {total_uploaded}")
     console.print(f"  Embedding tokens: {total_cost_tokens:,}")
     console.print(f"  Estimated embedding cost: ${estimated_cost:.4f}")

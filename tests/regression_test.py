@@ -5,7 +5,6 @@ Usage:
 
 Default BASE_URL: https://bv-rag-production.up.railway.app
 """
-import json
 import sys
 import time
 

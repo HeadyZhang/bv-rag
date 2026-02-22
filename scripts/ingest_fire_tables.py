@@ -7,10 +7,8 @@ and Qdrant (for vector search).
 Usage:
     python -m scripts.ingest_fire_tables
 """
-import json
 import logging
 import sys
-import uuid
 
 import openai
 from qdrant_client import QdrantClient

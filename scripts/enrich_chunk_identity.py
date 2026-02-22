@@ -173,7 +173,7 @@ def main():
                 "after": new_text[:150],
             })
 
-    logger.info(f"\n=== Results ===")
+    logger.info("\n=== Results ===")
     logger.info(f"Already has path in text: {already_has_path}")
     logger.info(f"Would update (prefix needed): {would_update}")
     logger.info(f"No metadata available: {no_metadata}")
@@ -192,7 +192,7 @@ def main():
         logger.info("This script currently supports dry_run mode only.")
         logger.info("To implement execute mode: update PG text, re-embed, upsert Qdrant.")
     else:
-        logger.info(f"\nDry run complete. Use MODE=execute to apply changes.")
+        logger.info("\nDry run complete. Use MODE=execute to apply changes.")
 
     db.close()
 

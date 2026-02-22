@@ -1,7 +1,6 @@
 """IACS-specific PDF parser for Unified Requirements and Interpretations."""
 import logging
 import re
-from dataclasses import asdict
 from pathlib import Path
 
 from parser.pdf_parser import AUTHORITY_MAP, PDFParser, ParsedPDFRegulation
