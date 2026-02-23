@@ -165,3 +165,49 @@ class TestPostCheckTableLookup:
         )
         assert result["correction_context"]
         assert "CORRECTION" in result["correction_context"]
+
+
+class TestNewTableKnownValues:
+    """Tests for newly added Table 9.1 and 9.3 known values."""
+
+    def test_table_9_1_corridor_galley_is_b15(self):
+        """Passenger ship >36 pax: corridor vs galley = B-15 (NOT A-0)."""
+        result = post_check_table_lookup(
+            answer="根据 Table 9.1，Category (2) 走廊与 Category (9) 厨房 = **A-0**",
+            query="客船超过36人走廊和厨房防火等级",
+        )
+        assert result["should_regenerate"] is True
+        error_types = {w["type"] for w in result["warnings"] if w["level"] == "ERROR"}
+        assert "table_value_mismatch" in error_types
+
+    def test_table_9_1_corridor_corridor_is_b0(self):
+        """Passenger ship >36 pax: corridor vs corridor = B-0."""
+        result = post_check_table_lookup(
+            answer="根据 Table 9.1，(2)×(2) = **B-0**",
+            query="客船走廊之间的防火等级",
+        )
+        assert result["should_regenerate"] is False
+
+    def test_table_9_3_corridor_galley_is_a0(self):
+        """Passenger ship ≤36 pax: corridor vs galley = A-0 (same as cargo)."""
+        result = post_check_table_lookup(
+            answer="根据 Table 9.3，(2)×(9) = **A-0**",
+            query="小型客船走廊和厨房防火等级",
+        )
+        assert result["should_regenerate"] is False
+
+    def test_table_9_1_control_vs_machinery_a60(self):
+        """Passenger >36 pax: control station vs machinery Cat A = A-60."""
+        result = post_check_table_lookup(
+            answer="根据 Table 9.1，(1)×(6) = **A-60**",
+            query="大型客船控制站和机舱防火等级",
+        )
+        assert result["should_regenerate"] is False
+
+    def test_table_9_3_wrong_value_detected(self):
+        """Passenger ≤36 pax: control vs accommodation should be A-60, not A-0."""
+        result = post_check_table_lookup(
+            answer="根据 Table 9.3，Category (1) 与 Category (3) = **A-0**",
+            query="小型客船控制站和住舱防火等级",
+        )
+        assert result["should_regenerate"] is True

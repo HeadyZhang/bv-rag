@@ -16,7 +16,9 @@ from generation.extension_prompts import (
     FILL_SYSTEM_PROMPT,
     PREDICT_SYSTEM_PROMPT,
 )
+from generation.post_process import fix_source_links
 from generation.prompts import LANGUAGE_INSTRUCTIONS, SYSTEM_PROMPT
+from generation.missing_tables_logger import log_if_missing_table
 from generation.table_post_check import post_check_table_lookup
 
 logger = logging.getLogger(__name__)
@@ -342,9 +344,15 @@ class AnswerGenerator:
         logger.info("[DIAG] ========== 查询诊断结束 ==========")
         logger.info("=" * 80)
 
+        # Log queries where the answer signals missing table data (Section 9.2)
+        log_if_missing_table(query=query, answer=answer)
+
         citations = self._extract_citations(answer)
         confidence = self._assess_confidence(retrieved_chunks)
         sources = self._build_sources(retrieved_chunks)
+
+        # Fix generic regulation URLs in the answer text
+        answer = fix_source_links(answer, sources)
 
         return {
             "answer": answer,
@@ -444,7 +452,13 @@ class AnswerGenerator:
             meta = chunk.get("metadata", {})
             breadcrumb = meta.get("breadcrumb", "")
             url = meta.get("url", "")
-            context_parts.append(f"**[{breadcrumb}]** (Source: {url})\n{text}")
+            reg_num = meta.get("regulation_number", "")
+            header_parts = [f"[Source: {breadcrumb}]"]
+            if reg_num:
+                header_parts.append(f"[Regulation: {reg_num}]")
+            if url:
+                header_parts.append(f"[URL: {url}]")
+            context_parts.append(f"{' '.join(header_parts)}\n{text}")
             total_tokens += chunk_tokens
 
             graph_ctx = chunk.get("graph_context", {})

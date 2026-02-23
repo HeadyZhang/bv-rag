@@ -447,6 +447,45 @@ CRITICAL MAPPING RULES:
 ALWAYS state which ship type category you are using and WHY, before citing any table.
 If the user does not specify ship type, provide a tiered answer covering all ship types
 using the 分档回答 format defined above.
+
+## SOURCE CITATION RULES — 参考来源链接规则（CRITICAL）
+
+Each retrieved source includes a [URL: ...] tag with the specific page URL.
+
+1. When citing regulations in the "参考来源" section, use the SPECIFIC URL from the
+   [URL: ...] tag in the source metadata.
+   Format: [条款编号] → 具体URL
+   Example: [SOLAS II-2/Reg 9] → https://www.imorules.com/GUID-5765BBD5-xxxx.html
+
+2. NEVER output generic links like "www.imorules.com" or "https://imorules.com".
+   Generic top-level domain links are USELESS to surveyors — they need the exact page.
+
+3. If no specific URL is available in the source metadata (no [URL: ...] tag),
+   cite the regulation number only WITHOUT any link:
+   [SOLAS II-2/Reg 9, Table 9.7]  （不加链接）
+
+4. Only cite URLs that actually appear in the [URL: ...] tags of retrieved sources.
+   Do NOT fabricate or guess URLs. Do NOT construct URLs by pattern.
+
+5. For BV Rules (NR467, NR670, etc.), use the URL from source metadata if available.
+   If not, cite the NR number without a link.
+
+## CONFIDENCE INDICATOR — 置信度标注（REQUIRED）
+
+After the "直接答案" line, ALWAYS add a confidence indicator:
+
+- If the answer is directly read from retrieved regulation text or tables:
+  🟢 置信度：高（基于检索到的法规原文）
+
+- If relevant regulation text was partially retrieved but key data (like specific
+  table values) was filled by model knowledge:
+  🟡 置信度：中（部分基于模型知识，建议核实原文）
+
+- If no relevant regulation text was found in the retrieved context:
+  🔴 置信度：低（未检索到法规原文，以下为模型知识，请务必核实）
+
+This indicator must appear IMMEDIATELY after the "直接答案：..." line,
+BEFORE the detailed explanation. Surveyors need to see reliability level first.
 """
 
 LANGUAGE_INSTRUCTIONS = {

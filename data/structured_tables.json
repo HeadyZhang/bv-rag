@@ -1,0 +1,1280 @@
+[
+  {
+    "id": "solas-ii2-reg3-space-categories",
+    "table_id": "SOLAS-II2-Reg3-Categories",
+    "batch": 1,
+    "title": "SOLAS II-2/Reg 3 & 9.2.3: Space Category Definitions for Fire Integrity Tables",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 3/9 > Space Category Definitions",
+    "source_url": "",
+    "text": "=== SOLAS II-2/Reg 3 & 9.2.3: Space Category Definitions ===\n=== Purpose: Define space categories used in fire integrity Tables 9.1–9.8 ===\n\nCategory (1) — Control stations:\n  Definition: Spaces containing the ship’s navigating equipment, radio equipment, main fire control stations, centralized fire recording or fire control stations, machinery control rooms, including safety-related equipment rooms.\n  Examples: Wheelhouse/bridge, radio room, fire control station, emergency generator room, emergency switchboard room.\n  Related requirements: Tables 9.1–9.8 row/column (1)\n\nCategory (2) — Corridors:\n  Definition: Corridors, lobbies and halls used as escape routes or general access passages.\n  Examples: Main corridor, lobby, hall, stairway landing.\n  Related requirements: Tables 9.1–9.8 row/column (2)\n\nCategory (3) — Accommodation spaces:\n  Definition: Living quarters, offices, hospitals, recreation rooms, pantries containing NO cooking appliances, similar low-fire-risk habitable spaces.\n  Examples: Crew cabin, officers’ lounge, mess room, hospital, office, pantry (without stove).\n  Related requirements: Tables 9.1–9.8 row/column (3)\n\nCategory (4) — Stairways:\n  Definition: Interior stairways, lifts and escalators (other than those entirely within machinery spaces) and their enclosures.\n  Examples: Main stairway enclosure, lift shaft, stairway trunk.\n  Related requirements: Tables 9.1–9.8 row/column (4)\n\nCategory (5) — Service spaces (low risk):\n  Definition: Lockers, store rooms, workshops, pantries without cooking appliances, laundries, similar spaces of small fire risk.\n  Examples: Bosun’s store, linen locker, workshop, laundry, provision room.\n  Related requirements: Tables 9.1–9.8 row/column (5)\n\nCategory (6) — Machinery spaces of Category A:\n  Definition: Spaces containing internal combustion machinery used for main propulsion or for other purposes where the total output is not less than 375 kW, or any oil-fired boiler or oil fuel unit.\n  Examples: Main engine room, generator room (>375 kW), boiler room, fuel purifier room.\n  Related requirements: Tables 9.1–9.8 row/column (6)\n\nCategory (7) — Other machinery spaces:\n  Definition: Spaces containing machinery and electrical equipment other than Category (6).\n  Examples: Steering gear room, bow thruster room, stabilizer room, small auxiliary engine room.\n  Related requirements: Tables 9.1–9.8 row/column (7)\n\nCategory (8) — Cargo spaces:\n  Definition: All spaces used for cargo (including cargo oil tanks) and trunks to such spaces.\n  Examples: Cargo hold, container hold, cargo tank, cargo trunk. For tankers: cargo pump room (see Reg 9.2.4).\n  Related requirements: Tables 9.1–9.8 row/column (8)\n\nCategory (9) — Service spaces (HIGH risk):\n  Definition: Galleys, pantries CONTAINING COOKING APPLIANCES, paint lockers, lamp rooms, flammable liquid store rooms.\n  Examples: Main galley, officers’ galley, paint locker, lamp room, chemical store.\n  Related requirements: Tables 9.1–9.8 row/column (9)\n\nCategory (10) — Open decks:\n  Definition: Open deck spaces and enclosed promenades, no source of ignition and with adequate ventilation.\n  Examples: Weather deck, open poop deck, enclosed promenade.\n  Related requirements: Tables 9.1–9.8 row/column (10). Generally no fire integrity requirement against open decks.\n\nCategory (11) — Cargo spaces with high fire risk (cargo ships):\n  Definition: For cargo ships only — open-top container spaces, open ro-ro cargo spaces, or cargo oil tank areas.\n  Examples: Open ro-ro cargo area, weather-deck container stacks, tanker cargo tank on-deck area.\n  Related requirements: Tables 9.5/9.6/9.7/9.8 row/column (11)\n\nADDITIONAL CATEGORIES for Passenger Ships (>36 pax) — Tables 9.1/9.2:\n  Category (12): Tanks, voids, and auxiliary machinery spaces with little or no fire risk.\n  Category (13): Cargo spaces and deck areas on ro-ro ships.\n  Category (14): Vehicle and ro-ro cargo spaces.\n\nCRITICAL DISTINCTIONS:\n- A galley/kitchen WITH cooking equipment = Category (9) HIGH RISK\n- A pantry WITHOUT cooking equipment = Category (3) or (5) LOW RISK\n- This distinction directly affects fire integrity rating (e.g., galley vs corridor = A-0 on cargo ships, but pantry vs corridor = B-0)\n\nUSAGE INSTRUCTION: Use these category definitions when looking up values in Tables 9.1–9.8 for fire integrity.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 3 / 9.2.3",
+      "section": "3",
+      "table_id": "SOLAS-II2-Reg3-Categories",
+      "title": "Space Category Definitions for Fire Integrity Tables",
+      "content_type": "structured_table",
+      "table_type": "TYPE-E",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.1",
+        "9.2",
+        "9.3",
+        "9.4",
+        "9.5",
+        "9.6",
+        "9.7",
+        "9.8"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2",
+      "Regulation 3",
+      "Regulation 9",
+      "space category",
+      "category definition",
+      "control station",
+      "corridor",
+      "accommodation",
+      "stairway",
+      "service space",
+      "machinery space",
+      "cargo space",
+      "galley",
+      "Category A",
+      "fire integrity",
+      "Category 1",
+      "Category 2",
+      "Category 3",
+      "Category 6",
+      "Category 9"
+    ],
+    "keywords_zh": [
+      "处所分类",
+      "类别定义",
+      "控制站",
+      "走廊",
+      "住舰",
+      "梯道",
+      "服务处所",
+      "机舰",
+      "货舰",
+      "厨房",
+      "防火分隔",
+      "类别"
+    ],
+    "verify_queries": [
+      "SOLAS space category definition fire integrity",
+      "Category 1 control station Category 9 galley definition",
+      "防火分隔表处所分类定义"
+    ]
+  },
+  {
+    "id": "solas-ii2-9-table-9.5-full",
+    "table_id": "SOLAS-II2-Table-9.5",
+    "batch": 1,
+    "title": "SOLAS II-2/9 Table 9.5: Fire Integrity of Bulkheads Separating Adjacent Spaces — Cargo Ships Other Than Tankers",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 9 > Table 9.5",
+    "source_url": "",
+    "text": "=== SOLAS II-2/9 Table 9.5: Fire integrity of bulkheads — Cargo ships NOT being tankers ===\n=== Applicable to: Cargo ships other than tankers (bulk carriers, container ships, general cargo, etc.) ===\n=== NOT applicable to: Tankers (use Table 9.7), Passenger ships >36 pax (use Table 9.1), Passenger ships ≤36 pax (use Table 9.3) ===\n\nSpace categories (SOLAS II-2/9.2.3.2):\n(1) Control stations\n(2) Corridors\n(3) Accommodation spaces\n(4) Stairways\n(5) Service spaces (low risk)\n(6) Machinery spaces of Category A\n(7) Other machinery spaces\n(8) Cargo spaces\n(9) Service spaces (high risk) — galleys, paint lockers\n(10) Open decks\n(11) Cargo areas with high fire risk\n\nBulkhead fire integrity matrix (row × column = fire rating):\n(1)×(1)=A-0   (1)×(2)=A-0   (1)×(3)=A-60  (1)×(4)=A-0   (1)×(5)=A-15\n(1)×(6)=A-60  (1)×(7)=A-15  (1)×(8)=A-60  (1)×(9)=A-60  (1)×(10)=*\n(1)×(11)=A-60\n(2)×(2)=C    (2)×(3)=B-0   (2)×(4)=B-0   (2)×(5)=B-0   (2)×(6)=A-60\n(2)×(7)=A-0   (2)×(8)=A-0   (2)×(9)=A-0   (2)×(10)=*   (2)×(11)=A-0\n(3)×(3)=C    (3)×(4)=B-0   (3)×(5)=B-0   (3)×(6)=A-60  (3)×(7)=A-0\n(3)×(8)=A-0   (3)×(9)=A-0   (3)×(10)=*   (3)×(11)=A-0\n(4)×(4)=B-0   (4)×(5)=B-0   (4)×(6)=A-60  (4)×(7)=A-0   (4)×(8)=A-0\n(4)×(9)=A-0   (4)×(10)=*   (4)×(11)=A-0\n(5)×(5)=C    (5)×(6)=A-60  (5)×(7)=A-0   (5)×(8)=A-0   (5)×(9)=A-0\n(5)×(10)=*   (5)×(11)=A-0\n(6)×(6)=A-0(a) (6)×(7)=A-0  (6)×(8)=A-0   (6)×(9)=A-60  (6)×(10)=*\n(6)×(11)=A-60\n(7)×(7)=A-0   (7)×(8)=A-0   (7)×(9)=A-0   (7)×(10)=*   (7)×(11)=A-0\n(8)×(8)=*    (8)×(9)=A-0   (8)×(10)=*   (8)×(11)=*\n(9)×(9)=A-0(a) (9)×(10)=*  (9)×(11)=A-0\n(10)×(10)=–  (10)×(11)=*\n(11)×(11)=*\n\n* = No requirement; – = Not applicable\n\nFootnotes:\n(a) Where spaces of the same category are adjacent but used for different purposes (e.g., two separate machinery spaces), a bulkhead may be required at the discretion of the Administration.\n\nLOOKUP INSTRUCTION: This table is symmetric. To find the fire rating between Category X and Category Y, look up (X)×(Y) or (Y)×(X) — the value is the same.\n\nCOMMON LOOKUPS:\n- Control station vs Corridor: (1)×(2) = A-0\n- Control station vs Machinery Cat A: (1)×(6) = A-60\n- Corridor vs Galley: (2)×(9) = A-0\n- Corridor vs Accommodation: (2)×(3) = B-0\n- Accommodation vs Machinery Cat A: (3)×(6) = A-60\n- Galley vs Accommodation: (3)×(9) = A-0\n- Machinery Cat A vs Galley: (6)×(9) = A-60",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 9",
+      "section": "9.2.3.3",
+      "table_id": "SOLAS-II2-Table-9.5",
+      "title": "Table 9.5 Fire integrity of bulkheads — Cargo ships other than tankers",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "cargo_ship_non_tanker",
+          "bulk_carrier",
+          "container_ship",
+          "general_cargo"
+        ],
+        "ship_type_exclusions": [
+          "tanker",
+          "passenger_ship"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "user_screenshot",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.6"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2/9",
+      "Table 9.5",
+      "fire integrity",
+      "bulkhead",
+      "cargo ship",
+      "bulk carrier",
+      "container ship",
+      "fire division",
+      "A-0",
+      "A-60",
+      "B-0",
+      "C",
+      "Category 1",
+      "Category 2",
+      "Category 3",
+      "Category 6",
+      "Category 9",
+      "control station",
+      "corridor",
+      "accommodation",
+      "galley",
+      "machinery"
+    ],
+    "keywords_zh": [
+      "货船防火分隔",
+      "舰壁",
+      "防火等级",
+      "散货船",
+      "集装箱船",
+      "货船",
+      "控制站",
+      "走廊",
+      "住舰",
+      "厨房",
+      "机舰"
+    ],
+    "verify_queries": [
+      "cargo ship corridor control station fire rating bulkhead",
+      "散货船走廊控制站防火等级",
+      "SOLAS Table 9.5 fire integrity cargo ship"
+    ]
+  },
+  {
+    "id": "solas-ii2-9-table-9.6-full",
+    "table_id": "SOLAS-II2-Table-9.6",
+    "batch": 1,
+    "title": "SOLAS II-2/9 Table 9.6: Fire Integrity of Decks Separating Adjacent Spaces — Cargo Ships Other Than Tankers",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 9 > Table 9.6",
+    "source_url": "",
+    "text": "=== SOLAS II-2/9 Table 9.6: Fire integrity of DECKS — Cargo ships NOT being tankers ===\n=== Applicable to: Cargo ships other than tankers (bulk carriers, container ships, general cargo, etc.) ===\n=== NOT applicable to: Tankers (use Table 9.8), Passenger ships >36 pax (use Table 9.2), Passenger ships ≤36 pax (use Table 9.4) ===\n\nThis table specifies the minimum fire integrity of DECKS (horizontal divisions) separating adjacent spaces above and below on cargo ships other than tankers.\n\nSpace categories (SOLAS II-2/9.2.3.2): same as Table 9.5.\n(1) Control stations  (2) Corridors  (3) Accommodation  (4) Stairways\n(5) Service spaces (low risk)  (6) Machinery spaces Cat A  (7) Other machinery\n(8) Cargo spaces  (9) Service spaces (high risk)  (10) Open decks  (11) High fire risk cargo\n\nDeck fire integrity matrix — Space above × Space below = fire rating:\n(1)×(1)=A-0   (1)×(2)=A-0   (1)×(3)=A-60  (1)×(4)=A-0   (1)×(5)=A-0\n(1)×(6)=A-60  (1)×(7)=A-15  (1)×(8)=A-60  (1)×(9)=A-60  (1)×(10)=*\n(1)×(11)=A-60\n(2)×(1)=A-0   (2)×(2)=*    (2)×(3)=*    (2)×(4)=*    (2)×(5)=*\n(2)×(6)=A-60  (2)×(7)=A-0   (2)×(8)=A-0   (2)×(9)=A-0   (2)×(10)=*\n(2)×(11)=A-0\n(3)×(1)=A-60  (3)×(2)=*    (3)×(3)=*    (3)×(4)=*    (3)×(5)=*\n(3)×(6)=A-60  (3)×(7)=A-0   (3)×(8)=A-0   (3)×(9)=A-0   (3)×(10)=*\n(3)×(11)=A-0\n(4)×(1)=A-0   (4)×(2)=*    (4)×(3)=*    (4)×(4)=*    (4)×(5)=*\n(4)×(6)=A-60  (4)×(7)=A-0   (4)×(8)=A-0   (4)×(9)=A-0   (4)×(10)=*\n(4)×(11)=A-0\n(5)×(1)=A-15  (5)×(2)=*    (5)×(3)=*    (5)×(4)=*    (5)×(5)=*\n(5)×(6)=A-60  (5)×(7)=A-0   (5)×(8)=A-0   (5)×(9)=A-0   (5)×(10)=*\n(5)×(11)=A-0\n(6)×(1)=A-60  (6)×(2)=A-0   (6)×(3)=A-0   (6)×(4)=A-0   (6)×(5)=A-0\n(6)×(6)=A-0(a) (6)×(7)=A-0  (6)×(8)=A-0   (6)×(9)=A-60  (6)×(10)=*\n(6)×(11)=A-0\n(7)×(1)=A-15  (7)×(2)=*    (7)×(3)=*    (7)×(4)=*    (7)×(5)=*\n(7)×(6)=A-0   (7)×(7)=A-0   (7)×(8)=A-0   (7)×(9)=A-0   (7)×(10)=*\n(7)×(11)=A-0\n(8)×(1)=A-60  (8)×(2)=A-0   (8)×(3)=A-0   (8)×(4)=A-0   (8)×(5)=A-0\n(8)×(6)=A-0   (8)×(7)=A-0   (8)×(8)=*    (8)×(9)=A-0   (8)×(10)=*\n(8)×(11)=*\n(9)×(1)=A-60  (9)×(2)=A-0   (9)×(3)=A-0   (9)×(4)=A-0   (9)×(5)=A-0\n(9)×(6)=A-60  (9)×(7)=A-0   (9)×(8)=A-0   (9)×(9)=A-0(a) (9)×(10)=*\n(9)×(11)=A-0\n(10)×(1)=*   (10)×(2)=*   (10)×(3)=*   (10)×(4)=*   (10)×(5)=*\n(10)×(6)=*   (10)×(7)=*   (10)×(8)=*   (10)×(9)=*   (10)×(10)=–\n(10)×(11)=*\n(11)×(1)=A-60 (11)×(2)=A-0 (11)×(3)=A-0 (11)×(4)=A-0 (11)×(5)=A-0\n(11)×(6)=A-0  (11)×(7)=A-0  (11)×(8)=*   (11)×(9)=A-0  (11)×(10)=*\n(11)×(11)=*\n\n* = No requirement; – = Not applicable\n\nIMPORTANT: Deck tables are NOT symmetric. The row is the space ABOVE, the column is the space BELOW. (1)×(6) means Control station above, Machinery Cat A below.\n\nFootnotes:\n(a) Where spaces of the same category are adjacent, the Administration may determine whether a division is required.\n\nLOOKUP INSTRUCTION: For deck divisions, identify which space is ABOVE and which is BELOW. Row = space above, Column = space below.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 9",
+      "section": "9.2.3.3",
+      "table_id": "SOLAS-II2-Table-9.6",
+      "title": "Table 9.6 Fire integrity of decks — Cargo ships other than tankers",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "cargo_ship_non_tanker",
+          "bulk_carrier",
+          "container_ship",
+          "general_cargo"
+        ],
+        "ship_type_exclusions": [
+          "tanker",
+          "passenger_ship"
+        ]
+      },
+      "data_verified": false,
+      "data_source": "model_knowledge",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.5"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2/9",
+      "Table 9.6",
+      "fire integrity",
+      "deck",
+      "cargo ship",
+      "horizontal division",
+      "A-0",
+      "A-60",
+      "above",
+      "below"
+    ],
+    "keywords_zh": [
+      "甲板防火分隔",
+      "货船甲板",
+      "水平分隔",
+      "上方",
+      "下方"
+    ],
+    "verify_queries": [
+      "cargo ship deck fire integrity between spaces",
+      "货船甲板防火等级",
+      "SOLAS Table 9.6 deck cargo ship"
+    ]
+  },
+  {
+    "id": "solas-ii2-9-table-9.7-full",
+    "table_id": "SOLAS-II2-Table-9.7",
+    "batch": 1,
+    "title": "SOLAS II-2/9 Table 9.7: Fire Integrity of Bulkheads Separating Adjacent Spaces — Tankers",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 9 > Table 9.7",
+    "source_url": "",
+    "text": "=== SOLAS II-2/9 Table 9.7: Fire integrity of bulkheads — TANKERS ===\n=== Applicable to: Oil tankers, chemical tankers, product tankers (ships carrying flammable liquids in bulk as defined in SOLAS II-2/Reg 2(h)) ===\n=== NOT applicable to: Cargo ships other than tankers (use Table 9.5), Passenger ships (use Table 9.1/9.3) ===\n\nSpace categories for tankers (SOLAS II-2/9.2.4):\n(1) Control stations\n(2) Corridors\n(3) Accommodation spaces\n(4) Stairways\n(5) Service spaces (low risk)\n(6) Machinery spaces of Category A\n(7) Other machinery spaces\n(8) Cargo pump rooms\n(9) Service spaces (high risk) — galleys, paint lockers\n(10) Open decks\n(11) Cargo tank areas (on deck and cofferdams)\n\nNOTE: For tankers, Category (8) is specifically “Cargo pump rooms” (not general cargo holds). Cargo tank areas are Category (11).\n\nBulkhead fire integrity matrix (row × column = fire rating):\n(1)×(1)=A-0   (1)×(2)=A-0   (1)×(3)=A-60  (1)×(4)=A-0   (1)×(5)=A-15\n(1)×(6)=A-60  (1)×(7)=A-15  (1)×(8)=A-60  (1)×(9)=A-60  (1)×(10)=*\n(1)×(11)=A-60\n(2)×(2)=C    (2)×(3)=B-0   (2)×(4)=B-0   (2)×(5)=B-0   (2)×(6)=A-60\n(2)×(7)=A-0   (2)×(8)=A-60  (2)×(9)=A-0   (2)×(10)=*   (2)×(11)=A-0\n(3)×(3)=C    (3)×(4)=B-0   (3)×(5)=B-0   (3)×(6)=A-60  (3)×(7)=A-0\n(3)×(8)=A-60  (3)×(9)=A-0   (3)×(10)=*   (3)×(11)=A-0\n(4)×(4)=B-0   (4)×(5)=B-0   (4)×(6)=A-60  (4)×(7)=A-0   (4)×(8)=A-0\n(4)×(9)=A-0   (4)×(10)=*   (4)×(11)=A-0\n(5)×(5)=C    (5)×(6)=A-60  (5)×(7)=A-0   (5)×(8)=A-0   (5)×(9)=A-0\n(5)×(10)=*   (5)×(11)=A-0\n(6)×(6)=A-0(a) (6)×(7)=A-0  (6)×(8)=A-0   (6)×(9)=A-60  (6)×(10)=*\n(6)×(11)=A-60\n(7)×(7)=A-0   (7)×(8)=A-0   (7)×(9)=A-0   (7)×(10)=*   (7)×(11)=A-0\n(8)×(8)=A-0(b) (8)×(9)=A-60  (8)×(10)=*  (8)×(11)=A-0(c)\n(9)×(9)=A-0(a) (9)×(10)=*  (9)×(11)=A-0\n(10)×(10)=–  (10)×(11)=*\n(11)×(11)=*\n\n* = No requirement; – = Not applicable\n\nFootnotes:\n(a) Bulkheads between spaces of the same category may be required at the Administration’s discretion.\n(b) Cargo pump rooms on tankers require A-0 divisions between each other.\n(c) The bulkhead between a cargo pump room and the cargo tank area is critical for tanker safety.\n\nKEY DIFFERENCES from Table 9.5 (non-tanker cargo ships):\n- Category (8) = Cargo pump rooms (vs general cargo holds on non-tankers)\n- (2)×(8) = A-60 (corridor vs cargo pump room, higher than non-tanker A-0)\n- (3)×(8) = A-60 (accommodation vs cargo pump room, higher than non-tanker A-0)\n- (8)×(8) = A-0 (between cargo pump rooms)\n- (8)×(9) = A-60 (cargo pump room vs galley)\n\nLOOKUP INSTRUCTION: This table is symmetric. To find the fire rating between Category X and Category Y, look up (X)×(Y) or (Y)×(X) — the value is the same.\n\nCOMMON LOOKUPS (TANKERS):\n- Control station vs Corridor: (1)×(2) = A-0\n- Corridor vs Cargo pump room: (2)×(8) = A-60\n- Accommodation vs Machinery Cat A: (3)×(6) = A-60\n- Corridor vs Galley: (2)×(9) = A-0\n- Machinery Cat A vs Galley: (6)×(9) = A-60\n- Accommodation vs Cargo pump room: (3)×(8) = A-60",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 9",
+      "section": "9.2.4.1",
+      "table_id": "SOLAS-II2-Table-9.7",
+      "title": "Table 9.7 Fire integrity of bulkheads — Tankers",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "tanker",
+          "oil_tanker",
+          "chemical_tanker",
+          "product_tanker"
+        ],
+        "ship_type_exclusions": [
+          "cargo_ship_non_tanker",
+          "passenger_ship"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "user_screenshot",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.8"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2/9",
+      "Table 9.7",
+      "fire integrity",
+      "bulkhead",
+      "tanker",
+      "oil tanker",
+      "chemical tanker",
+      "cargo pump room",
+      "A-0",
+      "A-60",
+      "Category 1",
+      "Category 2",
+      "Category 8",
+      "Category 9"
+    ],
+    "keywords_zh": [
+      "油轮防火分隔",
+      "化学品船",
+      "油船舰壁",
+      "货泵舰",
+      "控制站",
+      "走廊",
+      "厨房",
+      "机舰"
+    ],
+    "verify_queries": [
+      "tanker corridor control station fire rating bulkhead",
+      "油轮走廊控制站防火等级",
+      "SOLAS Table 9.7 fire integrity tanker"
+    ]
+  },
+  {
+    "id": "solas-ii2-9-table-9.8-full",
+    "table_id": "SOLAS-II2-Table-9.8",
+    "batch": 1,
+    "title": "SOLAS II-2/9 Table 9.8: Fire Integrity of Decks Separating Adjacent Spaces — Tankers",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 9 > Table 9.8",
+    "source_url": "",
+    "text": "=== SOLAS II-2/9 Table 9.8: Fire integrity of DECKS — TANKERS ===\n=== Applicable to: Oil tankers, chemical tankers, product tankers ===\n=== NOT applicable to: Cargo ships other than tankers (use Table 9.6), Passenger ships (use Table 9.2/9.4) ===\n\nThis table specifies the minimum fire integrity of DECKS (horizontal divisions) separating adjacent spaces above and below on tankers.\n\nSpace categories for tankers (SOLAS II-2/9.2.4): same as Table 9.7.\n(1) Control stations  (2) Corridors  (3) Accommodation  (4) Stairways\n(5) Service spaces (low risk)  (6) Machinery spaces Cat A  (7) Other machinery\n(8) Cargo pump rooms  (9) Service spaces (high risk)  (10) Open decks  (11) Cargo tank areas\n\nDeck fire integrity matrix — Space above × Space below = fire rating:\n(1)×(1)=A-0   (1)×(2)=A-0   (1)×(3)=A-60  (1)×(4)=A-0   (1)×(5)=A-0\n(1)×(6)=A-60  (1)×(7)=A-15  (1)×(8)=A-60  (1)×(9)=A-60  (1)×(10)=*\n(1)×(11)=A-60\n(2)×(1)=A-0   (2)×(2)=*    (2)×(3)=*    (2)×(4)=*    (2)×(5)=*\n(2)×(6)=A-60  (2)×(7)=A-0   (2)×(8)=A-60  (2)×(9)=A-0   (2)×(10)=*\n(2)×(11)=A-0\n(3)×(1)=A-60  (3)×(2)=*    (3)×(3)=*    (3)×(4)=*    (3)×(5)=*\n(3)×(6)=A-60  (3)×(7)=A-0   (3)×(8)=A-60  (3)×(9)=A-0   (3)×(10)=*\n(3)×(11)=A-0\n(4)×(1)=A-0   (4)×(2)=*    (4)×(3)=*    (4)×(4)=*    (4)×(5)=*\n(4)×(6)=A-60  (4)×(7)=A-0   (4)×(8)=A-0   (4)×(9)=A-0   (4)×(10)=*\n(4)×(11)=A-0\n(5)×(1)=A-15  (5)×(2)=*    (5)×(3)=*    (5)×(4)=*    (5)×(5)=*\n(5)×(6)=A-60  (5)×(7)=A-0   (5)×(8)=A-0   (5)×(9)=A-0   (5)×(10)=*\n(5)×(11)=A-0\n(6)×(1)=A-60  (6)×(2)=A-0   (6)×(3)=A-0   (6)×(4)=A-0   (6)×(5)=A-0\n(6)×(6)=A-0(a) (6)×(7)=A-0  (6)×(8)=A-0   (6)×(9)=A-60  (6)×(10)=*\n(6)×(11)=A-60\n(7)×(1)=A-15  (7)×(2)=*    (7)×(3)=*    (7)×(4)=*    (7)×(5)=*\n(7)×(6)=A-0   (7)×(7)=A-0   (7)×(8)=A-0   (7)×(9)=A-0   (7)×(10)=*\n(7)×(11)=A-0\n(8)×(1)=A-60  (8)×(2)=A-60  (8)×(3)=A-60  (8)×(4)=A-0   (8)×(5)=A-0\n(8)×(6)=A-0   (8)×(7)=A-0   (8)×(8)=A-0   (8)×(9)=A-60  (8)×(10)=*\n(8)×(11)=A-0\n(9)×(1)=A-60  (9)×(2)=A-0   (9)×(3)=A-0   (9)×(4)=A-0   (9)×(5)=A-0\n(9)×(6)=A-60  (9)×(7)=A-0   (9)×(8)=A-60  (9)×(9)=A-0(a) (9)×(10)=*\n(9)×(11)=A-0\n(10)×(1)=*   (10)×(2)=*   (10)×(3)=*   (10)×(4)=*   (10)×(5)=*\n(10)×(6)=*   (10)×(7)=*   (10)×(8)=*   (10)×(9)=*   (10)×(10)=–\n(10)×(11)=*\n(11)×(1)=A-60 (11)×(2)=A-0 (11)×(3)=A-0 (11)×(4)=A-0 (11)×(5)=A-0\n(11)×(6)=A-60 (11)×(7)=A-0 (11)×(8)=A-0  (11)×(9)=A-0  (11)×(10)=*\n(11)×(11)=*\n\n* = No requirement; – = Not applicable\n\nIMPORTANT: Deck tables are NOT symmetric. Row = space ABOVE, Column = space BELOW.\n\nKEY DIFFERENCES from Table 9.6 (non-tanker cargo ships):\n- Category (8) = Cargo pump rooms (higher hazard than general cargo holds)\n- (2)×(8) = A-60 (corridor above cargo pump room)\n- (3)×(8) = A-60 (accommodation above cargo pump room)\n- (8)×(2) = A-60 and (8)×(3) = A-60 (cargo pump room above corridors/accommodation)\n- Category (11) cargo tank areas have A-60 for all safety-critical boundaries\n\nLOOKUP INSTRUCTION: For deck divisions, identify which space is ABOVE and which is BELOW. Row = space above, Column = space below.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 9",
+      "section": "9.2.4.1",
+      "table_id": "SOLAS-II2-Table-9.8",
+      "title": "Table 9.8 Fire integrity of decks — Tankers",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "tanker",
+          "oil_tanker",
+          "chemical_tanker",
+          "product_tanker"
+        ],
+        "ship_type_exclusions": [
+          "cargo_ship_non_tanker",
+          "passenger_ship"
+        ]
+      },
+      "data_verified": false,
+      "data_source": "model_knowledge",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.7"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2/9",
+      "Table 9.8",
+      "fire integrity",
+      "deck",
+      "tanker",
+      "oil tanker",
+      "chemical tanker",
+      "cargo pump room",
+      "horizontal division"
+    ],
+    "keywords_zh": [
+      "油轮甲板防火分隔",
+      "货泵舰",
+      "水平分隔",
+      "油船甲板"
+    ],
+    "verify_queries": [
+      "tanker deck fire integrity between spaces above below",
+      "油轮甲板防火等级",
+      "SOLAS Table 9.8 deck tanker"
+    ]
+  },
+  {
+    "id": "solas-ii2-9-table-9.1-full",
+    "table_id": "SOLAS-II2-Table-9.1",
+    "batch": 1,
+    "title": "SOLAS II-2/9 Table 9.1: Fire Integrity of Bulkheads Separating Adjacent Spaces — Passenger Ships Carrying More Than 36 Passengers",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 9 > Table 9.1",
+    "source_url": "",
+    "text": "=== SOLAS II-2/9 Table 9.1: Fire integrity of bulkheads — Passenger ships carrying MORE THAN 36 passengers ===\n=== Applicable to: Passenger ships carrying more than 36 passengers ===\n=== NOT applicable to: Passenger ships ≤36 pax (use Table 9.3), Cargo ships (use Table 9.5), Tankers (use Table 9.7) ===\n\nSpace categories for passenger ships >36 pax (SOLAS II-2/9.2.2):\n(1) Control stations\n(2) Corridors\n(3) Accommodation spaces (low fire risk)\n(4) Stairways\n(5) Service spaces (low risk)\n(6) Machinery spaces of Category A\n(7) Other machinery spaces\n(8) Cargo spaces\n(9) Service spaces (high risk) — galleys, paint lockers\n(10) Open decks\n(11) Sanitary and similar spaces\n(12) Tanks, voids and auxiliary machinery spaces with little or no fire risk\n(13) Cargo deck spaces on ro-ro ships\n(14) Vehicle and ro-ro cargo spaces\n\nBulkhead fire integrity matrix (14×14 symmetric) — key values:\n(1)×(1)=A-0    (1)×(2)=A-0    (1)×(3)=A-60   (1)×(4)=A-0    (1)×(5)=A-15\n(1)×(6)=A-60   (1)×(7)=A-15   (1)×(8)=A-60   (1)×(9)=A-60   (1)×(10)=*\n(1)×(11)=A-0   (1)×(12)=A-0   (1)×(13)=A-60  (1)×(14)=A-60\n(2)×(2)=B-0    (2)×(3)=B-0    (2)×(4)=A-0(b) (2)×(5)=B-0    (2)×(6)=A-60\n(2)×(7)=A-0    (2)×(8)=A-0    (2)×(9)=B-15   (2)×(10)=*    (2)×(11)=C\n(2)×(12)=A-0   (2)×(13)=A-60  (2)×(14)=A-0\n(3)×(3)=C(c)   (3)×(4)=A-0(b) (3)×(5)=B-0    (3)×(6)=A-60   (3)×(7)=A-0\n(3)×(8)=A-0    (3)×(9)=A-0    (3)×(10)=*    (3)×(11)=C     (3)×(12)=A-0\n(3)×(13)=A-60  (3)×(14)=A-0\n(4)×(4)=A-0(b) (4)×(5)=A-0    (4)×(6)=A-60   (4)×(7)=A-0    (4)×(8)=A-0\n(4)×(9)=A-0    (4)×(10)=*    (4)×(11)=A-0   (4)×(12)=A-0   (4)×(13)=A-60\n(4)×(14)=A-0\n(5)×(5)=C      (5)×(6)=A-60   (5)×(7)=A-0    (5)×(8)=A-0    (5)×(9)=A-0\n(5)×(10)=*     (5)×(11)=B-0   (5)×(12)=A-0   (5)×(13)=A-0   (5)×(14)=A-0\n(6)×(6)=A-0(a) (6)×(7)=A-0    (6)×(8)=A-0    (6)×(9)=A-60   (6)×(10)=*\n(6)×(11)=A-0   (6)×(12)=A-0   (6)×(13)=A-60  (6)×(14)=A-60\n(7)×(7)=A-0    (7)×(8)=A-0    (7)×(9)=A-0    (7)×(10)=*    (7)×(11)=B-0\n(7)×(12)=A-0   (7)×(13)=A-0   (7)×(14)=A-0\n(8)×(8)=*      (8)×(9)=A-0    (8)×(10)=*    (8)×(11)=A-0   (8)×(12)=*\n(8)×(13)=A-0   (8)×(14)=A-0\n(9)×(9)=A-0(a) (9)×(10)=*    (9)×(11)=A-0   (9)×(12)=A-0   (9)×(13)=A-0\n(9)×(14)=A-0\n(10)×(10)=–   (10)×(11)=*    (10)×(12)=*   (10)×(13)=*   (10)×(14)=*\n(11)×(11)=C    (11)×(12)=A-0  (11)×(13)=A-0  (11)×(14)=A-0\n(12)×(12)=*    (12)×(13)=A-0  (12)×(14)=A-0\n(13)×(13)=A-0(d) (13)×(14)=A-0\n(14)×(14)=A-0\n\n* = No requirement; – = Not applicable\n\nFootnotes:\n(a) Bulkheads between same category may be required at Administration’s discretion.\n(b) Stairway enclosures forming part of a main vertical zone boundary must be A-class.\n(c) Cabins have minimum B-15 bulkheads between them.\n(d) Ro-ro cargo spaces may have enhanced requirements per Reg 20.\n\nKEY DIFFERENCES from Cargo Ship Tables:\n- Corridor vs Galley: (2)×(9) = B-15 (NOT A-0 as on cargo ships)\n- Category (2)×(2) = B-0 (corridor-corridor divisions required on passenger ships)\n- Stairway enclosures: (4) requires A-class divisions (main vertical zone boundary)\n- Additional Categories (11)-(14) for sanitary spaces, tanks, ro-ro areas\n- Generally MORE stringent requirements due to higher passenger density\n\nLOOKUP INSTRUCTION: This table is symmetric. Look up (X)×(Y) or (Y)×(X). For complete data, refer to SOLAS II-2/9 Table 9.1 original text.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 9",
+      "section": "9.2.2",
+      "table_id": "SOLAS-II2-Table-9.1",
+      "title": "Table 9.1 Fire integrity of bulkheads — Passenger ships >36 pax",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "passenger_ship",
+          "passenger_ship_gt36"
+        ],
+        "ship_type_exclusions": [
+          "tanker",
+          "cargo_ship_non_tanker"
+        ]
+      },
+      "data_verified": false,
+      "data_source": "model_knowledge",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.2"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2/9",
+      "Table 9.1",
+      "fire integrity",
+      "bulkhead",
+      "passenger ship",
+      "more than 36 passengers",
+      "B-15",
+      "A-60",
+      "A-0",
+      "Category 14",
+      "ro-ro",
+      "vehicle space"
+    ],
+    "keywords_zh": [
+      "客船防火分隔",
+      "舰壁",
+      "超过36人",
+      "客轮",
+      "防火等级"
+    ],
+    "verify_queries": [
+      "passenger ship fire integrity bulkhead more than 36",
+      "客船走廊厨房防火等级",
+      "SOLAS Table 9.1 passenger ship"
+    ]
+  },
+  {
+    "id": "solas-ii2-9-table-9.2-full",
+    "table_id": "SOLAS-II2-Table-9.2",
+    "batch": 1,
+    "title": "SOLAS II-2/9 Table 9.2: Fire Integrity of Decks Separating Adjacent Spaces — Passenger Ships Carrying More Than 36 Passengers",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 9 > Table 9.2",
+    "source_url": "",
+    "text": "=== SOLAS II-2/9 Table 9.2: Fire integrity of DECKS — Passenger ships carrying MORE THAN 36 passengers ===\n=== Applicable to: Passenger ships carrying more than 36 passengers ===\n=== NOT applicable to: Passenger ships ≤36 pax (use Table 9.4), Cargo ships (use Table 9.6), Tankers (use Table 9.8) ===\n\nThis table specifies minimum fire integrity of DECKS (horizontal divisions) separating spaces above and below on passenger ships >36 pax.\n\nSpace categories: Same 14 categories as Table 9.1.\n(1)-(14) as defined in SOLAS II-2/9.2.2.\n\nKey deck fire integrity values (Space above × Space below):\n(1)×(1)=A-0    (1)×(2)=A-0    (1)×(3)=A-60   (1)×(4)=A-0    (1)×(5)=A-0\n(1)×(6)=A-60   (1)×(7)=A-15   (1)×(8)=A-60   (1)×(9)=A-60   (1)×(10)=*\n(1)×(11)=A-0   (1)×(12)=A-0   (1)×(13)=A-60  (1)×(14)=A-60\n(2)×(1)=A-0    (2)×(6)=A-60   (2)×(9)=A-0    (2)×(13)=A-60  (2)×(14)=A-0\n(3)×(1)=A-60   (3)×(6)=A-60   (3)×(9)=A-0    (3)×(13)=A-60  (3)×(14)=A-0\n(6)×(1)=A-60   (6)×(2)=A-0    (6)×(3)=A-0    (6)×(6)=A-0    (6)×(9)=A-60\n(6)×(13)=A-60  (6)×(14)=A-60\n(9)×(1)=A-60   (9)×(2)=A-0    (9)×(3)=A-0    (9)×(6)=A-60   (9)×(9)=A-0\n(14)×(1)=A-60  (14)×(2)=A-0   (14)×(3)=A-0   (14)×(6)=A-60  (14)×(14)=A-0\n\nNOTE: Deck table is NOT symmetric. Row = space above, Column = space below.\n\nFor complete 14×14 matrix data, refer to SOLAS II-2/9 Table 9.2 original regulation text.\n\nKEY UNIVERSAL RULES (all passenger ship deck divisions):\n- Control station above/below ANY accommodation = A-60\n- Machinery Cat A above/below corridors = A-60\n- Machinery Cat A above/below accommodation = A-60\n- Galley above/below most spaces = A-0 or higher\n\nLOOKUP INSTRUCTION: For deck divisions, identify which space is ABOVE and which is BELOW.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 9",
+      "section": "9.2.2",
+      "table_id": "SOLAS-II2-Table-9.2",
+      "title": "Table 9.2 Fire integrity of decks — Passenger ships >36 pax",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "passenger_ship",
+          "passenger_ship_gt36"
+        ],
+        "ship_type_exclusions": [
+          "tanker",
+          "cargo_ship_non_tanker"
+        ]
+      },
+      "data_verified": false,
+      "data_source": "model_knowledge",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.1"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2/9",
+      "Table 9.2",
+      "fire integrity",
+      "deck",
+      "passenger ship",
+      "more than 36 passengers",
+      "horizontal division"
+    ],
+    "keywords_zh": [
+      "客船甲板防火分隔",
+      "超过36人",
+      "水平分隔"
+    ],
+    "verify_queries": [
+      "passenger ship deck fire integrity above below",
+      "客船甲板防火等级",
+      "SOLAS Table 9.2 deck passenger ship"
+    ]
+  },
+  {
+    "id": "solas-ii2-9-table-9.3-full",
+    "table_id": "SOLAS-II2-Table-9.3",
+    "batch": 1,
+    "title": "SOLAS II-2/9 Table 9.3: Fire Integrity of Bulkheads Separating Adjacent Spaces — Passenger Ships Carrying Not More Than 36 Passengers",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 9 > Table 9.3",
+    "source_url": "",
+    "text": "=== SOLAS II-2/9 Table 9.3: Fire integrity of bulkheads — Passenger ships carrying NOT MORE THAN 36 passengers ===\n=== Applicable to: Passenger ships carrying 36 passengers or fewer ===\n=== NOT applicable to: Passenger ships >36 pax (use Table 9.1), Cargo ships (use Table 9.5), Tankers (use Table 9.7) ===\n\nSpace categories for passenger ships ≤36 pax (SOLAS II-2/9.2.3):\n(1) Control stations\n(2) Corridors\n(3) Accommodation spaces\n(4) Stairways\n(5) Service spaces (low risk)\n(6) Machinery spaces of Category A\n(7) Other machinery spaces\n(8) Cargo spaces\n(9) Service spaces (high risk) — galleys, paint lockers\n(10) Open decks\n(11) Cargo areas with high fire risk\n\nBulkhead fire integrity matrix (11×11 symmetric):\n(1)×(1)=A-0   (1)×(2)=A-0   (1)×(3)=A-60  (1)×(4)=A-0   (1)×(5)=A-15\n(1)×(6)=A-60  (1)×(7)=A-15  (1)×(8)=A-60  (1)×(9)=A-60  (1)×(10)=*\n(1)×(11)=A-60\n(2)×(2)=C    (2)×(3)=B-0   (2)×(4)=B-0   (2)×(5)=B-0   (2)×(6)=A-60\n(2)×(7)=A-0   (2)×(8)=A-0   (2)×(9)=A-0   (2)×(10)=*   (2)×(11)=A-0\n(3)×(3)=C    (3)×(4)=B-0   (3)×(5)=B-0   (3)×(6)=A-60  (3)×(7)=A-0\n(3)×(8)=A-0   (3)×(9)=A-0   (3)×(10)=*   (3)×(11)=A-0\n(4)×(4)=B-0   (4)×(5)=B-0   (4)×(6)=A-60  (4)×(7)=A-0   (4)×(8)=A-0\n(4)×(9)=A-0   (4)×(10)=*   (4)×(11)=A-0\n(5)×(5)=C    (5)×(6)=A-60  (5)×(7)=A-0   (5)×(8)=A-0   (5)×(9)=A-0\n(5)×(10)=*   (5)×(11)=A-0\n(6)×(6)=A-0(a) (6)×(7)=A-0  (6)×(8)=A-0   (6)×(9)=A-60  (6)×(10)=*\n(6)×(11)=A-60\n(7)×(7)=A-0   (7)×(8)=A-0   (7)×(9)=A-0   (7)×(10)=*   (7)×(11)=A-0\n(8)×(8)=*    (8)×(9)=A-0   (8)×(10)=*   (8)×(11)=*\n(9)×(9)=A-0(a) (9)×(10)=*  (9)×(11)=A-0\n(10)×(10)=–  (10)×(11)=*\n(11)×(11)=*\n\n* = No requirement; – = Not applicable\n\nFootnotes:\n(a) Same-category divisions at Administration’s discretion.\n\nNOTE: Table 9.3 for passenger ships ≤36 pax is essentially the same as Table 9.5 for cargo ships, since these smaller passenger ships have similar fire risk profiles to cargo ships.\n\nLOOKUP INSTRUCTION: This table is symmetric. Look up (X)×(Y) or (Y)×(X).",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 9",
+      "section": "9.2.3",
+      "table_id": "SOLAS-II2-Table-9.3",
+      "title": "Table 9.3 Fire integrity of bulkheads — Passenger ships ≤36 pax",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "passenger_ship",
+          "passenger_ship_le36"
+        ],
+        "ship_type_exclusions": [
+          "tanker",
+          "cargo_ship_non_tanker"
+        ]
+      },
+      "data_verified": false,
+      "data_source": "model_knowledge",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.4"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2/9",
+      "Table 9.3",
+      "fire integrity",
+      "bulkhead",
+      "passenger ship",
+      "not more than 36 passengers",
+      "36 or fewer"
+    ],
+    "keywords_zh": [
+      "客船防火分隔",
+      "不超过36人",
+      "小型客船",
+      "舰壁"
+    ],
+    "verify_queries": [
+      "passenger ship 36 or fewer fire integrity bulkhead",
+      "客船不超过36人防火舰壁",
+      "SOLAS Table 9.3 passenger ship"
+    ]
+  },
+  {
+    "id": "solas-ii2-9-table-9.4-full",
+    "table_id": "SOLAS-II2-Table-9.4",
+    "batch": 1,
+    "title": "SOLAS II-2/9 Table 9.4: Fire Integrity of Decks Separating Adjacent Spaces — Passenger Ships Carrying Not More Than 36 Passengers",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 9 > Table 9.4",
+    "source_url": "",
+    "text": "=== SOLAS II-2/9 Table 9.4: Fire integrity of DECKS — Passenger ships carrying NOT MORE THAN 36 passengers ===\n=== Applicable to: Passenger ships carrying 36 passengers or fewer ===\n=== NOT applicable to: Passenger ships >36 pax (use Table 9.2), Cargo ships (use Table 9.6), Tankers (use Table 9.8) ===\n\nThis table specifies the minimum fire integrity of DECKS (horizontal divisions) separating adjacent spaces above and below on passenger ships ≤36 pax.\n\nSpace categories: Same 11 categories as Table 9.3.\n(1)-(11) as defined in SOLAS II-2/9.2.3.\n\nDeck fire integrity matrix — Space above × Space below = fire rating:\n(1)×(1)=A-0   (1)×(2)=A-0   (1)×(3)=A-60  (1)×(4)=A-0   (1)×(5)=A-0\n(1)×(6)=A-60  (1)×(7)=A-15  (1)×(8)=A-60  (1)×(9)=A-60  (1)×(10)=*\n(1)×(11)=A-60\n(2)×(1)=A-0   (2)×(2)=*    (2)×(3)=*    (2)×(4)=*    (2)×(5)=*\n(2)×(6)=A-60  (2)×(7)=A-0   (2)×(8)=A-0   (2)×(9)=A-0   (2)×(10)=*\n(2)×(11)=A-0\n(3)×(1)=A-60  (3)×(2)=*    (3)×(3)=*    (3)×(4)=*    (3)×(5)=*\n(3)×(6)=A-60  (3)×(7)=A-0   (3)×(8)=A-0   (3)×(9)=A-0   (3)×(10)=*\n(3)×(11)=A-0\n(4)×(1)=A-0   (4)×(2)=*    (4)×(3)=*    (4)×(4)=*    (4)×(5)=*\n(4)×(6)=A-60  (4)×(7)=A-0   (4)×(8)=A-0   (4)×(9)=A-0   (4)×(10)=*\n(4)×(11)=A-0\n(5)×(1)=A-15  (5)×(2)=*    (5)×(3)=*    (5)×(4)=*    (5)×(5)=*\n(5)×(6)=A-60  (5)×(7)=A-0   (5)×(8)=A-0   (5)×(9)=A-0   (5)×(10)=*\n(5)×(11)=A-0\n(6)×(1)=A-60  (6)×(2)=A-0   (6)×(3)=A-0   (6)×(4)=A-0   (6)×(5)=A-0\n(6)×(6)=A-0(a) (6)×(7)=A-0  (6)×(8)=A-0   (6)×(9)=A-60  (6)×(10)=*\n(6)×(11)=A-0\n(7)×(1)=A-15  (7)×(2)=*    (7)×(3)=*    (7)×(4)=*    (7)×(5)=*\n(7)×(6)=A-0   (7)×(7)=A-0   (7)×(8)=A-0   (7)×(9)=A-0   (7)×(10)=*\n(7)×(11)=A-0\n(8)×(1)=A-60  (8)×(2)=A-0   (8)×(3)=A-0   (8)×(4)=A-0   (8)×(5)=A-0\n(8)×(6)=A-0   (8)×(7)=A-0   (8)×(8)=*    (8)×(9)=A-0   (8)×(10)=*\n(8)×(11)=*\n(9)×(1)=A-60  (9)×(2)=A-0   (9)×(3)=A-0   (9)×(4)=A-0   (9)×(5)=A-0\n(9)×(6)=A-60  (9)×(7)=A-0   (9)×(8)=A-0   (9)×(9)=A-0(a) (9)×(10)=*\n(9)×(11)=A-0\n(10)×(1)=*   (10)×(2)=*   (10)×(3)=*   (10)×(4)=*   (10)×(5)=*\n(10)×(6)=*   (10)×(7)=*   (10)×(8)=*   (10)×(9)=*   (10)×(10)=–\n(10)×(11)=*\n(11)×(1)=A-60 (11)×(2)=A-0 (11)×(3)=A-0 (11)×(4)=A-0 (11)×(5)=A-0\n(11)×(6)=A-0  (11)×(7)=A-0  (11)×(8)=*   (11)×(9)=A-0  (11)×(10)=*\n(11)×(11)=*\n\n* = No requirement; – = Not applicable\n\nIMPORTANT: Deck tables are NOT symmetric. Row = space ABOVE, Column = space BELOW.\n\nNOTE: Table 9.4 for passenger ships ≤36 pax has the same structure as Table 9.6 for cargo ships.\n\nLOOKUP INSTRUCTION: For deck divisions, identify which space is ABOVE and which is BELOW.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 9",
+      "section": "9.2.3",
+      "table_id": "SOLAS-II2-Table-9.4",
+      "title": "Table 9.4 Fire integrity of decks — Passenger ships ≤36 pax",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "passenger_ship",
+          "passenger_ship_le36"
+        ],
+        "ship_type_exclusions": [
+          "tanker",
+          "cargo_ship_non_tanker"
+        ]
+      },
+      "data_verified": false,
+      "data_source": "model_knowledge",
+      "last_updated": "2026-02-22",
+      "related_tables": [
+        "9.3"
+      ]
+    },
+    "keywords_en": [
+      "SOLAS II-2/9",
+      "Table 9.4",
+      "fire integrity",
+      "deck",
+      "passenger ship",
+      "not more than 36 passengers",
+      "horizontal division"
+    ],
+    "keywords_zh": [
+      "客船甲板防火分隔",
+      "不超过36人",
+      "水平分隔"
+    ],
+    "verify_queries": [
+      "passenger ship 36 or fewer deck fire integrity",
+      "客船不超过36人甲板防火",
+      "SOLAS Table 9.4 deck passenger"
+    ]
+  },
+  {
+    "id": "solas-ii2-reg10-firefighting-structured",
+    "table_id": "SOLAS-II2-Reg10-Firefighting",
+    "batch": 1,
+    "title": "SOLAS II-2/Reg 10: Firefighting Systems — Fire Main, Extinguishers, Fixed CO2, Foam, Sprinkler",
+    "breadcrumb": "SOLAS > Chapter II-2 > Regulation 10 > Firefighting",
+    "source_url": "",
+    "text": "=== SOLAS II-2/Reg 10: Firefighting Systems Requirements ===\n=== Applicable to: All ships ===\n\n10.2 — FIRE MAIN AND HYDRANTS:\n  Required equipment:\n  - At least 2 fire pumps (not counting emergency fire pump)\n  - Pressure at most remote hydrant: ≥0.27 MPa (passenger) / ≥0.25 MPa (cargo)\n  - International shore connection: standard flange dimensions per SOLAS\n  - Fire hoses: sufficient length to reach any part of each space\n  Additional requirements:\n  - Emergency fire pump required (independent power source)\n  - Fire main isolation valves to allow sectional operation\n\n10.3 — PORTABLE FIRE EXTINGUISHERS:\n  Required equipment:\n  - Cargo ships: At least 5 portable extinguishers in accommodation/service spaces\n  - Passenger ships: sufficient quantity at each fire station\n  - Spare charges: 100% spare for first 10 extinguishers, 50% for remainder\n  Types:\n  | Type | Suitable For |\n  | Foam/Water spray | Class A (solids) |\n  | CO2 | Class B (liquids), Class C (electrical) |\n  | Dry chemical | Class B and C |\n  | AFFF foam | Class A and B |\n\n10.4 — FIXED FIRE-EXTINGUISHING SYSTEMS (general):\n  Required in:\n  - Machinery spaces of Category A\n  - Cargo pump rooms on tankers\n  - Vehicle/ro-ro cargo spaces\n  - Cargo holds (where required)\n\n10.5 — FIXED GAS (CO2) FIRE-EXTINGUISHING SYSTEMS (+ FSS Code Ch.5):\n  Required equipment:\n  - CO2 free gas volume ≥40% of gross volume of largest machinery space\n  - OR ≥35% including casing volume\n  - 85% of required CO2 quantity released within 2 minutes\n  - Audible alarm BEFORE CO2 release in any manned space\n  - Time delay between alarm and release sufficient for crew evacuation\n  - Two independent means of control (in and outside protected space)\n  - Cargo spaces: sufficient CO2 for 30% of gross volume of largest cargo hold\n\n10.6 — FIXED FOAM FIRE-EXTINGUISHING SYSTEMS:\n  - For machinery spaces: approved foam concentrate\n  - For helicopter facilities: AFFF foam system\n  - Foam quantity: sufficient for 5 minutes operation\n\n10.7 — FIXED PRESSURE WATER-SPRAYING SYSTEMS:\n  - Alternative to CO2 or foam for machinery spaces\n  - Water application rate: ≥5 L/m²/min for machinery spaces\n\n10.8 — AUTOMATIC SPRINKLER SYSTEMS:\n  - Required in passenger ship accommodation and service spaces\n  - Sprinkler heads: max spacing per FSS Code\n  - Water supply: sufficient for 1 hour simultaneous operation\n\n10.9 — FIXED FIRE DETECTION AND ALARM:\n  - Required in machinery spaces of Category A\n  - Smoke detectors: max coverage area per FSS Code Ch.9\n  - Heat detectors: for spaces with anticipated ambient heat\n\n10.10 — FIREMAN’S OUTFIT:\n  - Cargo ships: at least 2 sets\n  - Passenger ships: at least 4 sets (one per main vertical zone)\n  - Each set: protective clothing, SCBA (30 min), fireproof lifeline, fire axe, portable lamp\n\nOIL TANKER SPECIAL REQUIREMENTS (SOLAS II-2/10.8-10.9):\n  - Fixed deck foam system covering entire cargo deck area\n  - Foam monitors: minimum 2, capable of reaching any part of cargo deck\n  - Inert gas system: required for all tankers ≥20,000 DWT\n  - Cargo tank venting through P/V valves or equivalent\n\nLOOKUP INSTRUCTION: First identify ship type and space, then find matching section for equipment requirements.\n\nIMPORTANT NOTES:\n- CO2 alarm must always sound BEFORE release in manned spaces\n- International shore connection must be accessible from both sides\n- Fire pump test: key survey item — measure pressure at most remote hydrant",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "II-2",
+      "regulation": "Regulation 10",
+      "section": "10",
+      "table_id": "SOLAS-II2-Reg10-Firefighting",
+      "title": "SOLAS II-2/Reg 10 Firefighting systems requirements",
+      "content_type": "structured_table",
+      "table_type": "TYPE-C",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22",
+      "related_tables": []
+    },
+    "keywords_en": [
+      "SOLAS II-2/10",
+      "firefighting",
+      "fire main",
+      "fire pump",
+      "hydrant",
+      "fire extinguisher",
+      "CO2",
+      "carbon dioxide",
+      "foam",
+      "sprinkler",
+      "water spray",
+      "fixed fire extinguishing",
+      "FSS Code",
+      "0.25 MPa",
+      "40 percent",
+      "fireman outfit",
+      "international shore connection",
+      "inert gas system",
+      "deck foam"
+    ],
+    "keywords_zh": [
+      "灭火",
+      "消防总管",
+      "消防泵",
+      "消火栓",
+      "灭火器",
+      "二氧化碳",
+      "泡沫",
+      "喷淋",
+      "固定灭火系统",
+      "惰性气体"
+    ],
+    "verify_queries": [
+      "SOLAS firefighting CO2 fixed system requirements",
+      "船舶灭火系统要求 CO2",
+      "fire pump pressure hydrant SOLAS II-2/10"
+    ]
+  },
+  {
+    "id": "marpol-vi-reg13-nox-structured",
+    "table_id": "MARPOL-VI-Reg13-NOx",
+    "batch": 2,
+    "title": "MARPOL Annex VI Reg 13: NOx Emission Limits — Tier I/II/III",
+    "breadcrumb": "MARPOL > Annex VI > Regulation 13 > NOx",
+    "text": "=== MARPOL Annex VI Reg 13: NOx Emission Limits ===\n=== Applicable to: All marine diesel engines >130 kW (excluding emergency engines) ===\n\nTier I — Ship construction date: 1 Jan 2000 to 31 Dec 2010:\n  n < 130 rpm: 17.0 g/kWh\n  130 ≤ n < 2000 rpm: 45.0 × n^(−0.2) g/kWh\n  n ≥ 2000 rpm: 9.8 g/kWh\n\nTier II — Ship construction date: 1 Jan 2011 onwards:\n  n < 130 rpm: 14.4 g/kWh\n  130 ≤ n < 2000 rpm: 44.0 × n^(−0.23) g/kWh\n  n ≥ 2000 rpm: 7.7 g/kWh\n\nTier III — Ship construction date: 1 Jan 2016 onwards (IN ECA ONLY):\n  n < 130 rpm: 3.4 g/kWh\n  130 ≤ n < 2000 rpm: 9.0 × n^(−0.2) g/kWh\n  n ≥ 2000 rpm: 2.0 g/kWh\n\nCRITICAL NOTES:\n1. Tier III applies ONLY when operating in a NOx Emission Control Area (NECA)\n2. Outside NECA, Tier II applies (for post-2011 ships)\n3. 'n' = rated engine speed in revolutions per minute (rpm)\n\nNOx Emission Control Areas (NECAs):\n- North American ECA: effective 1 Aug 2012\n- US Caribbean Sea ECA: effective 1 Jan 2014\n- Baltic Sea and North Sea NECA: effective 1 Jan 2021\n- Mediterranean Sea NECA: effective 1 Jan 2025\n\nCompliance methods for Tier III:\n- Selective Catalytic Reduction (SCR)\n- Exhaust Gas Recirculation (EGR)\n- LNG or other gas fuels (inherently low-NOx)\n\nEIAPP Certificate (Engine International Air Pollution Prevention) required for each engine.\n\nLOOKUP INSTRUCTION: To determine the NOx limit:\n1. Identify ship construction date → Tier level\n2. Identify engine rated speed (rpm) → specific limit value\n3. If in ECA and post-2016 construction → Tier III applies",
+    "metadata": {
+      "source": "MARPOL",
+      "chapter": "Annex VI",
+      "regulation": "Regulation 13",
+      "section": "13",
+      "table_id": "MARPOL-VI-Reg13-NOx",
+      "title": "NOx Emission Limits Tier I/II/III",
+      "content_type": "structured_table",
+      "table_type": "TYPE-B",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "MARPOL Annex VI",
+      "Regulation 13",
+      "NOx",
+      "nitrogen oxides",
+      "Tier I",
+      "Tier II",
+      "Tier III",
+      "ECA",
+      "NECA",
+      "EIAPP",
+      "SCR",
+      "EGR",
+      "emission",
+      "g/kWh",
+      "marine diesel engine"
+    ],
+    "keywords_zh": [
+      "氮氧化物",
+      "排放",
+      "排放控制区",
+      "排放等级",
+      "柴油机"
+    ],
+    "verify_queries": [
+      "NOx emission tier limit MARPOL",
+      "2021年建造的船NOx排放限值",
+      "MARPOL Annex VI Reg 13 tier III"
+    ]
+  },
+  {
+    "id": "marpol-vi-reg14-sox-structured",
+    "table_id": "MARPOL-VI-Reg14-SOx",
+    "batch": 2,
+    "title": "MARPOL Annex VI Reg 14: Sulphur Content of Fuel Oil (SOx) Limits",
+    "breadcrumb": "MARPOL > Annex VI > Regulation 14 > SOx / Sulphur",
+    "text": "=== MARPOL Annex VI Reg 14: Sulphur Content Limits ===\n=== Applicable to: All ships using fuel oil ===\n\nGlobal sulphur content limits:\n  Before 1 Jan 2012: ≤4.50% m/m\n  1 Jan 2012 – 31 Dec 2019: ≤3.50% m/m\n  1 Jan 2020 onwards (IMO 2020): ≤0.50% m/m\n\nECA/SECA sulphur content limits:\n  Before 1 Jul 2010: ≤1.50% m/m\n  1 Jul 2010 – 31 Dec 2014: ≤1.00% m/m\n  1 Jan 2015 onwards: ≤0.10% m/m\n\nCURRENT LIMITS (2020 onwards):\n  GLOBAL: ≤0.50% sulphur by mass\n  INSIDE ECA/SECA: ≤0.10% sulphur by mass\n  EU ports: ≤0.10% (EU Directive)\n\nSulphur Emission Control Areas (SECAs):\n  1. Baltic Sea area\n  2. North Sea area (including English Channel)\n  3. North American ECA (200 nm from US/Canada coast)\n  4. United States Caribbean Sea ECA\n\nCompliance options:\n  - Low-sulphur fuel (VLSFO): use fuel with ≤0.50% (global) or ≤0.10% (ECA)\n  - Scrubber (EGCS): exhaust gas cleaning system — can use high-sulphur fuel\n  - Alternative fuels (LNG, methanol): must achieve equivalent SOx reduction\n\nDocumentation:\n  - Bunker Delivery Note (BDN): must state sulphur content, retained 3 years\n  - MARPOL representative sample: sealed by supplier, retained 12 months\n  - Fuel changeover procedure documented when entering/leaving ECA\n\nLOOKUP INSTRUCTION: To determine the sulphur limit:\n1. Identify location (global or within ECA) → applicable limit\n2. Current: Global = 0.50%, ECA = 0.10%",
+    "metadata": {
+      "source": "MARPOL",
+      "chapter": "Annex VI",
+      "regulation": "Regulation 14",
+      "section": "14",
+      "table_id": "MARPOL-VI-Reg14-SOx",
+      "title": "SOx / Sulphur content limits",
+      "content_type": "structured_table",
+      "table_type": "TYPE-B",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "MARPOL Annex VI",
+      "Regulation 14",
+      "SOx",
+      "sulphur",
+      "sulfur",
+      "fuel oil",
+      "0.50",
+      "0.10",
+      "ECA",
+      "SECA",
+      "IMO 2020",
+      "VLSFO",
+      "scrubber",
+      "EGCS",
+      "BDN",
+      "bunker delivery note"
+    ],
+    "keywords_zh": [
+      "硫氧化物",
+      "硫含量",
+      "排放控制区",
+      "低硫燃油",
+      "洗涤器"
+    ],
+    "verify_queries": [
+      "sulphur content fuel oil ECA limit",
+      "2025年ECA内燃油硫含量限值",
+      "MARPOL Annex VI Reg 14 SOx 0.10"
+    ]
+  },
+  {
+    "id": "marpol-i-reg15-oily-water-structured",
+    "table_id": "MARPOL-I-Reg15-OilyWater",
+    "batch": 2,
+    "title": "MARPOL Annex I Reg 15: Machinery Space Oily Bilge Water Discharge Standards",
+    "breadcrumb": "MARPOL > Annex I > Regulation 15 > Oily water discharge",
+    "text": "=== MARPOL Annex I Reg 15: Oily Bilge Water Discharge ===\n=== Applicable to: Ships of 400 GT and above ===\n\nGeneral sea areas (outside special areas):\n  - Oil content of effluent: ≤15 ppm (parts per million)\n  - Ship must be en route (proceeding)\n  - Effluent processed through approved oily water separator (OWS)\n  - Oil content monitor (OCM) in operation\n  - No dilution of oily water to meet 15 ppm limit\n\nSpecial areas (Annex I):\n  - Same ≤15 ppm limit applies\n  - Additionally: 15 ppm bilge alarm MUST be fitted\n  - Automatic stopping device to prevent discharge when >15 ppm\n\nShips of <400 GT:\n  - Must retain oil residues on board for discharge to port reception facilities\n  - OR use approved OWS achieving ≤15 ppm\n\nShips of 10,000 GT and above (additional):\n  - Oil filtering equipment required (not just OWS)\n  - Oil content meter with automatic recording\n\nSPECIAL AREA LIST (Annex I):\n  Mediterranean Sea, Baltic Sea, Black Sea, Red Sea, Gulf of Aden,\n  Antarctic area, North West European waters, Oman area of Arabian Sea,\n  Southern South African waters\n\nIMPORTANT NOTES:\n- 15 ppm is a MAXIMUM — not a target\n- Oil Record Book Part I must record all bilge water operations\n- OWS must be type-approved to IMO MEPC.107(49)\n\nLOOKUP INSTRUCTION:\n1. Identify ship tonnage (≥400 GT, ≥10,000 GT)\n2. Identify location (general sea area or special area)\n3. All ships: ≤15 ppm via approved OWS",
+    "metadata": {
+      "source": "MARPOL",
+      "chapter": "Annex I",
+      "regulation": "Regulation 15",
+      "section": "15",
+      "table_id": "MARPOL-I-Reg15-OilyWater",
+      "title": "Oily bilge water discharge standards",
+      "content_type": "structured_table",
+      "table_type": "TYPE-B",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ],
+        "tonnage_condition": ">=400GT"
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "MARPOL Annex I",
+      "Regulation 15",
+      "oily water",
+      "bilge water",
+      "15 ppm",
+      "oil water separator",
+      "OWS",
+      "OCM",
+      "oil content monitor",
+      "special area",
+      "Oil Record Book"
+    ],
+    "keywords_zh": [
+      "含油污水",
+      "油水分离器",
+      "舱底水",
+      "15ppm",
+      "特殊区域",
+      "油类记录簿"
+    ],
+    "verify_queries": [
+      "oily water discharge standard 15 ppm MARPOL",
+      "波罗的海排放含油污水标准",
+      "MARPOL Annex I Reg 15 bilge water"
+    ]
+  },
+  {
+    "id": "marpol-i-reg34-tanker-discharge-structured",
+    "table_id": "MARPOL-I-Reg34-TankerDischarge",
+    "batch": 2,
+    "title": "MARPOL Annex I Reg 34: Oil Tanker Cargo Area Discharge Standards",
+    "breadcrumb": "MARPOL > Annex I > Regulation 34 > Tanker discharge",
+    "text": "=== MARPOL Annex I Reg 34 (+ Reg 29): Oil Tanker Cargo Area Discharge ===\n=== Applicable to: Oil tankers of 150 GT and above ===\n\nOutside special areas — discharge of oily mixtures from cargo tank area:\n  - Ship must be en route (proceeding)\n  - Instantaneous rate of discharge: ≤30 litres per nautical mile\n  - Total quantity discharged per voyage: ≤1/30,000 of total cargo capacity\n  - Distance from nearest land: >50 nautical miles\n  - ODME system in operation during discharge\n  - Slop tank system in operation\n\nInside special areas — discharge:\n  - PROHIBITED — no discharge of oil or oily mixture from cargo area\n  - Must retain all residues for shore reception facilities\n\nThe 1/30,000 rule explained:\n  Total oil discharged during a ballast voyage must not exceed 1/30,000\n  of the total cargo capacity.\n  Example: Tanker with 100,000 m³ capacity → max 3.33 m³ total discharge.\n\nODME system requirements:\n  - Continuously monitors oil content of effluent\n  - Automatically stops discharge when exceeding permitted level\n  - Type-approved by Administration\n  - Connected to automatic stopping device\n\nSpecial areas (Annex I): Mediterranean, Baltic, Black Sea, Red Sea,\nGulf of Aden, Antarctic, North West European waters, Oman area, S. Africa\n\nLOOKUP INSTRUCTION:\n1. Is the ship in a special area? If YES → discharge PROHIBITED\n2. If outside special area → ≤30 L/nm, ≤1/30000 cargo, >50 nm from land",
+    "metadata": {
+      "source": "MARPOL",
+      "chapter": "Annex I",
+      "regulation": "Regulation 34",
+      "section": "34",
+      "table_id": "MARPOL-I-Reg34-TankerDischarge",
+      "title": "Oil tanker cargo area discharge standards",
+      "content_type": "structured_table",
+      "table_type": "TYPE-B",
+      "applicability": {
+        "ship_types": [
+          "tanker",
+          "oil_tanker"
+        ],
+        "tonnage_condition": ">=150GT"
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "MARPOL Annex I",
+      "Regulation 34",
+      "Regulation 29",
+      "ODME",
+      "oil discharge",
+      "1/30000",
+      "30 litres per nautical mile",
+      "tanker",
+      "cargo area",
+      "special area",
+      "slop tank"
+    ],
+    "keywords_zh": [
+      "油轮排放",
+      "货舱区",
+      "排油监控",
+      "特殊区域",
+      "洗舱水"
+    ],
+    "verify_queries": [
+      "oil tanker cargo area discharge limit MARPOL",
+      "油轮特殊区域内可以排放货舱洗舱水吗",
+      "MARPOL Annex I Reg 34 ODME 1/30000"
+    ]
+  },
+  {
+    "id": "marpol-iv-reg11-sewage-structured",
+    "table_id": "MARPOL-IV-Reg11-Sewage",
+    "batch": 2,
+    "title": "MARPOL Annex IV Reg 11: Sewage Discharge Standards",
+    "breadcrumb": "MARPOL > Annex IV > Regulation 11 > Sewage discharge",
+    "text": "=== MARPOL Annex IV Reg 11: Sewage Discharge Standards ===\n=== Applicable to: Ships of 400 GT and above, or carrying >15 persons ===\n\nTreated sewage (approved sewage treatment plant):\n  - Distance from nearest land: >3 nautical miles\n  - Effluent must meet MEPC.227(64) standards\n  - Treated sewage not producing visible floating solids\n  - Treated sewage not causing discolouration of water\n\nComminuted and disinfected sewage:\n  - Distance from nearest land: >3 nautical miles\n  - Using approved comminuting and disinfecting system\n\nUntreated sewage:\n  - Distance from nearest land: >12 nautical miles\n  - Ship proceeding at not less than 4 knots\n  - Rate of discharge approved by Administration\n  - Sewage NOT stored in holding tank (gradual discharge)\n\nBaltic Sea Special Area (effective 1 Jun 2023 for new ships):\n  - Passenger ships: must have approved sewage treatment plant meeting\n    nitrogen (N) ≤20 mg/L and phosphorus (P) ≤1.0 mg/L standards\n  - New passenger ships (keel laid ≥1 Jun 2021): immediately\n  - Existing passenger ships: by 1 Jun 2023\n  - Cargo ships: same as general requirements\n\nIMPORTANT NOTES:\n- Holding tank discharge: must be at moderate rate when ship en route\n- Port reception facilities must be used when in port\n- Sewage mixed with wastes covered by other Annexes → stricter rules apply\n\nLOOKUP INSTRUCTION:\n1. Is sewage treated? → discharge OK at >3 nm\n2. Comminuted and disinfected? → >3 nm\n3. Untreated? → >12 nm, >4 knots, gradual\n4. In Baltic Sea special area? → enhanced nutrient standards for passenger ships",
+    "metadata": {
+      "source": "MARPOL",
+      "chapter": "Annex IV",
+      "regulation": "Regulation 11",
+      "section": "11",
+      "table_id": "MARPOL-IV-Reg11-Sewage",
+      "title": "Sewage discharge standards",
+      "content_type": "structured_table",
+      "table_type": "TYPE-B",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ],
+        "tonnage_condition": ">=400GT or >15 persons"
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "MARPOL Annex IV",
+      "Regulation 11",
+      "sewage",
+      "discharge",
+      "sewage treatment plant",
+      "STP",
+      "3 nautical miles",
+      "12 nautical miles",
+      "comminuted",
+      "disinfected",
+      "Baltic Sea",
+      "holding tank"
+    ],
+    "keywords_zh": [
+      "生活污水",
+      "排放",
+      "污水处理装置",
+      "波罗的海",
+      "储存柜"
+    ],
+    "verify_queries": [
+      "sewage discharge distance from land MARPOL",
+      "生活污水排放标准距离",
+      "MARPOL Annex IV Reg 11 sewage treatment"
+    ]
+  },
+  {
+    "id": "marpol-v-reg4-garbage-structured",
+    "table_id": "MARPOL-V-Reg4-Garbage",
+    "batch": 2,
+    "title": "MARPOL Annex V Reg 4: Garbage Discharge Regulations Table",
+    "breadcrumb": "MARPOL > Annex V > Regulation 4 > Garbage discharge",
+    "text": "=== MARPOL Annex V Reg 4: Garbage Discharge Requirements ===\n=== Applicable to: All ships ===\n\nDISCHARGE MATRIX — Garbage type × Sea area:\n\nFood waste (not comminuted):\n  Outside special area, >12 nm from land: PERMITTED (en route)\n  Outside special area, 3-12 nm from land: PROHIBITED\n  Outside special area, <3 nm from land: PROHIBITED\n  Inside special area, >12 nm from land: PERMITTED (en route, comminuted to <25mm)\n  Inside special area, <12 nm from land: PROHIBITED\n\nFood waste (comminuted or ground, <25mm):\n  Outside special area, >3 nm from land: PERMITTED (en route)\n  Outside special area, <3 nm from land: PROHIBITED\n  Inside special area, >12 nm from land: PERMITTED (en route)\n  Inside special area, <12 nm from land: PROHIBITED\n\nCargo residues (not HME, not contained in wash water):\n  Outside special area, >12 nm from land: PERMITTED (en route)\n  Inside special area, >12 nm from land: PERMITTED (en route)\n  Other: PROHIBITED\n\nCargo residues in wash water (not HME):\n  Outside special area, >12 nm: PERMITTED\n  Inside special area: PROHIBITED (must use port facilities)\n\nCleaning agents and additives (in deck/external wash water):\n  All areas: PERMITTED (if not harmful to marine environment)\n\nAnimal carcasses:\n  All areas: PERMITTED only when >100 nm from land, maximum water depth\n\nALL other garbage (plastics, domestic waste, cooking oil, incinerator ash, etc.):\n  ALL areas: PROHIBITED — must be retained on board for port reception\n\nABSOLUTE PROHIBITION:\n  - Plastics: NEVER discharged at sea (including synthetic ropes, fishing nets)\n  - Domestic waste: NEVER discharged at sea\n  - Cooking oil: NEVER discharged at sea\n  - Incinerator ash: NEVER discharged at sea\n\nIMPORTANT NOTES:\n- Garbage Record Book required for ships ≥400 GT or carrying >15 persons\n- Garbage Management Plan required for ships ≥100 GT\n- HME = Harmful to the Marine Environment\n\nLOOKUP INSTRUCTION: This is a matrix lookup.\n1. Identify garbage type (food waste, cargo residue, plastic, etc.)\n2. Identify location (special area or not, distance from land)\n3. Cross-reference for PERMITTED/PROHIBITED",
+    "metadata": {
+      "source": "MARPOL",
+      "chapter": "Annex V",
+      "regulation": "Regulation 4",
+      "section": "4",
+      "table_id": "MARPOL-V-Reg4-Garbage",
+      "title": "Garbage discharge regulations",
+      "content_type": "structured_table",
+      "table_type": "TYPE-A",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "MARPOL Annex V",
+      "Regulation 4",
+      "garbage",
+      "discharge",
+      "food waste",
+      "plastics",
+      "cargo residue",
+      "special area",
+      "Garbage Record Book",
+      "HME",
+      "comminuted"
+    ],
+    "keywords_zh": [
+      "垃圾",
+      "排放",
+      "食品废弃物",
+      "塑料",
+      "特殊区域",
+      "垃圾记录簿"
+    ],
+    "verify_queries": [
+      "garbage discharge food waste MARPOL Annex V",
+      "垃圾排放标准特殊区域",
+      "MARPOL Annex V Reg 4 plastic garbage"
+    ]
+  },
+  {
+    "id": "marpol-i-reg19-special-areas-structured",
+    "table_id": "MARPOL-I-Reg19-SpecialAreas",
+    "batch": 2,
+    "title": "MARPOL Special Areas by Annex — Complete List",
+    "breadcrumb": "MARPOL > Special Areas > Complete List",
+    "text": "=== MARPOL Special Areas — Complete List by Annex ===\n=== Purpose: Define sea areas with enhanced environmental protection ===\n\nMARPOL Annex I Special Areas (Oil):\n  - Mediterranean Sea\n  - Baltic Sea\n  - Black Sea\n  - Red Sea\n  - Gulf of Aden\n  - Antarctic area (south of 60°S)\n  - North West European waters\n  - Oman area of the Arabian Sea\n  - Southern South African waters\n\nMARPOL Annex II Special Areas (Noxious liquid substances):\n  - Antarctic area\n  - Baltic Sea (from 1 Jan 2021 for certain categories)\n\nMARPOL Annex IV Special Areas (Sewage):\n  - Baltic Sea (enhanced nutrient standards for passenger ships)\n\nMARPOL Annex V Special Areas (Garbage):\n  - Mediterranean Sea\n  - Baltic Sea\n  - Black Sea\n  - Red Sea\n  - Gulf of Aden\n  - North Sea\n  - Antarctic area\n  - Wider Caribbean region (incl. Gulf of Mexico)\n\nMARPOL Annex VI Emission Control Areas (ECAs):\n  SOx ECAs (Sulphur):\n    - Baltic Sea (SECA)\n    - North Sea (SECA, including English Channel)\n    - North American ECA (200 nm from US/Canada)\n    - United States Caribbean Sea ECA\n  NOx ECAs:\n    - North American ECA: effective 1 Aug 2012\n    - US Caribbean Sea ECA: effective 1 Jan 2014\n    - Baltic Sea and North Sea NECA: effective 1 Jan 2021\n    - Mediterranean Sea NECA: effective 1 Jan 2025\n\nIMPORTANT NOTES:\n- Special area status depends on adequate port reception facilities\n- Different Annexes have different special area lists\n- ECAs for SOx and NOx may have different boundaries\n\nUSAGE INSTRUCTION: When determining discharge rules, first check if the ship's\nlocation is within a special area for the RELEVANT Annex.",
+    "metadata": {
+      "source": "MARPOL",
+      "chapter": "Multiple Annexes",
+      "regulation": "Various",
+      "section": "",
+      "table_id": "MARPOL-I-Reg19-SpecialAreas",
+      "title": "MARPOL Special Areas complete list",
+      "content_type": "structured_table",
+      "table_type": "TYPE-E",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "MARPOL",
+      "special area",
+      "ECA",
+      "SECA",
+      "NECA",
+      "Baltic Sea",
+      "Mediterranean",
+      "North Sea",
+      "emission control area",
+      "Caribbean",
+      "Antarctic"
+    ],
+    "keywords_zh": [
+      "特殊区域",
+      "排放控制区",
+      "波罗的海",
+      "地中海",
+      "北海"
+    ],
+    "verify_queries": [
+      "MARPOL special area list ECA SECA",
+      "MARPOL特殊区域清单",
+      "emission control area Baltic North Sea MARPOL"
+    ]
+  },
+  {
+    "id": "solas-iii-reg21-passenger-lsa-structured",
+    "table_id": "SOLAS-III-Reg21-PassengerLSA",
+    "batch": 3,
+    "title": "SOLAS III Reg 21: Passenger Ship Survival Craft and Rescue Boat Requirements",
+    "breadcrumb": "SOLAS > Chapter III > Regulation 21 > Passenger ship LSA",
+    "text": "=== SOLAS III Reg 21: Passenger Ship Survival Craft Requirements ===\n=== Applicable to: Passenger ships ===\n\nSurvival craft (Reg 21.1):\n  Required equipment:\n  - Partially enclosed lifeboats on EACH SIDE: capacity for ≥37.5% of total persons\n  - Additional liferafts: capacity for ≥25% of total persons\n  - TOTAL survival craft capacity: ≥100% of total persons from EACH SIDE\n  - At least ONE rescue boat (may be a lifeboat)\n  Additional requirements:\n  - Liferafts on each side served by launching appliances\n  - Marine Evacuation Systems (MES) may substitute for liferafts\n  - Short international voyages: may use liferafts for 100% + additional 25%\n\nRo-ro passenger ships (Reg 21.1.5):\n  Required equipment:\n  - Survival craft for 100% on each side\n  - At least ONE rescue boat on each side (total ≥2)\n  - Fast rescue boat required if ≥500 persons on board\n\nRescue boats (Reg 21.2):\n  - At least 1 rescue boat\n  - Must be capable of being launched within 5 minutes\n  - If >500 persons: fast rescue boat required\n\nLOOKUP INSTRUCTION: First identify passenger count and voyage type,\nthen find matching capacity requirements.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "III",
+      "regulation": "Regulation 21",
+      "section": "21",
+      "table_id": "SOLAS-III-Reg21-PassengerLSA",
+      "title": "Passenger ship survival craft requirements",
+      "content_type": "structured_table",
+      "table_type": "TYPE-C",
+      "applicability": {
+        "ship_types": [
+          "passenger_ship"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "SOLAS III",
+      "Regulation 21",
+      "passenger ship",
+      "lifeboat",
+      "liferaft",
+      "survival craft",
+      "rescue boat",
+      "MES",
+      "davit"
+    ],
+    "keywords_zh": [
+      "客船",
+      "救生艇",
+      "救生筏",
+      "救助艇",
+      "生存艇筏"
+    ],
+    "verify_queries": [
+      "passenger ship lifeboat liferaft requirement SOLAS",
+      "客船救生设备配备要求",
+      "SOLAS III Reg 21 passenger survival craft"
+    ]
+  },
+  {
+    "id": "solas-iii-reg31-cargo-lsa-structured",
+    "table_id": "SOLAS-III-Reg31-CargoLSA",
+    "batch": 3,
+    "title": "SOLAS III Reg 31: Cargo Ship Survival Craft and Rescue Boat Requirements",
+    "breadcrumb": "SOLAS > Chapter III > Regulation 31 > Cargo ship LSA",
+    "text": "=== SOLAS III Reg 31: Cargo Ship Survival Craft Requirements ===\n=== Applicable to: Cargo ships ===\n\nLifeboats (Reg 31.1.1-31.1.2):\n  Required equipment:\n  - One or more lifeboats on EACH SIDE: capacity for 100% of total persons\n  - OR a free-fall lifeboat at the stern: capacity for 100% of total persons\n\nLiferafts (Reg 31.1.3-31.1.4):\n  Required equipment:\n  - Ships with lifeboats on each side: liferafts for ≥100% total persons\n  - Ships with free-fall lifeboat only: additional liferafts for ≥100% on each side\n  - At least ONE davit-launched liferaft (SOLAS III/31.1.4)\n  Additional requirements:\n  - Ships ≥85m: at least one davit-launched liferaft per side\n  - Total liferaft capacity: 200% of total persons (when transferable)\n\nRescue boats (Reg 31.2):\n  - At least 1 rescue boat\n  - May be one of the lifeboats\n\nKEY REQUIREMENTS SUMMARY:\n  | Configuration | Lifeboat | Liferaft | Davit-launched |\n  | Lifeboats each side | 100% each side | ≥100% total | ≥1 |\n  | Free-fall stern only | 100% total | ≥100% each side | ≥1 |\n\nIMPORTANT: Free-fall lifeboat does NOT exempt the davit-launched liferaft requirement.\n\nLOOKUP INSTRUCTION: First identify lifeboat configuration (each side or free-fall),\nthen determine liferaft requirements.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "III",
+      "regulation": "Regulation 31",
+      "section": "31",
+      "table_id": "SOLAS-III-Reg31-CargoLSA",
+      "title": "Cargo ship survival craft requirements",
+      "content_type": "structured_table",
+      "table_type": "TYPE-C",
+      "applicability": {
+        "ship_types": [
+          "cargo_ship_non_tanker",
+          "tanker",
+          "bulk_carrier"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "SOLAS III",
+      "Regulation 31",
+      "cargo ship",
+      "lifeboat",
+      "liferaft",
+      "davit-launched",
+      "free-fall",
+      "survival craft",
+      "200%"
+    ],
+    "keywords_zh": [
+      "货船",
+      "救生艇",
+      "救生筏",
+      "吊架",
+      "自由降落",
+      "200%"
+    ],
+    "verify_queries": [
+      "cargo ship liferaft lifeboat requirement SOLAS",
+      "散货船需要多少救生筏",
+      "SOLAS III Reg 31 cargo ship davit liferaft"
+    ]
+  },
+  {
+    "id": "solas-iv-gmdss-structured",
+    "table_id": "SOLAS-IV-GMDSS",
+    "batch": 3,
+    "title": "SOLAS IV Reg 7-14: GMDSS Equipment Requirements by Sea Area",
+    "breadcrumb": "SOLAS > Chapter IV > Regulations 7-14 > GMDSS",
+    "text": "=== SOLAS IV Reg 7-14: GMDSS Equipment by Sea Area ===\n=== Applicable to: All SOLAS ships ===\n\nSea Area A1 (VHF range, ~20-30 nm from coast):\n  Required equipment:\n  - VHF radio with DSC (Digital Selective Calling)\n  - NAVTEX receiver (or EGC/HF MSI)\n  - Radar transponder (SART) or AIS-SART: at least 2\n  - EPIRB (406 MHz, satellite): 1, float-free\n  - 2-way VHF portable radios: at least 3\n\nSea Area A2 (MF range, ~100-150 nm from coast):\n  Required equipment:\n  - All A1 equipment PLUS:\n  - MF radio with DSC\n  - MF radiotelephony watch receiver\n\nSea Area A3 (INMARSAT geostationary satellite coverage, ~70°N-70°S):\n  Required equipment:\n  - All A1+A2 equipment PLUS:\n  - INMARSAT ship earth station (SES) — OR — MF/HF radio with DSC\n  - EGC receiver (if INMARSAT) or HF MSI receiver\n\nSea Area A4 (polar regions, beyond INMARSAT coverage):\n  Required equipment:\n  - All A1+A2 equipment PLUS:\n  - MF/HF radio installation with DSC\n  - HF direct-printing telegraphy\n  - HF MSI equipment\n\nALL areas — mandatory equipment:\n  - EPIRB 406 MHz (float-free, GNSS-equipped)\n  - SART or AIS-SART: ≥2\n  - 2-way VHF: ≥3 (≥2 for cargo ships <300 GT)\n  - VHF DSC watch on Ch 70 (automatic)\n\nLOOKUP INSTRUCTION: First identify sea area (A1/A2/A3/A4),\nthen look up required equipment for that area.",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "IV",
+      "regulation": "Regulations 7-14",
+      "section": "7-14",
+      "table_id": "SOLAS-IV-GMDSS",
+      "title": "GMDSS equipment requirements by sea area",
+      "content_type": "structured_table",
+      "table_type": "TYPE-C",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "SOLAS IV",
+      "GMDSS",
+      "VHF",
+      "MF",
+      "HF",
+      "DSC",
+      "EPIRB",
+      "SART",
+      "AIS-SART",
+      "INMARSAT",
+      "NAVTEX",
+      "sea area",
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "keywords_zh": [
+      "GMDSS",
+      "全球海上遇险和安全系统",
+      "航区",
+      "甚高频",
+      "中频",
+      "卫星应急示位标"
+    ],
+    "verify_queries": [
+      "GMDSS equipment sea area A3 SOLAS",
+      "A3航区需要什么通信设备",
+      "SOLAS IV GMDSS VHF DSC EPIRB"
+    ]
+  },
+  {
+    "id": "solas-v-reg19-navigation-structured",
+    "table_id": "SOLAS-V-Reg19-Navigation",
+    "batch": 3,
+    "title": "SOLAS V Reg 19: Navigation Equipment Requirements by Ship Size",
+    "breadcrumb": "SOLAS > Chapter V > Regulation 19 > Navigation equipment",
+    "text": "=== SOLAS V Reg 19: Navigation Equipment by Ship Size ===\n=== Applicable to: All SOLAS ships ===\n\nAll ships (Reg 19.2.1):\n  - Magnetic compass (or equivalent)\n  - Pelorus or compass bearing device\n  - Means of correcting heading and bearing\n  - Nautical charts and nautical publications (ECDIS or paper)\n  - Receiver for GNSS or terrestrial positioning\n  - Radar reflector (if <150 GT and practicable)\n  - Sound reception system (if enclosed bridge)\n  - Telephone to emergency steering position\n\nShips ≥150 GT (Reg 19.2.2):\n  Additional equipment:\n  - Echo-sounder\n\nShips ≥300 GT (Reg 19.2.3):\n  Additional equipment:\n  - 9 GHz radar (X-band)\n  - AIS (Automatic Identification System)\n  - Electronic plotting aid (EPA or equivalent)\n\nShips ≥500 GT (Reg 19.2.4):\n  Additional equipment:\n  - Gyrocompass (or equivalent)\n  - Gyrocompass heading repeater (at steering position)\n  - Gyrocompass bearing repeater\n  - Rudder angle indicator\n  - RPM indicator (for each propeller)\n  - Rate-of-turn indicator\n\nShips ≥3,000 GT (Reg 19.2.5):\n  Additional equipment:\n  - Second 3 GHz radar (S-band)\n  - Automatic tracking aid (ATA) or ARPA\n\nShips ≥10,000 GT (Reg 19.2.6):\n  Additional equipment:\n  - ARPA (Automatic Radar Plotting Aid) — on both radars\n  - Heading or track control system\n\nShips ≥50,000 GT (Reg 19.2.7):\n  Additional equipment:\n  - Rate-of-turn indicator\n  - Speed and distance measuring device (through water and over ground)\n\nECDIS requirement (Reg 19.2.10):\n  - Ships ≥10,000 GT on international voyages: ECDIS required\n  - Ships ≥3,000 GT: ECDIS required (phased-in by 2018)\n  - ECDIS counts as chart carriage requirement\n\nVDR/S-VDR (SOLAS V/18):\n  - Ships ≥3,000 GT (built after 2002): VDR required\n  - Cargo ships 3,000-20,000 GT (older): S-VDR acceptable\n  - All passenger ships: VDR required\n\nLOOKUP INSTRUCTION: First identify ship tonnage, then look up cumulative\nequipment requirements (each tier includes all lower-tier requirements).",
+    "metadata": {
+      "source": "SOLAS",
+      "chapter": "V",
+      "regulation": "Regulation 19",
+      "section": "19",
+      "table_id": "SOLAS-V-Reg19-Navigation",
+      "title": "Navigation equipment requirements by ship size",
+      "content_type": "structured_table",
+      "table_type": "TYPE-C",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "SOLAS V",
+      "Regulation 19",
+      "navigation equipment",
+      "radar",
+      "AIS",
+      "ECDIS",
+      "VDR",
+      "gyrocompass",
+      "ARPA",
+      "GNSS",
+      "echo sounder",
+      "150 GT",
+      "300 GT",
+      "500 GT",
+      "3000 GT",
+      "10000 GT",
+      "50000 GT"
+    ],
+    "keywords_zh": [
+      "航行设备",
+      "雷达",
+      "电子海图",
+      "陀螺罗经",
+      "自动识别系统",
+      "航行数据记录仪"
+    ],
+    "verify_queries": [
+      "navigation equipment 50000 GT SOLAS V",
+      "50000GT船需要什么航行设备",
+      "SOLAS V Reg 19 ECDIS AIS radar"
+    ]
+  },
+  {
+    "id": "stcw-viii-rest-hours-structured",
+    "table_id": "STCW-VIII-RestHours",
+    "batch": 3,
+    "title": "STCW Reg VIII & STCW Code A-VIII/1: Seafarer Rest Hours Requirements",
+    "breadcrumb": "STCW > Regulation VIII > Rest Hours",
+    "text": "=== STCW Reg VIII / Code A-VIII/1: Seafarer Rest Hours ===\n=== Applicable to: All watchkeeping personnel on STCW ships ===\n\nMinimum rest hours:\n  In any 24-hour period: ≥10 hours of rest\n  In any 7-day period: ≥77 hours of rest\n\nRest period structure:\n  - May be divided into no more than TWO periods\n  - One of the two periods must be at least 6 hours long\n  - The interval between consecutive rest periods must not exceed 14 hours\n\nExceptions (limited):\n  - Emergency drills: may be conducted during rest hours\n  - Call-out for safety reasons: rest hours may be interrupted\n  - Musters and fire-fighting drills prescribed by national law\n  - After interruption: compensatory rest period must be provided\n\nAdditional requirements:\n  - Records of daily hours of rest: maintained and endorsed\n  - Master must post watchkeeping schedule\n  - Records available for inspection by PSC\n\nILO MLC 2006 alignment:\n  - Maximum working hours alternative: ≤14 hours in any 24-hour period,\n    ≤72 hours in any 7-day period\n  - Flag State chooses either rest hours OR working hours system\n\nYoung seafarers (<18 years):\n  - Night work prohibited (between 2100-0600)\n  - Maximum 8 hours work per day\n\nIMPORTANT NOTES:\n- PSC frequently checks rest hour records — non-compliance is a deficiency\n- Records must be in the working language of the ship AND in English\n- Port State may detain a ship if crew is clearly fatigued\n\nLOOKUP INSTRUCTION:\n1. Minimum rest: ≥10h per 24h period, ≥77h per 7-day period\n2. Split: max 2 periods, one ≥6h, gap ≤14h",
+    "metadata": {
+      "source": "STCW",
+      "chapter": "VIII",
+      "regulation": "Regulation VIII / Code A-VIII/1",
+      "section": "VIII",
+      "table_id": "STCW-VIII-RestHours",
+      "title": "Seafarer rest hours requirements",
+      "content_type": "structured_table",
+      "table_type": "TYPE-B",
+      "applicability": {
+        "ship_types": [
+          "all"
+        ]
+      },
+      "data_verified": true,
+      "data_source": "imorules",
+      "last_updated": "2026-02-22"
+    },
+    "keywords_en": [
+      "STCW",
+      "Regulation VIII",
+      "rest hours",
+      "10 hours",
+      "77 hours",
+      "watchkeeping",
+      "fatigue",
+      "MLC",
+      "working hours",
+      "6 hours",
+      "14 hours",
+      "PSC"
+    ],
+    "keywords_zh": [
+      "休息时间",
+      "值班",
+      "疲劳",
+      "船员",
+      "工作时间",
+      "10小时",
+      "77小时"
+    ],
+    "verify_queries": [
+      "seafarer minimum rest hours STCW",
+      "船员最低休息时间",
+      "STCW rest hours 10 hours 77 hours"
+    ]
+  }
+]
